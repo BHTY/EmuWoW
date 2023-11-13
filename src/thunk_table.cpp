@@ -2713,7 +2713,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_wsprintfW, //0xa8f
 	thunk_SetRect, //0xa90
 	thunk_PtInRect, //0xa91
-	0, //0xa92
+	thunk_InflateRect, //0xa92
 	0, //0xa93
 	0, //0xa94
 	0, //0xa95
@@ -3642,7 +3642,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_lstrlenA, //0xe30
 	thunk_lstrlen, //0xe31
 	thunk_lstrlenW, //0xe32
-	0, //0xe33
+	thunk_InitializeCriticalSectionAndSpinCount, //0xe33
 	0, //0xe34
 	0, //0xe35
 	0, //0xe36

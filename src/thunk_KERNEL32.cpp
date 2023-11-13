@@ -3784,3 +3784,10 @@ int thunk_lstrlenW(CPU* cpu){
 	printf("\nCalling KERNEL32!lstrlenW(%p)", lpString);
 	return lstrlenW(lpString);
 }
+
+BOOL thunk_InitializeCriticalSectionAndSpinCount(CPU* cpu) {
+	LPCRITICAL_SECTION lpCriticalSection = cpu->fn_arg(cpu, 0);
+	DWORD dwSpinCount = cpu->fn_arg(cpu, 1);
+	printf("\nCalling KERNEL32!InitializeCriticalSectionAndSpinCount(%p, %p)", lpCriticalSection, dwSpinCount);
+	return InitializeCriticalSectionAndSpinCount(lpCriticalSection, dwSpinCount);
+}

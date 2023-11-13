@@ -566,3 +566,4 @@ LPWSTR thunk_lstrcpynW(CPU* cpu);
 int thunk_lstrlenA(CPU* cpu);
 int thunk_lstrlen(CPU* cpu);
 int thunk_lstrlenW(CPU* cpu);
+BOOL thunk_InitializeCriticalSectionAndSpinCount(CPU* cpu);

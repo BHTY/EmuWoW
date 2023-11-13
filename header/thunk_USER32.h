@@ -661,3 +661,4 @@ INT thunk_wsprintfA(CPU* cpu);
 INT thunk_wsprintfW(CPU* cpu);
 BOOL thunk_SetRect(CPU* cpu);
 BOOL thunk_PtInRect(CPU* cpu);
+BOOL thunk_InflateRect(CPU* cpu);

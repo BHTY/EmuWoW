@@ -3,7 +3,7 @@
 #include "cpu.h"
 #pragma warning(disable:4146)
 
-#define HEADLESS
+//#define HEADLESS
 //#define NO_DEBUGGER
 
 #ifdef HEADLESS
@@ -103,6 +103,8 @@ typedef struct {
 	};
 
 	int print_addr;
+
+	uint32_t base;
 } i386; //figure out how we're handling weird shit like segments & operand size overrides
 
 typedef struct {

@@ -4451,3 +4451,10 @@ BOOL thunk_PtInRect(CPU* cpu) {
 	printf("\nCalling USER32!PtInRect(%p, %p)", lprc, pt);
 	return PtInRect(lprc, *(POINT*)&pt);
 }
+BOOL thunk_InflateRect(CPU* cpu) {
+	LPRECT lprc = cpu->fn_arg(cpu, 0);
+	int dx = cpu->fn_arg(cpu, 1);
+	int dy = cpu->fn_arg(cpu, 2);
+	printf("\nCalling USER32!InflateRect(%p, %p, %p)", lprc, dx, dy);
+	return InflateRect(lprc, dx, dy);
+}

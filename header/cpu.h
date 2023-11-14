@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <winnt.h>
 #include <winternl.h>
+#include <varargs.h>
 
 typedef struct __PEB {
 	BYTE                          Reserved1[2];
@@ -43,9 +44,9 @@ typedef struct __TEB {
 typedef struct CPU {
 	INT (*step)(struct CPU*);
 	VOID(*set_params)(struct CPU*, INT, ...);
-	DWORD_PTR (*fn_arg)(struct CPU*, DWORD);
+	DWORD_PTR (*fn_arg)(struct CPU*, INT);
 
-	VOID (*set_ret_val)(struct CPU*, DWORD);
+	VOID (*set_ret_val)(struct CPU*, DWORD_PTR);
 	DWORD_PTR(*get_ret_val)(struct CPU*);
 
 	DWORD_PTR(*syscall_id)(struct CPU*);
@@ -53,13 +54,15 @@ typedef struct CPU {
 	VOID(*set_teb)(struct CPU*, PTEB);
 	_PTEB(*get_teb)(struct CPU*);
 
-	VOID (*set_ip)(struct CPU*, DWORD);
+	VOID (*set_ip)(struct CPU*, DWORD_PTR);
 	DWORD_PTR(*get_ip)(struct CPU*);
 
-	VOID (*set_sp)(struct CPU*, DWORD);
+	VOID (*set_sp)(struct CPU*, DWORD_PTR);
 	DWORD_PTR(*get_sp)(struct CPU*);
 
-	DWORD_PTR(*push_ra)(struct CPU*, DWORD);
+	DWORD_PTR(*push_ra)(struct CPU*, DWORD_PTR);
+
+	va_list(*get_va_list)(struct CPU*, DWORD_PTR);
 
 	int callback_depth;
 

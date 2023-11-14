@@ -1,0 +1,3 @@
+LIBRARY NTDLL
+EXPORTS
+	NtCreateFile @1

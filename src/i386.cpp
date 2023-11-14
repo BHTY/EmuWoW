@@ -7,8 +7,6 @@
 
 uint8_t escape_routine[3] = { 0xcd, 0xff, 0xc3 };
 
-DWORD EscapeVector = escape_routine;
-
 int log_instructions = 1;
 
 #ifndef HEADLESS
@@ -3263,7 +3261,11 @@ INT i386_step(i386_CPU* cpu) {
 	return 0;
 }
 
-CPU* AllocCPU() {
+va_list i386_get_va_list(i386_CPU* cpu, DWORD offset) {
+	return cpu->I386.esp + 4 + (offset * 4);
+}
+
+CPU* Alloc386() {
 	i386_CPU* cpu = malloc(sizeof(i386_CPU));
 	memset(cpu, 0, sizeof(i386_CPU));
 
@@ -3280,11 +3282,14 @@ CPU* AllocCPU() {
 	cpu->cpu.get_ret_val = i386_get_ret_val;
 	cpu->cpu.set_params = i386_set_params;
 	cpu->cpu.push_ra = i386_push_ra;
+	cpu->cpu.get_va_list = i386_get_va_list;
 
 	cpu->cpu.step = i386_step;
 
 	cpu->I386.operand_size = 1;
 	cpu->I386.print_addr = 1;
+
+	EscapeVector = escape_routine;
 
 	return cpu;
 }

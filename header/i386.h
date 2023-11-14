@@ -3,7 +3,7 @@
 #include "cpu.h"
 #pragma warning(disable:4146)
 
-//#define HEADLESS
+#define HEADLESS
 //#define NO_DEBUGGER
 
 #ifdef HEADLESS

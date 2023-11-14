@@ -33,7 +33,7 @@ UNICODE_STRING MakeUnicodeFromAnsi(LPSTR lpString) {
 }
 
 CPU* EmuCreateThread(PBYTE lpStartAddress, DWORD dwStackReserve, DWORD dwStackCommit, PEB* peb) {
-    CPU* cpu = AllocCPU();
+    CPU* cpu = Alloc386();
     _PTEB pTeb = malloc(sizeof(__TEB));
     cpu->set_teb(cpu, pTeb);
 

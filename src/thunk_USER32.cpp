@@ -3873,7 +3873,7 @@ INT thunk_wsprintfW(CPU* cpu){
 	LPCWSTR unnamedParam1 = cpu->fn_arg(cpu, 1);
 	printf("\nCalling USER32!wsprintfW(%p, %p)", unnamedParam0, unnamedParam1);
 
-	return wvsprintfW(unnamedParam0, unnamedParam1, cpu->get_sp(cpu) + 4 + 8);//wsprintfW(unnamedParam0, unnamedParam1);
+	return wvsprintfW(unnamedParam0, unnamedParam1, cpu->get_va_list(cpu, 2));// cpu->get_sp(cpu) + 4 + 8);//wsprintfW(unnamedParam0, unnamedParam1);
 }
 
 BOOL thunk_SetRect(CPU* cpu) {

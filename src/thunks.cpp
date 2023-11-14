@@ -14,6 +14,8 @@ ClassProcMap* classProcMapRoot = NULL;
 HWNDProcMap* hwndProcMapRoot = NULL;
 TimerProcMap* timerProcMapRoot = NULL;
 
+DWORD EscapeVector;
+
 VOID AddClassProcMapEntry(LPSTR lpClassName, DWORD WndProc) {
 	ClassProcMap* classProcMapEntry = malloc(sizeof(ClassProcMap));
 

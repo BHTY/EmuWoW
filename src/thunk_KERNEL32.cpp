@@ -2117,13 +2117,6 @@ SIZE_T thunk_HeapSize(CPU* cpu){
 	printf("\nCalling KERNEL32!HeapSize(%p, %p, %p)", hHeap, dwFlags, lpMem);
 	return HeapSize(hHeap, dwFlags, lpMem);
 }
-BOOL thunk_HeapSummary(CPU* cpu){
-	HANDLE hHeap = cpu->fn_arg(cpu, 0);
-	DWORD dwFlags = cpu->fn_arg(cpu, 1);
-	LPHEAP_SUMMARY lpSummary = cpu->fn_arg(cpu, 2);
-	printf("\nCalling KERNEL32!HeapSummary(%p, %p, %p)", hHeap, dwFlags, lpSummary);
-	return HeapSummary(hHeap, dwFlags, lpSummary);
-}
 BOOL thunk_HeapUnlock(CPU* cpu){
 	HANDLE hHeap = cpu->fn_arg(cpu, 0);
 	printf("\nCalling KERNEL32!HeapUnlock(%p)", hHeap);

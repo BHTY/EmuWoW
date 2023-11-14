@@ -2061,16 +2061,16 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_ChangeDisplaySettingsExW, //0x803
 	thunk_CreateDesktopA, //0x804
 	thunk_CreateDesktopW, //0x805
-	thunk_DisplayConfigGetDeviceInfo, //0x806
+	NULL, //0x806
 	thunk_EnumDisplayDevicesA, //0x807
 	thunk_EnumDisplayDevicesW, //0x808
 	thunk_EnumDisplaySettingsA, //0x809
 	thunk_EnumDisplaySettingsW, //0x80a
 	thunk_EnumDisplaySettingsExA, //0x80b
 	thunk_EnumDisplaySettingsExW, //0x80c
-	thunk_GetDisplayConfigBufferSizes, //0x80d
+	NULL, //0x80d
 	thunk_UpdateLayeredWindow, //0x80e
-	thunk_UpdateLayeredWindowIndirect, //0x80f
+	NULL, //0x80f
 	thunk_ActivateKeyboardLayout, //0x810
 	thunk_AdjustWindowRect, //0x811
 	thunk_AdjustWindowRectEx, //0x812
@@ -2094,8 +2094,8 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_ChangeClipboardChain, //0x824
 	thunk_ChangeMenuA, //0x825
 	thunk_ChangeMenuW, //0x826
-	thunk_ChangeWindowMessageFilter, //0x827
-	thunk_ChangeWindowMessageFilterEx, //0x828
+	NULL, //0x827
+	NULL, //0x828
 	thunk_CharLowerA, //0x829
 	thunk_CharLowerW, //0x82a
 	thunk_CharLowerBuffA, //0x82b
@@ -2124,8 +2124,8 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_ClipCursor, //0x842
 	thunk_CloseClipboard, //0x843
 	thunk_CloseDesktop, //0x844
-	thunk_CloseTouchInputHandle, //0x845
-	thunk_CloseGestureInfoHandle, //0x846
+	NULL, //0x845
+	NULL, //0x846
 	thunk_CloseWindow, //0x847
 	thunk_CloseWindowStation, //0x848
 	thunk_CopyAcceleratorTableA, //0x849
@@ -2154,7 +2154,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_CreateWindowStationW, //0x860
 	thunk_CreateMDIWindowA, //0x861
 	thunk_CreateMDIWindowW, //0x862
-	thunk_CreateSyntheticPointerDevice, //0x863
+	NULL, //0x863
 	thunk_DefDlgProcA, //0x864
 	thunk_DefDlgProcW, //0x865
 	thunk_DeferWindowPos, //0x866
@@ -2172,7 +2172,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_DestroyCursor, //0x872
 	thunk_DestroyIcon, //0x873
 	thunk_DestroyMenu, //0x874
-	thunk_DestroySyntheticPointerDevice, //0x875
+	NULL, //0x875
 	thunk_DestroyWindow, //0x876
 	thunk_DialogBoxIndirectParamA, //0x877
 	thunk_DialogBoxIndirectParamW, //0x878
@@ -2207,8 +2207,8 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_DrawTextExW, //0x895
 	thunk_EmptyClipboard, //0x896
 	thunk_EnableMenuItem, //0x897
-	thunk_EnableMouseInPointer, //0x898
-	thunk_EnableNonClientDpiScaling, //0x899
+	NULL, //0x898
+	NULL, //0x899
 	thunk_EnableScrollBar, //0x89a
 	thunk_EnableWindow, //0x89b
 	thunk_EndDeferWindowPos, //0x89c
@@ -2229,8 +2229,8 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_EnumWindows, //0x8ab
 	thunk_EnumWindowStationsA, //0x8ac
 	thunk_EnumWindowStationsW, //0x8ad
-	thunk_EvaluateProximityToRect, //0x8ae
-	thunk_EvaluateProximityToPolygon, //0x8af
+	NULL, //0x8ae
+	NULL, //0x8af
 	thunk_ExcludeUpdateRgn, //0x8b0
 	thunk_ExitWindowsEx, //0x8b1
 	thunk_FillRect, //0x8b2
@@ -2246,8 +2246,8 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_GetAltTabInfoW, //0x8bc
 	thunk_GetAncestor, //0x8bd
 	thunk_GetAsyncKeyState, //0x8be
-	thunk_GetAutoRotationState, //0x8bf
-	thunk_GetAwarenessFromDpiAwarenessContext, //0x8c0
+	NULL, //0x8bf
+	NULL, //0x8c0
 	thunk_GetCapture, //0x8c1
 	thunk_GetCaretBlinkTime, //0x8c2
 	thunk_GetCaretPos, //0x8c3
@@ -2269,7 +2269,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_GetClipboardViewer, //0x8d3
 	thunk_GetClipCursor, //0x8d4
 	thunk_GetComboBoxInfo, //0x8d5
-	thunk_GetCurrentInputMessageSource, //0x8d6
+	NULL, //0x8d6
 	thunk_GetCursor, //0x8d7
 	thunk_GetCursorInfo, //0x8d8
 	thunk_GetCursorPos, //0x8d9
@@ -2277,25 +2277,25 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_GetDCEx, //0x8db
 	thunk_GetDesktopWindow, //0x8dc
 	thunk_GetDialogBaseUnits, //0x8dd
-	thunk_GetDisplayAutoRotationPreferences, //0x8de
+	NULL, //0x8de
 	thunk_GetDlgCtrlID, //0x8df
 	thunk_GetDlgItem, //0x8e0
 	thunk_GetDlgItemInt, //0x8e1
 	thunk_GetDlgItemTextA, //0x8e2
 	thunk_GetDlgItemTextW, //0x8e3
 	thunk_GetDoubleClickTime, //0x8e4
-	thunk_GetDpiForWindow, //0x8e5
-	thunk_GetDpiForSystem, //0x8e6
+	NULL, //0x8e5
+	NULL, //0x8e6
 	thunk_GetFocus, //0x8e7
 	thunk_GetForegroundWindow, //0x8e8
-	thunk_GetGestureConfig, //0x8e9
-	thunk_GetGestureExtraArgs, //0x8ea
-	thunk_GetGestureInfo, //0x8eb
+	NULL, //0x8e9
+	NULL, //0x8ea
+	NULL, //0x8eb
 	thunk_GetGUIThreadInfo, //0x8ec
 	thunk_GetGuiResources, //0x8ed
 	thunk_GetIconInfo, //0x8ee
-	thunk_GetIconInfoExA, //0x8ef
-	thunk_GetIconInfoExW, //0x8f0
+	NULL, //0x8ef
+	NULL, //0x8f0
 	thunk_GetInputState, //0x8f1
 	thunk_GetKBCodePage, //0x8f2
 	thunk_GetKeyboardLayout, //0x8f3
@@ -2342,33 +2342,33 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_GetNextDlgTabItem, //0x91c
 	thunk_GetOpenClipboardWindow, //0x91d
 	thunk_GetParent, //0x91e
-	thunk_GetPhysicalCursorPos, //0x91f
-	thunk_GetPointerDevice, //0x920
-	thunk_GetPointerDeviceCursors, //0x921
-	thunk_GetPointerDeviceProperties, //0x922
-	thunk_GetPointerDeviceRects, //0x923
-	thunk_GetPointerDevices, //0x924
-	thunk_GetPointerInputTransform, //0x925
-	thunk_GetPointerPenInfo, //0x926
-	thunk_GetPointerPenInfoHistory, //0x927
-	thunk_GetPointerFramePenInfo, //0x928
-	thunk_GetPointerFramePenInfoHistory, //0x929
-	thunk_GetPointerType, //0x92a
-	thunk_GetPointerCursorId, //0x92b
-	thunk_GetPointerInfo, //0x92c
-	thunk_GetPointerInfoHistory, //0x92d
-	thunk_GetPointerFrameInfo, //0x92e
-	thunk_GetPointerFrameInfoHistory, //0x92f
-	thunk_GetPointerTouchInfo, //0x930
-	thunk_GetPointerTouchInfoHistory, //0x931
-	thunk_GetPointerFrameTouchInfo, //0x932
-	thunk_GetPointerFrameTouchInfoHistory, //0x933
+	NULL, //0x91f
+	NULL, //0x920
+	NULL, //0x921
+	NULL, //0x922
+	NULL, //0x923
+	NULL, //0x924
+	NULL, //0x925
+	NULL, //0x926
+	NULL, //0x927
+	NULL, //0x928
+	NULL, //0x929
+	NULL, //0x92a
+	NULL, //0x92b
+	NULL, //0x92c
+	NULL, //0x92d
+	NULL, //0x92e
+	NULL, //0x92f
+	NULL, //0x930
+	NULL, //0x931
+	NULL, //0x932
+	NULL, //0x933
 	thunk_GetPriorityClipboardFormat, //0x934
 	thunk_GetProcessDefaultLayout, //0x935
 	thunk_GetPropA, //0x936
 	thunk_GetPropW, //0x937
 	thunk_GetQueueStatus, //0x938
-	thunk_GetRawPointerDeviceData, //0x939
+	NULL, //0x939
 	thunk_GetScrollInfo, //0x93a
 	thunk_GetScrollBarInfo, //0x93b
 	thunk_GetScrollPos, //0x93c
@@ -2379,26 +2379,26 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_GetSysColorBrush, //0x941
 	thunk_GetSystemMenu, //0x942
 	thunk_GetSystemMetrics, //0x943
-	thunk_GetSystemMetricsForDpi, //0x944
+	NULL, //0x944
 	thunk_GetTabbedTextExtentA, //0x945
 	thunk_GetTabbedTextExtentW, //0x946
 	thunk_GetTitleBarInfo, //0x947
 	thunk_GetThreadDesktop, //0x948
-	thunk_GetThreadDpiAwarenessContext, //0x949
+	NULL, //0x949
 	thunk_GetTopWindow, //0x94a
-	thunk_GetTouchInputInfo, //0x94b
+	NULL, //0x94b
 	thunk_GetUpdateRect, //0x94c
 	thunk_GetUpdateRgn, //0x94d
-	thunk_GetUpdatedClipboardFormats, //0x94e
+	NULL, //0x94e
 	thunk_GetUserObjectInformationA, //0x94f
 	thunk_GetUserObjectInformationW, //0x950
 	thunk_GetUserObjectSecurity, //0x951
 	thunk_GetWindow, //0x952
 	thunk_GetWindowContextHelpId, //0x953
 	thunk_GetWindowDC, //0x954
-	thunk_GetWindowDisplayAffinity, //0x955
-	thunk_GetWindowDpiAwarenessContext, //0x956
-	thunk_GetWindowFeedbackSetting, //0x957
+	NULL, //0x955
+	NULL, //0x956
+	NULL, //0x957
 	thunk_GetWindowInfo, //0x958
 	thunk_GetWindowLongA, //0x959
 	thunk_GetWindowLongW, //0x95a
@@ -2419,9 +2419,9 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_GrayStringW, //0x969
 	thunk_HideCaret, //0x96a
 	thunk_HiliteMenuItem, //0x96b
-	thunk_InitializeTouchInjection, //0x96c
-	thunk_InjectSyntheticPointerInput, //0x96d
-	thunk_InjectTouchInput, //0x96e
+	NULL, //0x96c
+	NULL, //0x96d
+	NULL, //0x96e
 	thunk_InSendMessage, //0x96f
 	thunk_InSendMessageEx, //0x970
 	thunk_InsertMenuA, //0x971
@@ -2450,10 +2450,10 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_IsHungAppWindow, //0x988
 	thunk_IsIconic, //0x989
 	thunk_IsMenu, //0x98a
-	thunk_IsMouseInPointerEnabled, //0x98b
-	thunk_IsProcessDPIAware, //0x98c
-	thunk_IsTouchWindow, //0x98d
-	thunk_IsValidDpiAwarenessContext, //0x98e
+	NULL, //0x98b
+	NULL, //0x98c
+	NULL, //0x98d
+	NULL, //0x98e
 	thunk_IsWinEventHookInstalled, //0x98f
 	thunk_IsWindow, //0x990
 	thunk_IsWindowEnabled, //0x991
@@ -2481,8 +2481,8 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_LoadMenuIndirectW, //0x9a7
 	thunk_LoadStringA, //0x9a8
 	thunk_LoadStringW, //0x9a9
-	thunk_LogicalToPhysicalPoint, //0x9aa
-	thunk_LogicalToPhysicalPointForPerMonitorDPI, //0x9ab
+	NULL, //0x9aa
+	NULL, //0x9ab
 	thunk_LockSetForegroundWindow, //0x9ac
 	thunk_LockWindowUpdate, //0x9ad
 	thunk_LockWorkStation, //0x9ae
@@ -2524,11 +2524,11 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_OpenWindowStationA, //0x9d2
 	thunk_OpenWindowStationW, //0x9d3
 	thunk_PaintDesktop, //0x9d4
-	thunk_PackTouchHitTestingProximityEvaluation, //0x9d5
+	NULL, //0x9d5
 	thunk_PeekMessageA, //0x9d6
 	thunk_PeekMessageW, //0x9d7
-	thunk_PhysicalToLogicalPoint, //0x9d8
-	thunk_PhysicalToLogicalPointForPerMonitorDPI, //0x9d9
+	NULL, //0x9d8
+	NULL, //0x9d9
 	thunk_PostMessageA, //0x9da
 	thunk_PostMessageW, //0x9db
 	thunk_PostQuitMessage, //0x9dc
@@ -2550,20 +2550,20 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_RegisterDeviceNotificationA, //0x9ec
 	thunk_RegisterDeviceNotificationW, //0x9ed
 	thunk_RegisterHotKey, //0x9ee
-	thunk_RegisterPointerDeviceNotifications, //0x9ef
-	thunk_RegisterPointerInputTarget, //0x9f0
-	thunk_RegisterPointerInputTargetEx, //0x9f1
-	thunk_RegisterPowerSettingNotification, //0x9f2
+	NULL, //0x9ef
+	NULL, //0x9f0
+	NULL, //0x9f1
+	NULL, //0x9f2
 	thunk_RegisterRawInputDevices, //0x9f3
 	thunk_RegisterShellHookWindow, //0x9f4
-	thunk_RegisterSuspendResumeNotification, //0x9f5
-	thunk_RegisterTouchHitTestingWindow, //0x9f6
-	thunk_RegisterTouchWindow, //0x9f7
+	NULL, //0x9f5
+	NULL, //0x9f6
+	NULL, //0x9f7
 	thunk_RegisterWindowMessageA, //0x9f8
 	thunk_RegisterWindowMessageW, //0x9f9
 	thunk_ReleaseCapture, //0x9fa
 	thunk_ReleaseDC, //0x9fb
-	thunk_RemoveClipboardFormatListener, //0x9fc
+	NULL, //0x9fc
 	thunk_RemoveMenu, //0x9fd
 	thunk_RemovePropA, //0x9fe
 	thunk_RemovePropW, //0x9ff
@@ -2592,7 +2592,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_SetClassWord, //0xa16
 	thunk_SetClipboardData, //0xa17
 	thunk_SetClipboardViewer, //0xa18
-	thunk_SetCoalescableTimer, //0xa19
+	NULL, //0xa19
 	thunk_SetCursor, //0xa1a
 	thunk_SetCursorPos, //0xa1b
 	thunk_SetDebugErrorLevel, //0xa1c
@@ -2602,7 +2602,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_SetDoubleClickTime, //0xa20
 	thunk_SetFocus, //0xa21
 	thunk_SetForegroundWindow, //0xa22
-	thunk_SetGestureConfig, //0xa23
+	NULL, //0xa23
 	thunk_SetKeyboardState, //0xa24
 	thunk_SetLastErrorEx, //0xa25
 	thunk_SetLayeredWindowAttributes, //0xa26
@@ -2616,10 +2616,10 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_SetMessageExtraInfo, //0xa2e
 	thunk_SetMessageQueue, //0xa2f
 	thunk_SetParent, //0xa30
-	thunk_SetPhysicalCursorPos, //0xa31
-	thunk_SetProcessDPIAware, //0xa32
+	NULL, //0xa31
+	NULL, //0xa32
 	thunk_SetProcessDefaultLayout, //0xa33
-	thunk_SetProcessDpiAwarenessContext, //0xa34
+	NULL, //0xa34
 	thunk_SetProcessWindowStation, //0xa35
 	thunk_SetPropA, //0xa36
 	thunk_SetPropW, //0xa37
@@ -2628,14 +2628,14 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_SetScrollRange, //0xa3a
 	thunk_SetSystemCursor, //0xa3b
 	thunk_SetThreadDesktop, //0xa3c
-	thunk_SetThreadDpiAwarenessContext, //0xa3d
+	NULL, //0xa3d
 	thunk_SetTimer, //0xa3e
 	thunk_SetUserObjectInformationA, //0xa3f
 	thunk_SetUserObjectInformationW, //0xa40
 	thunk_SetUserObjectSecurity, //0xa41
 	thunk_SetWindowContextHelpId, //0xa42
-	thunk_SetWindowDisplayAffinity, //0xa43
-	thunk_SetWindowFeedbackSetting, //0xa44
+	NULL, //0xa43
+	NULL, //0xa44
 	thunk_SetWindowLongA, //0xa45
 	thunk_SetWindowLongW, //0xa46
 	thunk_SetWindowPlacement, //0xa47
@@ -2655,16 +2655,16 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_ShowOwnedPopups, //0xa55
 	thunk_ShowWindow, //0xa56
 	thunk_ShowWindowAsync, //0xa57
-	thunk_ShutdownBlockReasonCreate, //0xa58
-	thunk_ShutdownBlockReasonDestroy, //0xa59
-	thunk_SkipPointerFrameMessages, //0xa5a
+	NULL, //0xa58
+	NULL, //0xa59
+	NULL, //0xa5a
 	thunk_SubtractRect, //0xa5b
 	thunk_SwapMouseButton, //0xa5c
 	thunk_SwitchDesktop, //0xa5d
 	thunk_SwitchToThisWindow, //0xa5e
 	thunk_SystemParametersInfoA, //0xa5f
 	thunk_SystemParametersInfoW, //0xa60
-	thunk_SystemParametersInfoForDpi, //0xa61
+	NULL, //0xa61
 	thunk_TabbedTextOutA, //0xa62
 	thunk_TabbedTextOutW, //0xa63
 	thunk_TileWindows, //0xa64
@@ -2688,11 +2688,11 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_UnregisterClassW, //0xa76
 	thunk_UnregisterDeviceNotification, //0xa77
 	thunk_UnregisterHotKey, //0xa78
-	thunk_UnregisterPointerInputTarget, //0xa79
-	thunk_UnregisterPointerInputTargetEx, //0xa7a
-	thunk_UnregisterPowerSettingNotification, //0xa7b
-	thunk_UnregisterSuspendResumeNotification, //0xa7c
-	thunk_UnregisterTouchWindow, //0xa7d
+	NULL, //0xa79
+	NULL, //0xa7a
+	NULL, //0xa7b
+	NULL, //0xa7c
+	NULL, //0xa7d
 	thunk_UpdateWindow, //0xa7e
 	thunk_UserHandleGrantAccess, //0xa7f
 	thunk_ValidateRect, //0xa80
@@ -3392,7 +3392,7 @@ DWORD_PTR(*thunk_table[4096])(CPU*) = {
 	thunk_HeapLock, //0xd36
 	thunk_HeapReAlloc, //0xd37
 	thunk_HeapSize, //0xd38
-	thunk_HeapSummary, //0xd39
+	NULL, //0xd39
 	thunk_HeapUnlock, //0xd3a
 	thunk_HeapValidate, //0xd3b
 	thunk_HeapWalk, //0xd3c

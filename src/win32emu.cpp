@@ -34,7 +34,7 @@ UNICODE_STRING MakeUnicodeFromAnsi(LPSTR lpString) {
 
 CPU* EmuCreateThread(PBYTE lpStartAddress, DWORD dwStackReserve, DWORD dwStackCommit, PEB* peb) {
     CPU* cpu = AllocCPU();
-    PTEB pTeb = malloc(sizeof(TEB));
+    _PTEB pTeb = malloc(sizeof(__TEB));
     cpu->set_teb(cpu, pTeb);
 
     //allocate stack
@@ -60,7 +60,7 @@ CPU* EmuCreateThread(PBYTE lpStartAddress, DWORD dwStackReserve, DWORD dwStackCo
 }
 
 VOID EmuInitProcessOld(LPCSTR lpApplicationName, LPSTR lpCommandLine) {
-    PEB* peb = malloc(sizeof(PEB));
+    __PEB* peb = malloc(sizeof(PEB));
     memset(peb, 0, sizeof(PEB));
     
     PRTL_USER_PROCESS_PARAMETERS lpProcParams = malloc(sizeof(RTL_USER_PROCESS_PARAMETERS));

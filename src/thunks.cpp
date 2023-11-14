@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include "thunks.h"
 #include <windows.h>
-#include <errhandlingapi.h>
+//#include <errhandlingapi.h>
 #include <winbase.h>
 
 //#define printf(...)

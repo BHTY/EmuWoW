@@ -68,6 +68,19 @@ void cpu_movsd(i386* cpu) {
 	}
 }
 
+void cpu_movsw(i386* cpu) {
+	*(uint16_t*)virtual_to_physical_addr(cpu, cpu->edi) = *(uint16_t*)virtual_to_physical_addr(cpu, cpu->esi);
+
+	if (cpu->eflags & 0x400) {
+		cpu->edi -= 2;
+		cpu->esi -= 2;
+	}
+	else {
+		cpu->edi += 2;
+		cpu->esi += 2;
+	}
+}
+
 void cpu_movsb(i386* cpu) {
 	*(uint8_t*)virtual_to_physical_addr(cpu, cpu->edi) = *(uint8_t*)virtual_to_physical_addr(cpu, cpu->esi);
 
@@ -191,6 +204,10 @@ uint32_t alu_ror32(i386* cpu, uint32_t a, uint8_t shamt) { //flags
 	return (a >> shamt) | (a << (32 - shamt));
 }
 
+uint32_t alu_rol32(i386* cpu, uint32_t a, uint8_t shamt) { //flags
+	return (a << shamt) | (a >> (32 - shamt));
+}
+
 uint32_t alu_rcr32(i386* cpu, uint32_t a, uint8_t shamt) { //flags
 	uint64_t x = (a) | ((uint64_t)(cpu->eflags & 0x1) << 32);
 	uint64_t n = ((x >> shamt) | (x << (33 - shamt)));
@@ -295,6 +312,11 @@ uint32_t alu_xor32(i386* cpu, uint32_t a, uint32_t b) { //also has to set flags
 	return result;
 }
 
+uint16_t alu_xor16(i386* cpu, uint16_t a, uint16_t b) { //also has to set flags
+	uint16_t result = a ^ b;
+	return result;
+}
+
 uint8_t alu_xor8(i386* cpu, uint8_t a, uint8_t b) { //also has to set flags
 	uint8_t result = a ^ b;
 	return result;
@@ -339,12 +361,12 @@ void cpu_adc16(i386* cpu, uint16_t* dst_ptr, uint16_t* src_ptr) {
 }
 
 void cpu_sbb16(i386* cpu, uint16_t* dst_ptr, uint16_t* src_ptr) {
-	printf("16-bit subtract with borrow is unimplemented!");
+	*dst_ptr = alu_sub16(cpu, *dst_ptr, *src_ptr + (cpu->eflags & 0x1));
 	//cpu->running = 0;
 }
 
 void cpu_and16(i386* cpu, uint16_t* dst_ptr, uint16_t* src_ptr) {
-	printf("16-bit AND is unimplemented!");
+	*dst_ptr = alu_and16(cpu, *dst_ptr, *src_ptr);
 	//cpu->running = 0;
 }
 
@@ -354,7 +376,7 @@ void cpu_sub16(i386* cpu, uint16_t* dst_ptr, uint16_t* src_ptr) {
 }
 
 void cpu_xor16(i386* cpu, uint16_t* dst_ptr, uint16_t* src_ptr) {
-	printf("16-bit XOR is unimplemented!");
+	*dst_ptr = alu_xor16(cpu, *dst_ptr, *src_ptr);
 	//cpu->running = 0;
 }
 
@@ -438,8 +460,9 @@ void cpu_dec32(i386* cpu, uint32_t* dst_ptr) {
 }
 
 void cpu_inc16(i386* cpu, uint16_t* dst_ptr) {
-	printf("16-bit increment is unimplemented!");
-	//cpu->running = 0;
+	(*dst_ptr)++;
+	cpu_set_zf(cpu, *dst_ptr);
+	cpu_set_sf(cpu, *dst_ptr);
 }
 
 void cpu_dec16(i386* cpu, uint16_t* dst_ptr) {
@@ -471,6 +494,10 @@ void cpu_ror32(i386* cpu, uint32_t* dst_ptr, uint8_t shamt) {
 	*dst_ptr = alu_ror32(cpu, *dst_ptr, shamt);
 }
 
+void cpu_rol32(i386* cpu, uint32_t* dst_ptr, uint8_t shamt) {
+	*dst_ptr = alu_rol32(cpu, *dst_ptr, shamt);
+}
+
 void cpu_rcr32(i386* cpu, uint32_t* dst_ptr, uint8_t shamt) {
 	*dst_ptr = alu_rcr32(cpu, *dst_ptr, shamt);
 }
@@ -489,7 +516,7 @@ void cpu_adc8(i386* cpu, uint8_t* dst_ptr, uint8_t* src_ptr) {
 }
 
 void cpu_sbb8(i386* cpu, uint8_t* dst_ptr, uint8_t* src_ptr) {
-	printf("8-bit subtract with borrow is unimplemented!");
+	*dst_ptr = alu_sub16(cpu, *dst_ptr, *src_ptr + (cpu->eflags & 0x1));
 	//cpu->running = 0;
 }
 
@@ -520,7 +547,7 @@ const char* mul_family_names[8] = { "TEST", NULL, "NOT", "NEG", "MUL", "IMUL", "
 const char* shift_family_names[8] = { "ROL", "ROR", "RCL", "RCR", "SHL", "SHR", "???", "SAR" };
 void(*shift_family_fns_8[8])(i386*, uint8_t*, uint8_t) = { 0, 0, 0, 0, 0, 0, 0, cpu_sar8 };
 void(*shift_family_fns_16[8])(i386*, uint16_t*, uint8_t) = { 0, 0, 0, 0, cpu_shl16, cpu_shr16, 0, cpu_sar16 };
-void(*shift_family_fns_32[8])(i386*, uint32_t*, uint8_t) = { 0, cpu_ror32, 0, cpu_rcr32, cpu_shl32, cpu_shr32, 0, cpu_sar32 };
+void(*shift_family_fns_32[8])(i386*, uint32_t*, uint8_t) = { cpu_rol32, cpu_ror32, 0, cpu_rcr32, cpu_shl32, cpu_shr32, 0, cpu_sar32 };
 
 void cpu_push16(i386* cpu, uint16_t* val) {
 	cpu->esp -= 2;
@@ -682,6 +709,17 @@ uint32_t calc_modrm_addr(i386* cpu, uint8_t modrm) {
 	return addr + cpu->base;
 }
 
+void op_00(i386* cpu) { //ADD r/m8, r8
+	get_modrm();
+	cpu->eip += 2;
+	printf("ADD ");
+	get_modrm_dst_ptr_8(1);
+	get_modrm_src_reg_8();
+
+	printf("%s", reg_names_8[REG(modrm)]);
+	cpu_add8(cpu, (uint8_t*)dst_ptr, (uint8_t*)src_ptr);
+}
+
 void op_01(i386* cpu) { //ADD r/m16/32, r16/32
 	get_modrm();
 	cpu->eip += 2;
@@ -802,6 +840,33 @@ void op_1B(i386* cpu) { //sbb r16/32, r/m16/32
 		break;
 	case 1:
 		cpu_sbb32(cpu, src_ptr, dst_ptr);
+		break;
+	}
+}
+
+void op_1C(i386* cpu) {
+	cpu->eip++;
+	uint8_t* imm = virtual_to_physical_addr(cpu, cpu->eip);
+	printf("SBB AL, %02x", *imm);
+	cpu_sbb8(cpu, &(cpu->al), imm);
+	cpu->eip++;
+}
+
+void op_1D(i386* cpu) {
+	cpu->eip++;
+	uint32_t* imm = virtual_to_physical_addr(cpu, cpu->eip);
+	printf("SBB ");
+
+	switch (cpu->operand_size) {
+	case 0:
+		printf("AX, %04x", *(uint16_t*)imm);
+		cpu_sbb16(cpu, &(cpu->ax), imm);
+		cpu->eip += 2;
+		break;
+	case 1:
+		printf("EAX, %08x", *imm);
+		cpu_sbb32(cpu, &(cpu->eax), imm);
+		cpu->eip += 4;
 		break;
 	}
 }
@@ -1834,6 +1899,25 @@ void op_A3(i386* cpu) { //MOV [imm32], eax
 	cpu->eip += 4;
 }
 
+void op_A4(i386* cpu) {
+	cpu->eip++;
+	printf("MOVSB");
+	cpu_movsb(cpu);
+}
+
+void op_A5(i386* cpu) {
+	cpu->eip++;
+
+	if (cpu->operand_size) {
+		cpu_movsd(cpu);
+		printf("MOVSD");
+	}
+	else {
+		cpu_movsw(cpu);
+		printf("MOVSW");
+	}
+}
+
 void op_A8(i386* cpu) { //TEST AL, imm
 	cpu->eip++;
 	uint8_t imm = *virtual_to_physical_addr(cpu, cpu->eip);
@@ -2383,6 +2467,11 @@ void op_F7(i386* cpu) {
 	}
 }
 
+void op_FA(i386* cpu) {
+	printf("???");
+	cpu->eip++;
+}
+
 void op_FE(i386* cpu) { //???
 	get_modrm();
 	print_modrm();
@@ -2466,6 +2555,20 @@ void extended_op_94(i386* cpu) {
 	}
 	else {
 		*(uint8_t*)dst_ptr = 0;
+	}
+}
+
+void extended_op_95(i386* cpu) {
+	printf("SETNE ");
+	get_modrm();
+	cpu->eip += 2;
+	get_modrm_dst_ptr_8(0);
+
+	if (cpu->eflags & 0x400) {
+		*(uint8_t*)dst_ptr = 0;
+	}
+	else {
+		*(uint8_t*)dst_ptr = 1;
 	}
 }
 
@@ -2717,7 +2820,7 @@ void(*extended_op_table[256])(i386* cpu) = {
 	0, //0x92
 	0, //0x93
 	extended_op_94, //0x94
-	0, //0x95
+	extended_op_95, //0x95
 	0, //0x96
 	0, //0x97
 	0, //0x98
@@ -2827,7 +2930,7 @@ void(*extended_op_table[256])(i386* cpu) = {
 };
 
 void(*op_table[256])(i386* cpu) = {
-	0, //0x0
+	op_00, //0x0
 	op_01, //0x1
 	0, //0x2
 	op_03, //0x3
@@ -2855,8 +2958,8 @@ void(*op_table[256])(i386* cpu) = {
 	0, //0x19
 	0, //0x1a
 	op_1B, //0x1b
-	0, //0x1c
-	0, //0x1d
+	op_1C, //0x1c
+	op_1D, //0x1d
 	0, //0x1e
 	0, //0x1f
 	0, //0x20
@@ -2991,8 +3094,8 @@ void(*op_table[256])(i386* cpu) = {
 	op_A1, //0xa1
 	op_A2, //0xa2
 	op_A3, //0xa3
-	0, //0xa4
-	0, //0xa5
+	op_A4, //0xa4
+	op_A5, //0xa5
 	0, //0xa6
 	0, //0xa7
 	op_A8, //0xa8
@@ -3077,7 +3180,7 @@ void(*op_table[256])(i386* cpu) = {
 	op_F7, //0xf7
 	0, //0xf8
 	0, //0xf9
-	0, //0xfa
+	op_FA, //0xfa
 	0, //0xfb
 	0, //0xfc
 	0, //0xfd

@@ -53,11 +53,6 @@ HDESK thunk_CreateDesktopW(CPU* cpu){
 	printf("\nCalling USER32!CreateDesktopW(%p, %p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5);
 	return CreateDesktopW(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5);
 }
-LONG thunk_DisplayConfigGetDeviceInfo(CPU* cpu){
-	DISPLAYCONFIG_DEVICE_INFO_HEADER * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!DisplayConfigGetDeviceInfo(%p)", unnamedParam0);
-	return DisplayConfigGetDeviceInfo(unnamedParam0);
-}
 BOOL thunk_EnumDisplayDevicesA(CPU* cpu){
 	LPCSTR unnamedParam0 = cpu->fn_arg(cpu, 0);
 	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -104,13 +99,6 @@ BOOL thunk_EnumDisplaySettingsExW(CPU* cpu){
 	printf("\nCalling USER32!EnumDisplaySettingsExW(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 	return EnumDisplaySettingsExW(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 }
-LONG thunk_GetDisplayConfigBufferSizes(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT32 * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetDisplayConfigBufferSizes(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetDisplayConfigBufferSizes(unnamedParam0, unnamedParam1, unnamedParam2);
-}
 BOOL thunk_UpdateLayeredWindow(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	HDC unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -123,12 +111,6 @@ BOOL thunk_UpdateLayeredWindow(CPU* cpu){
 	DWORD unnamedParam8 = cpu->fn_arg(cpu, 8);
 	printf("\nCalling USER32!UpdateLayeredWindow(%p, %p, %p, %p, %p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5, unnamedParam6, unnamedParam7, unnamedParam8);
 	return UpdateLayeredWindow(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5, unnamedParam6, unnamedParam7, unnamedParam8);
-}
-BOOL thunk_UpdateLayeredWindowIndirect(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UPDATELAYEREDWINDOWINFO const * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!UpdateLayeredWindowIndirect(%p, %p)", unnamedParam0, unnamedParam1);
-	return UpdateLayeredWindowIndirect(unnamedParam0, unnamedParam1);
 }
 HKL thunk_ActivateKeyboardLayout(CPU* cpu){
 	HKL unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -296,20 +278,6 @@ BOOL thunk_ChangeMenuW(CPU* cpu){
 	UINT unnamedParam4 = cpu->fn_arg(cpu, 4);
 	printf("\nCalling USER32!ChangeMenuW(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
 	return ChangeMenuW(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-}
-BOOL thunk_ChangeWindowMessageFilter(CPU* cpu){
-	UINT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!ChangeWindowMessageFilter(%p, %p)", unnamedParam0, unnamedParam1);
-	return ChangeWindowMessageFilter(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_ChangeWindowMessageFilterEx(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
-	DWORD unnamedParam2 = cpu->fn_arg(cpu, 2);
-	CHANGEFILTERSTRUCT * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	printf("\nCalling USER32!ChangeWindowMessageFilterEx(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-	return ChangeWindowMessageFilterEx(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 }
 LPSTR thunk_CharLowerA(CPU* cpu){
 	LPSTR unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -481,16 +449,6 @@ BOOL thunk_CloseDesktop(CPU* cpu){
 	HDESK unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!CloseDesktop(%p)", unnamedParam0);
 	return CloseDesktop(unnamedParam0);
-}
-BOOL thunk_CloseTouchInputHandle(CPU* cpu){
-	HTOUCHINPUT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!CloseTouchInputHandle(%p)", unnamedParam0);
-	return CloseTouchInputHandle(unnamedParam0);
-}
-BOOL thunk_CloseGestureInfoHandle(CPU* cpu){
-	HGESTUREINFO unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!CloseGestureInfoHandle(%p)", unnamedParam0);
-	return CloseGestureInfoHandle(unnamedParam0);
 }
 BOOL thunk_CloseWindow(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -736,13 +694,6 @@ HWND thunk_CreateMDIWindowW(CPU* cpu){
 	printf("\nCalling USER32!CreateMDIWindowW(%p, %p, %p, %p, %p, %p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5, unnamedParam6, unnamedParam7, unnamedParam8, unnamedParam9);
 	return CreateMDIWindowW(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5, unnamedParam6, unnamedParam7, unnamedParam8, unnamedParam9);
 }
-HSYNTHETICPOINTERDEVICE thunk_CreateSyntheticPointerDevice(CPU* cpu){
-	POINTER_INPUT_TYPE unnamedParam0 = cpu->fn_arg(cpu, 0);
-	ULONG unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_FEEDBACK_MODE unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!CreateSyntheticPointerDevice(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return CreateSyntheticPointerDevice(unnamedParam0, unnamedParam1, unnamedParam2);
-}
 LRESULT thunk_DefDlgProcA(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -863,11 +814,6 @@ BOOL thunk_DestroyMenu(CPU* cpu){
 	HMENU unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!DestroyMenu(%p)", unnamedParam0);
 	return DestroyMenu(unnamedParam0);
-}
-VOID thunk_DestroySyntheticPointerDevice(CPU* cpu){
-	HSYNTHETICPOINTERDEVICE unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!DestroySyntheticPointerDevice(%p)", unnamedParam0);
-	return DestroySyntheticPointerDevice(unnamedParam0);
 }
 BOOL thunk_DestroyWindow(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -1163,16 +1109,6 @@ BOOL thunk_EnableMenuItem(CPU* cpu){
 	printf("\nCalling USER32!EnableMenuItem(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
 	return EnableMenuItem(unnamedParam0, unnamedParam1, unnamedParam2);
 }
-BOOL thunk_EnableMouseInPointer(CPU* cpu){
-	BOOL unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!EnableMouseInPointer(%p)", unnamedParam0);
-	return EnableMouseInPointer(unnamedParam0);
-}
-BOOL thunk_EnableNonClientDpiScaling(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!EnableNonClientDpiScaling(%p)", unnamedParam0);
-	return EnableNonClientDpiScaling(unnamedParam0);
-}
 BOOL thunk_EnableScrollBar(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -1299,21 +1235,6 @@ BOOL thunk_EnumWindowStationsW(CPU* cpu){
 	printf("\nCalling USER32!EnumWindowStationsW(%p, %p)", unnamedParam0, unnamedParam1);
 	return EnumWindowStationsW(unnamedParam0, unnamedParam1);
 }
-BOOL thunk_EvaluateProximityToRect(CPU* cpu){
-	const RECT * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	const TOUCH_HIT_TESTING_INPUT * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	TOUCH_HIT_TESTING_PROXIMITY_EVALUATION * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!EvaluateProximityToRect(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return EvaluateProximityToRect(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_EvaluateProximityToPolygon(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	const POINT * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	const TOUCH_HIT_TESTING_INPUT * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	TOUCH_HIT_TESTING_PROXIMITY_EVALUATION * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	printf("\nCalling USER32!EvaluateProximityToPolygon(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-	return EvaluateProximityToPolygon(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-}
 INT thunk_ExcludeUpdateRgn(CPU* cpu){
 	HDC unnamedParam0 = cpu->fn_arg(cpu, 0);
 	HWND unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -1411,16 +1332,6 @@ SHORT thunk_GetAsyncKeyState(CPU* cpu){
 	INT unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!GetAsyncKeyState(%p)", unnamedParam0);
 	return GetAsyncKeyState(unnamedParam0);
-}
-BOOL thunk_GetAutoRotationState(CPU* cpu){
-	AR_STATE * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!GetAutoRotationState(%p)", unnamedParam0);
-	return GetAutoRotationState(unnamedParam0);
-}
-DPI_AWARENESS thunk_GetAwarenessFromDpiAwarenessContext(CPU* cpu){
-	DPI_AWARENESS_CONTEXT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!GetAwarenessFromDpiAwarenessContext(%p)", unnamedParam0);
-	return GetAwarenessFromDpiAwarenessContext(unnamedParam0);
 }
 HWND thunk_GetCapture(CPU* cpu){
 	printf("\nCalling USER32!GetCaptur)");
@@ -1543,11 +1454,6 @@ BOOL thunk_GetComboBoxInfo(CPU* cpu){
 	printf("\nCalling USER32!GetComboBoxInfo(%p, %p)", unnamedParam0, unnamedParam1);
 	return GetComboBoxInfo(unnamedParam0, unnamedParam1);
 }
-BOOL thunk_GetCurrentInputMessageSource(CPU* cpu){
-	INPUT_MESSAGE_SOURCE * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!GetCurrentInputMessageSource(%p)", unnamedParam0);
-	return GetCurrentInputMessageSource(unnamedParam0);
-}
 HCURSOR thunk_GetCursor(CPU* cpu){
 	printf("\nCalling USER32!GetCurso)");
 	return GetCursor();
@@ -1581,11 +1487,6 @@ HWND thunk_GetDesktopWindow(CPU* cpu){
 DWORD thunk_GetDialogBaseUnits(CPU* cpu){
 	printf("\nCalling USER32!GetDialogBaseUnit)");
 	return GetDialogBaseUnits();
-}
-BOOL thunk_GetDisplayAutoRotationPreferences(CPU* cpu){
-	ORIENTATION_PREFERENCE * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!GetDisplayAutoRotationPreferences(%p)", unnamedParam0);
-	return GetDisplayAutoRotationPreferences(unnamedParam0);
 }
 INT thunk_GetDlgCtrlID(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -1626,15 +1527,6 @@ UINT thunk_GetDoubleClickTime(CPU* cpu){
 	printf("\nCalling USER32!GetDoubleClickTim)");
 	return GetDoubleClickTime();
 }
-UINT thunk_GetDpiForWindow(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!GetDpiForWindow(%p)", unnamedParam0);
-	return GetDpiForWindow(unnamedParam0);
-}
-UINT thunk_GetDpiForSystem(CPU* cpu){
-	printf("\nCalling USER32!GetDpiForSyste)");
-	return GetDpiForSystem();
-}
 HWND thunk_GetFocus(CPU* cpu){
 	printf("\nCalling USER32!GetFocu)");
 	return GetFocus();
@@ -1642,29 +1534,6 @@ HWND thunk_GetFocus(CPU* cpu){
 HWND thunk_GetForegroundWindow(CPU* cpu){
 	printf("\nCalling USER32!GetForegroundWindo)");
 	return GetForegroundWindow();
-}
-BOOL thunk_GetGestureConfig(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
-	DWORD unnamedParam2 = cpu->fn_arg(cpu, 2);
-	UINT * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	GESTURECONFIG * unnamedParam4 = cpu->fn_arg(cpu, 4);
-	UINT unnamedParam5 = cpu->fn_arg(cpu, 5);
-	printf("\nCalling USER32!GetGestureConfig(%p, %p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5);
-	return GetGestureConfig(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4, unnamedParam5);
-}
-BOOL thunk_GetGestureExtraArgs(CPU* cpu){
-	HGESTUREINFO unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
-	BYTE * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetGestureExtraArgs(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetGestureExtraArgs(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetGestureInfo(CPU* cpu){
-	HGESTUREINFO unnamedParam0 = cpu->fn_arg(cpu, 0);
-	PGESTUREINFO unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetGestureInfo(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetGestureInfo(unnamedParam0, unnamedParam1);
 }
 BOOL thunk_GetGUIThreadInfo(CPU* cpu){
 	DWORD unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -1683,18 +1552,6 @@ BOOL thunk_GetIconInfo(CPU* cpu){
 	PICONINFO unnamedParam1 = cpu->fn_arg(cpu, 1);
 	printf("\nCalling USER32!GetIconInfo(%p, %p)", unnamedParam0, unnamedParam1);
 	return GetIconInfo(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetIconInfoExA(CPU* cpu){
-	HICON unnamedParam0 = cpu->fn_arg(cpu, 0);
-	ICONINFOEXA * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetIconInfoExA(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetIconInfoExA(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetIconInfoExW(CPU* cpu){
-	HICON unnamedParam0 = cpu->fn_arg(cpu, 0);
-	ICONINFOEXW * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetIconInfoExW(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetIconInfoExW(unnamedParam0, unnamedParam1);
 }
 BOOL thunk_GetInputState(CPU* cpu){
 	printf("\nCalling USER32!GetInputStat)");
@@ -1981,147 +1838,6 @@ HWND thunk_GetParent(CPU* cpu){
 	printf("\nCalling USER32!GetParent(%p)", unnamedParam0);
 	return GetParent(unnamedParam0);
 }
-BOOL thunk_GetPhysicalCursorPos(CPU* cpu){
-	POINT * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!GetPhysicalCursorPos(%p)", unnamedParam0);
-	return GetPhysicalCursorPos(unnamedParam0);
-}
-BOOL thunk_GetPointerDevice(CPU* cpu){
-	HANDLE device = cpu->fn_arg(cpu, 0);
-	POINTER_DEVICE_INFO * unnamedParam0 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetPointerDevice(%p, %p)", device, unnamedParam0);
-	return GetPointerDevice(device, unnamedParam0);
-}
-BOOL thunk_GetPointerDeviceCursors(CPU* cpu){
-	HANDLE unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_DEVICE_CURSOR_INFO * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerDeviceCursors(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerDeviceCursors(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerDeviceProperties(CPU* cpu){
-	HANDLE device = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam0 = cpu->fn_arg(cpu, 1);
-	POINTER_DEVICE_PROPERTY * unnamedParam1 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerDeviceProperties(%p, %p, %p)", device, unnamedParam0, unnamedParam1);
-	return GetPointerDeviceProperties(device, unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetPointerDeviceRects(CPU* cpu){
-	HANDLE unnamedParam0 = cpu->fn_arg(cpu, 0);
-	RECT * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	RECT * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerDeviceRects(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerDeviceRects(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerDevices(CPU* cpu){
-	UINT32 * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_DEVICE_INFO * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetPointerDevices(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetPointerDevices(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetPointerInputTransform(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 unnamedParam1 = cpu->fn_arg(cpu, 1);
-	INPUT_TRANSFORM * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerInputTransform(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerInputTransform(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerPenInfo(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_PEN_INFO * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetPointerPenInfo(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetPointerPenInfo(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetPointerPenInfoHistory(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_PEN_INFO * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerPenInfoHistory(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerPenInfoHistory(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerFramePenInfo(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_PEN_INFO * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerFramePenInfo(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerFramePenInfo(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerFramePenInfoHistory(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT32 * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	POINTER_PEN_INFO * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	printf("\nCalling USER32!GetPointerFramePenInfoHistory(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-	return GetPointerFramePenInfoHistory(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-}
-BOOL thunk_GetPointerType(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_INPUT_TYPE * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetPointerType(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetPointerType(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetPointerCursorId(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetPointerCursorId(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetPointerCursorId(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetPointerInfo(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_INFO * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetPointerInfo(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetPointerInfo(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetPointerInfoHistory(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_INFO * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerInfoHistory(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerInfoHistory(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerFrameInfo(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_INFO * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerFrameInfo(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerFrameInfo(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerFrameInfoHistory(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT32 * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	POINTER_INFO * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	printf("\nCalling USER32!GetPointerFrameInfoHistory(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-	return GetPointerFrameInfoHistory(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-}
-BOOL thunk_GetPointerTouchInfo(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_TOUCH_INFO * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetPointerTouchInfo(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetPointerTouchInfo(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_GetPointerTouchInfoHistory(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_TOUCH_INFO * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerTouchInfoHistory(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerTouchInfoHistory(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerFrameTouchInfo(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	POINTER_TOUCH_INFO * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetPointerFrameTouchInfo(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetPointerFrameTouchInfo(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetPointerFrameTouchInfoHistory(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT32 * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	POINTER_TOUCH_INFO * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	printf("\nCalling USER32!GetPointerFrameTouchInfoHistory(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-	return GetPointerFrameTouchInfoHistory(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-}
 INT thunk_GetPriorityClipboardFormat(CPU* cpu){
 	UINT * unnamedParam0 = cpu->fn_arg(cpu, 0);
 	INT unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -2149,15 +1865,6 @@ DWORD thunk_GetQueueStatus(CPU* cpu){
 	UINT unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!GetQueueStatus(%p)", unnamedParam0);
 	return GetQueueStatus(unnamedParam0);
-}
-BOOL thunk_GetRawPointerDeviceData(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT32 unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT32 unnamedParam2 = cpu->fn_arg(cpu, 2);
-	POINTER_DEVICE_PROPERTY * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	LONG * unnamedParam4 = cpu->fn_arg(cpu, 4);
-	printf("\nCalling USER32!GetRawPointerDeviceData(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-	return GetRawPointerDeviceData(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
 }
 BOOL thunk_GetScrollInfo(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -2218,12 +1925,6 @@ INT thunk_GetSystemMetrics(CPU* cpu){
 	printf("\nCalling USER32!GetSystemMetrics(%p)", unnamedParam0);
 	return GetSystemMetrics(unnamedParam0);
 }
-INT thunk_GetSystemMetricsForDpi(CPU* cpu){
-	INT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetSystemMetricsForDpi(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetSystemMetricsForDpi(unnamedParam0, unnamedParam1);
-}
 DWORD thunk_GetTabbedTextExtentA(CPU* cpu){
 	HDC unnamedParam0 = cpu->fn_arg(cpu, 0);
 	LPCSTR unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -2253,22 +1954,10 @@ HDESK thunk_GetThreadDesktop(CPU* cpu){
 	printf("\nCalling USER32!GetThreadDesktop(%p)", unnamedParam0);
 	return GetThreadDesktop(unnamedParam0);
 }
-DPI_AWARENESS_CONTEXT thunk_GetThreadDpiAwarenessContext(CPU* cpu){
-	printf("\nCalling USER32!GetThreadDpiAwarenessContex)");
-	return GetThreadDpiAwarenessContext();
-}
 HWND thunk_GetTopWindow(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!GetTopWindow(%p)", unnamedParam0);
 	return GetTopWindow(unnamedParam0);
-}
-BOOL thunk_GetTouchInputInfo(CPU* cpu){
-	HTOUCHINPUT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
-	TOUCHINPUT * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	int unnamedParam3 = cpu->fn_arg(cpu, 3);
-	printf("\nCalling USER32!GetTouchInputInfo(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-	return GetTouchInputInfo(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 }
 BOOL thunk_GetUpdateRect(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -2283,13 +1972,6 @@ INT thunk_GetUpdateRgn(CPU* cpu){
 	BOOL unnamedParam2 = cpu->fn_arg(cpu, 2);
 	printf("\nCalling USER32!GetUpdateRgn(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
 	return GetUpdateRgn(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_GetUpdatedClipboardFormats(CPU* cpu){
-	UINT * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!GetUpdatedClipboardFormats(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return GetUpdatedClipboardFormats(unnamedParam0, unnamedParam1, unnamedParam2);
 }
 BOOL thunk_GetUserObjectInformationA(CPU* cpu){
 	HANDLE unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -2333,26 +2015,6 @@ HDC thunk_GetWindowDC(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!GetWindowDC(%p)", unnamedParam0);
 	return GetWindowDC(unnamedParam0);
-}
-BOOL thunk_GetWindowDisplayAffinity(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	DWORD * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!GetWindowDisplayAffinity(%p, %p)", unnamedParam0, unnamedParam1);
-	return GetWindowDisplayAffinity(unnamedParam0, unnamedParam1);
-}
-DPI_AWARENESS_CONTEXT thunk_GetWindowDpiAwarenessContext(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!GetWindowDpiAwarenessContext(%p)", unnamedParam0);
-	return GetWindowDpiAwarenessContext(unnamedParam0);
-}
-BOOL thunk_GetWindowFeedbackSetting(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	FEEDBACK_TYPE unnamedParam1 = cpu->fn_arg(cpu, 1);
-	DWORD unnamedParam2 = cpu->fn_arg(cpu, 2);
-	UINT32 * unnamedParam3 = cpu->fn_arg(cpu, 3);
-	void * unnamedParam4 = cpu->fn_arg(cpu, 4);
-	printf("\nCalling USER32!GetWindowFeedbackSetting(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-	return GetWindowFeedbackSetting(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
 }
 BOOL thunk_GetWindowInfo(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -2488,25 +2150,6 @@ BOOL thunk_HiliteMenuItem(CPU* cpu){
 	UINT unnamedParam3 = cpu->fn_arg(cpu, 3);
 	printf("\nCalling USER32!HiliteMenuItem(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 	return HiliteMenuItem(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-}
-BOOL thunk_InitializeTouchInjection(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!InitializeTouchInjection(%p, %p)", unnamedParam0, unnamedParam1);
-	return InitializeTouchInjection(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_InjectSyntheticPointerInput(CPU* cpu){
-	HSYNTHETICPOINTERDEVICE unnamedParam0 = cpu->fn_arg(cpu, 0);
-	const POINTER_TYPE_INFO * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT32 unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!InjectSyntheticPointerInput(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return InjectSyntheticPointerInput(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-BOOL thunk_InjectTouchInput(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	const POINTER_TOUCH_INFO * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!InjectTouchInput(%p, %p)", unnamedParam0, unnamedParam1);
-	return InjectTouchInput(unnamedParam0, unnamedParam1);
 }
 BOOL thunk_InSendMessage(CPU* cpu){
 	printf("\nCalling USER32!InSendMessag)");
@@ -2674,25 +2317,6 @@ BOOL thunk_IsMenu(CPU* cpu){
 	printf("\nCalling USER32!IsMenu(%p)", unnamedParam0);
 	return IsMenu(unnamedParam0);
 }
-BOOL thunk_IsMouseInPointerEnabled(CPU* cpu){
-	printf("\nCalling USER32!IsMouseInPointerEnable)");
-	return IsMouseInPointerEnabled();
-}
-BOOL thunk_IsProcessDPIAware(CPU* cpu){
-	printf("\nCalling USER32!IsProcessDPIAwar)");
-	return IsProcessDPIAware();
-}
-BOOL thunk_IsTouchWindow(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	PULONG unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!IsTouchWindow(%p, %p)", unnamedParam0, unnamedParam1);
-	return IsTouchWindow(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_IsValidDpiAwarenessContext(CPU* cpu){
-	DPI_AWARENESS_CONTEXT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!IsValidDpiAwarenessContext(%p)", unnamedParam0);
-	return IsValidDpiAwarenessContext(unnamedParam0);
-}
 BOOL thunk_IsWinEventHookInstalled(CPU* cpu){
 	DWORD unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!IsWinEventHookInstalled(%p)", unnamedParam0);
@@ -2856,18 +2480,6 @@ INT thunk_LoadStringW(CPU* cpu){
 	INT unnamedParam3 = cpu->fn_arg(cpu, 3);
 	printf("\nCalling USER32!LoadStringW(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 	return LoadStringW(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-}
-BOOL thunk_LogicalToPhysicalPoint(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINT * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!LogicalToPhysicalPoint(%p, %p)", unnamedParam0, unnamedParam1);
-	return LogicalToPhysicalPoint(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_LogicalToPhysicalPointForPerMonitorDPI(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINT * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!LogicalToPhysicalPointForPerMonitorDPI(%p, %p)", unnamedParam0, unnamedParam1);
-	return LogicalToPhysicalPointForPerMonitorDPI(unnamedParam0, unnamedParam1);
 }
 BOOL thunk_LockSetForegroundWindow(CPU* cpu){
 	UINT unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -3149,12 +2761,6 @@ BOOL thunk_PaintDesktop(CPU* cpu){
 	printf("\nCalling USER32!PaintDesktop(%p)", unnamedParam0);
 	return PaintDesktop(unnamedParam0);
 }
-LRESULT thunk_PackTouchHitTestingProximityEvaluation(CPU* cpu){
-	const TOUCH_HIT_TESTING_INPUT * unnamedParam0 = cpu->fn_arg(cpu, 0);
-	const TOUCH_HIT_TESTING_PROXIMITY_EVALUATION * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!PackTouchHitTestingProximityEvaluation(%p, %p)", unnamedParam0, unnamedParam1);
-	return PackTouchHitTestingProximityEvaluation(unnamedParam0, unnamedParam1);
-}
 BOOL thunk_PeekMessageA(CPU* cpu){
 	LPMSG unnamedParam0 = cpu->fn_arg(cpu, 0);
 	HWND unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -3172,18 +2778,6 @@ BOOL thunk_PeekMessageW(CPU* cpu){
 	UINT unnamedParam4 = cpu->fn_arg(cpu, 4);
 	printf("\nCalling USER32!PeekMessageW(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
 	return PeekMessageW(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-}
-BOOL thunk_PhysicalToLogicalPoint(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINT * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!PhysicalToLogicalPoint(%p, %p)", unnamedParam0, unnamedParam1);
-	return PhysicalToLogicalPoint(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_PhysicalToLogicalPointForPerMonitorDPI(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINT * unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!PhysicalToLogicalPointForPerMonitorDPI(%p, %p)", unnamedParam0, unnamedParam1);
-	return PhysicalToLogicalPointForPerMonitorDPI(unnamedParam0, unnamedParam1);
 }
 BOOL thunk_PostMessageA(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -3335,32 +2929,6 @@ BOOL thunk_RegisterHotKey(CPU* cpu){
 	printf("\nCalling USER32!RegisterHotKey(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 	return RegisterHotKey(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 }
-BOOL thunk_RegisterPointerDeviceNotifications(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	BOOL unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!RegisterPointerDeviceNotifications(%p, %p)", unnamedParam0, unnamedParam1);
-	return RegisterPointerDeviceNotifications(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_RegisterPointerInputTarget(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_INPUT_TYPE unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!RegisterPointerInputTarget(%p, %p)", unnamedParam0, unnamedParam1);
-	return RegisterPointerInputTarget(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_RegisterPointerInputTargetEx(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_INPUT_TYPE unnamedParam1 = cpu->fn_arg(cpu, 1);
-	BOOL unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!RegisterPointerInputTargetEx(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return RegisterPointerInputTargetEx(unnamedParam0, unnamedParam1, unnamedParam2);
-}
-HPOWERNOTIFY thunk_RegisterPowerSettingNotification(CPU* cpu){
-	HANDLE unnamedParam0 = cpu->fn_arg(cpu, 0);
-	LPCGUID unnamedParam1 = cpu->fn_arg(cpu, 1);
-	DWORD unnamedParam2 = cpu->fn_arg(cpu, 2);
-	printf("\nCalling USER32!RegisterPowerSettingNotification(%p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2);
-	return RegisterPowerSettingNotification(unnamedParam0, unnamedParam1, unnamedParam2);
-}
 BOOL thunk_RegisterRawInputDevices(CPU* cpu){
 	const RAWINPUTDEVICE * unnamedParam0 = cpu->fn_arg(cpu, 0);
 	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -3372,24 +2940,6 @@ BOOL thunk_RegisterShellHookWindow(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!RegisterShellHookWindow(%p)", unnamedParam0);
 	return RegisterShellHookWindow(unnamedParam0);
-}
-HPOWERNOTIFY thunk_RegisterSuspendResumeNotification(CPU* cpu){
-	HANDLE unnamedParam0 = cpu->fn_arg(cpu, 0);
-	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!RegisterSuspendResumeNotification(%p, %p)", unnamedParam0, unnamedParam1);
-	return RegisterSuspendResumeNotification(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_RegisterTouchHitTestingWindow(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	ULONG unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!RegisterTouchHitTestingWindow(%p, %p)", unnamedParam0, unnamedParam1);
-	return RegisterTouchHitTestingWindow(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_RegisterTouchWindow(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	ULONG unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!RegisterTouchWindow(%p, %p)", unnamedParam0, unnamedParam1);
-	return RegisterTouchWindow(unnamedParam0, unnamedParam1);
 }
 UINT thunk_RegisterWindowMessageA(CPU* cpu){
 	LPCSTR unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -3410,11 +2960,6 @@ INT thunk_ReleaseDC(CPU* cpu){
 	HDC unnamedParam1 = cpu->fn_arg(cpu, 1);
 	printf("\nCalling USER32!ReleaseDC(%p, %p)", unnamedParam0, unnamedParam1);
 	return ReleaseDC(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_RemoveClipboardFormatListener(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!RemoveClipboardFormatListener(%p)", unnamedParam0);
-	return RemoveClipboardFormatListener(unnamedParam0);
 }
 BOOL thunk_RemoveMenu(CPU* cpu){
 	HMENU unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -3630,15 +3175,6 @@ HWND thunk_SetClipboardViewer(CPU* cpu){
 	printf("\nCalling USER32!SetClipboardViewer(%p)", unnamedParam0);
 	return SetClipboardViewer(unnamedParam0);
 }
-UINT_PTR thunk_SetCoalescableTimer(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT_PTR unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT unnamedParam2 = cpu->fn_arg(cpu, 2);
-	TIMERPROC unnamedParam3 = cpu->fn_arg(cpu, 3);
-	ULONG unnamedParam4 = cpu->fn_arg(cpu, 4);
-	printf("\nCalling USER32!SetCoalescableTimer(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-	return SetCoalescableTimer(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-}
 HCURSOR thunk_SetCursor(CPU* cpu){
 	HCURSOR unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!SetCursor(%p)", unnamedParam0);
@@ -3691,15 +3227,6 @@ BOOL thunk_SetForegroundWindow(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!SetForegroundWindow(%p)", unnamedParam0);
 	return SetForegroundWindow(unnamedParam0);
-}
-BOOL thunk_SetGestureConfig(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
-	UINT unnamedParam2 = cpu->fn_arg(cpu, 2);
-	PGESTURECONFIG unnamedParam3 = cpu->fn_arg(cpu, 3);
-	UINT unnamedParam4 = cpu->fn_arg(cpu, 4);
-	printf("\nCalling USER32!SetGestureConfig(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-	return SetGestureConfig(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
 }
 BOOL thunk_SetKeyboardState(CPU* cpu){
 	LPBYTE unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -3786,25 +3313,10 @@ HWND thunk_SetParent(CPU* cpu){
 	printf("\nCalling USER32!SetParent(%p, %p)", unnamedParam0, unnamedParam1);
 	return SetParent(unnamedParam0, unnamedParam1);
 }
-BOOL thunk_SetPhysicalCursorPos(CPU* cpu){
-	INT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	INT unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!SetPhysicalCursorPos(%p, %p)", unnamedParam0, unnamedParam1);
-	return SetPhysicalCursorPos(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_SetProcessDPIAware(CPU* cpu){
-	printf("\nCalling USER32!SetProcessDPIAwar)");
-	return SetProcessDPIAware();
-}
 BOOL thunk_SetProcessDefaultLayout(CPU* cpu){
 	DWORD unnamedParam0 = cpu->fn_arg(cpu, 0);
 	printf("\nCalling USER32!SetProcessDefaultLayout(%p)", unnamedParam0);
 	return SetProcessDefaultLayout(unnamedParam0);
-}
-BOOL thunk_SetProcessDpiAwarenessContext(CPU* cpu){
-	DPI_AWARENESS_CONTEXT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!SetProcessDpiAwarenessContext(%p)", unnamedParam0);
-	return SetProcessDpiAwarenessContext(unnamedParam0);
 }
 BOOL thunk_SetProcessWindowStation(CPU* cpu){
 	HWINSTA unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -3861,11 +3373,6 @@ BOOL thunk_SetThreadDesktop(CPU* cpu){
 	printf("\nCalling USER32!SetThreadDesktop(%p)", unnamedParam0);
 	return SetThreadDesktop(unnamedParam0);
 }
-DPI_AWARENESS_CONTEXT thunk_SetThreadDpiAwarenessContext(CPU* cpu){
-	DPI_AWARENESS_CONTEXT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!SetThreadDpiAwarenessContext(%p)", unnamedParam0);
-	return SetThreadDpiAwarenessContext(unnamedParam0);
-}
 UINT_PTR thunk_SetTimer(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
 	UINT_PTR unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -3910,21 +3417,6 @@ BOOL thunk_SetWindowContextHelpId(CPU* cpu){
 	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
 	printf("\nCalling USER32!SetWindowContextHelpId(%p, %p)", unnamedParam0, unnamedParam1);
 	return SetWindowContextHelpId(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_SetWindowDisplayAffinity(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	DWORD unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!SetWindowDisplayAffinity(%p, %p)", unnamedParam0, unnamedParam1);
-	return SetWindowDisplayAffinity(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_SetWindowFeedbackSetting(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	FEEDBACK_TYPE unnamedParam1 = cpu->fn_arg(cpu, 1);
-	DWORD unnamedParam2 = cpu->fn_arg(cpu, 2);
-	UINT32 unnamedParam3 = cpu->fn_arg(cpu, 3);
-	const void * unnamedParam4 = cpu->fn_arg(cpu, 4);
-	printf("\nCalling USER32!SetWindowFeedbackSetting(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-	return SetWindowFeedbackSetting(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
 }
 LONG thunk_SetWindowLongA(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -4057,22 +3549,6 @@ BOOL thunk_ShowWindowAsync(CPU* cpu){
 	printf("\nCalling USER32!ShowWindowAsync(%p, %p)", unnamedParam0, unnamedParam1);
 	return ShowWindowAsync(unnamedParam0, unnamedParam1);
 }
-BOOL thunk_ShutdownBlockReasonCreate(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	LPCWSTR unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!ShutdownBlockReasonCreate(%p, %p)", unnamedParam0, unnamedParam1);
-	return ShutdownBlockReasonCreate(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_ShutdownBlockReasonDestroy(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!ShutdownBlockReasonDestroy(%p)", unnamedParam0);
-	return ShutdownBlockReasonDestroy(unnamedParam0);
-}
-BOOL thunk_SkipPointerFrameMessages(CPU* cpu){
-	UINT32 unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!SkipPointerFrameMessages(%p)", unnamedParam0);
-	return SkipPointerFrameMessages(unnamedParam0);
-}
 BOOL thunk_SubtractRect(CPU* cpu){
 	LPRECT unnamedParam0 = cpu->fn_arg(cpu, 0);
 	const RECT * unnamedParam1 = cpu->fn_arg(cpu, 1);
@@ -4111,15 +3587,6 @@ BOOL thunk_SystemParametersInfoW(CPU* cpu){
 	UINT unnamedParam3 = cpu->fn_arg(cpu, 3);
 	printf("\nCalling USER32!SystemParametersInfoW(%p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
 	return SystemParametersInfoW(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3);
-}
-BOOL thunk_SystemParametersInfoForDpi(CPU* cpu){
-	UINT unnamedParam0 = cpu->fn_arg(cpu, 0);
-	UINT unnamedParam1 = cpu->fn_arg(cpu, 1);
-	void * unnamedParam2 = cpu->fn_arg(cpu, 2);
-	UINT unnamedParam3 = cpu->fn_arg(cpu, 3);
-	UINT unnamedParam4 = cpu->fn_arg(cpu, 4);
-	printf("\nCalling USER32!SystemParametersInfoForDpi(%p, %p, %p, %p, %p)", unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
-	return SystemParametersInfoForDpi(unnamedParam0, unnamedParam1, unnamedParam2, unnamedParam3, unnamedParam4);
 }
 LONG thunk_TabbedTextOutA(CPU* cpu){
 	HDC unnamedParam0 = cpu->fn_arg(cpu, 0);
@@ -4295,33 +3762,6 @@ BOOL thunk_UnregisterHotKey(CPU* cpu){
 	INT unnamedParam1 = cpu->fn_arg(cpu, 1);
 	printf("\nCalling USER32!UnregisterHotKey(%p, %p)", unnamedParam0, unnamedParam1);
 	return UnregisterHotKey(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_UnregisterPointerInputTarget(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_INPUT_TYPE unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!UnregisterPointerInputTarget(%p, %p)", unnamedParam0, unnamedParam1);
-	return UnregisterPointerInputTarget(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_UnregisterPointerInputTargetEx(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	POINTER_INPUT_TYPE unnamedParam1 = cpu->fn_arg(cpu, 1);
-	printf("\nCalling USER32!UnregisterPointerInputTargetEx(%p, %p)", unnamedParam0, unnamedParam1);
-	return UnregisterPointerInputTargetEx(unnamedParam0, unnamedParam1);
-}
-BOOL thunk_UnregisterPowerSettingNotification(CPU* cpu){
-	HPOWERNOTIFY unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!UnregisterPowerSettingNotification(%p)", unnamedParam0);
-	return UnregisterPowerSettingNotification(unnamedParam0);
-}
-BOOL thunk_UnregisterSuspendResumeNotification(CPU* cpu){
-	HPOWERNOTIFY unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!UnregisterSuspendResumeNotification(%p)", unnamedParam0);
-	return UnregisterSuspendResumeNotification(unnamedParam0);
-}
-BOOL thunk_UnregisterTouchWindow(CPU* cpu){
-	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);
-	printf("\nCalling USER32!UnregisterTouchWindow(%p)", unnamedParam0);
-	return UnregisterTouchWindow(unnamedParam0);
 }
 BOOL thunk_UpdateWindow(CPU* cpu){
 	HWND unnamedParam0 = cpu->fn_arg(cpu, 0);

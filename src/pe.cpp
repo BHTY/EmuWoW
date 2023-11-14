@@ -3,8 +3,8 @@
 #include <winternl.h>
 #include <wchar.h>
 #include <stdio.h>
-#include "pe.h"
 #include "cpu.h"
+#include "pe.h"
 
 LPWSTR GetFileNameFromPathW(LPWSTR lpPath) {
 	wchar_t* LastSlash = NULL;
@@ -175,7 +175,7 @@ LPVOID EmuLoadLibrary(LPCSTR lpLibFileName, DWORD dwFlags, PPEB pPeb, CPU* pCPU)
 	return ImageBase;
 }
 
-CPU* EmuLoadModule(LPCSTR lpLibFileName, PPEB pPeb) {
+CPU* EmuLoadModule(LPCSTR lpLibFileName, _PPEB pPeb) {
 	HANDLE hHeap;
 	CPU* pCPU;
 	PBYTE ImageBase = MapImageIntoMemory(lpLibFileName);

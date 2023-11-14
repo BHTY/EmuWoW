@@ -167,7 +167,7 @@ LPVOID EmuLoadLibrary(LPCSTR lpLibFileName, DWORD dwFlags, PPEB pPeb, CPU* pCPU)
 
 	//call DLL entry point
 	if (nt_hdr->FileHeader.Characteristics & IMAGE_FILE_DLL && strcmp(lpLibFileName, "win.dll") != 0) {
-		//printf("%s: About to call DLLEntry @ %p\n", lpLibFileName, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint);
+		printf("%s: About to call DLL entry point @ %p (SP=%p)\n", lpLibFileName, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint, pCPU->get_sp(pCPU));
 		pCPU->set_params(pCPU, 3, NULL, DLL_PROCESS_ATTACH, ImageBase);
 		ThunkCallback(pCPU, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint);
 	}

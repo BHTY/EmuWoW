@@ -33,7 +33,7 @@ UNICODE_STRING MakeUnicodeFromAnsi(LPSTR lpString) {
 }
 
 CPU* EmuCreateThread(PBYTE lpStartAddress, DWORD dwStackReserve, DWORD dwStackCommit, PEB* peb) {
-    CPU* cpu = Alloc386();
+    CPU* cpu = AllocMIPS();
     _PTEB pTeb = malloc(sizeof(__TEB));
     cpu->set_teb(cpu, pTeb);
 
@@ -49,7 +49,7 @@ CPU* EmuCreateThread(PBYTE lpStartAddress, DWORD dwStackReserve, DWORD dwStackCo
     pTeb->Reserved1[2] = StackLowestCommitted; //Stack Limit
      
     //put stack pointer into CPU
-    cpu->set_sp(cpu, StackTop);
+    cpu->set_sp(cpu, StackTop - 16);
 
     pTeb->Reserved1[6] = pTeb;
     pTeb->ProcessEnvironmentBlock = peb;
@@ -79,7 +79,7 @@ VOID EmuInitProcessOld(LPCSTR lpApplicationName, LPSTR lpCommandLine) {
 
     CPU* cpu = EmuCreateThread((PBYTE)image + pImageHdr->AddressOfEntryPoint, pImageHdr->SizeOfStackReserve, pImageHdr->SizeOfStackCommit, peb);
 
-    //while (1);
+    while (1);
 
     while (!(cpu->step(cpu))) {
     }

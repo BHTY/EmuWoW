@@ -2,7 +2,7 @@
 
 #include "cpu.h"
 
-#define printf(...)
+//#define printf(...)
 
 typedef struct {
 	LPVOID lpParam;

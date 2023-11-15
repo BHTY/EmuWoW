@@ -98,6 +98,8 @@ VOID EmuInitProcess(LPCSTR lpApplicationName, LPSTR lpCommandLine) {
 
     //while (1);
 
+    printf("\nExecuting EXE entry point.\n");
+
     while (!(cpu->step(cpu))) {
 
     }
@@ -105,6 +107,8 @@ VOID EmuInitProcess(LPCSTR lpApplicationName, LPSTR lpCommandLine) {
 
 int main(int argc, char** argv)
 {
+    printf("Win32Emu Image Base: %p\n", GetModuleHandle(NULL));
+
     EmuInitProcess(argv[1], "");
 
     /*VirtualAlloc(0x400000, 0x100000, MEM_RESERVE, PAGE_READWRITE);

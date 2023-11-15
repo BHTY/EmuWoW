@@ -1,6 +1,7 @@
 #include "mips.h"
 #include <varargs.h>
 #include "thunks.h"
+#include "pe.h"
 #undef printf
 
 int mips_escape[3] = { 0x30630000, 0x34630fff, 0x0000000c };
@@ -173,6 +174,10 @@ void inst_bgez(MIPS* cpu, uint32_t word) {
 }
 
 void inst_sll(MIPS* cpu, uint32_t word) {
+    if (word == 0) {
+        printf("NOP\n");
+        return;
+    }
     printf("SLL $%d, $%d, %d\n", decode_rd(word), decode_rt(word), decode_shamt(word));
     cpu->regs[decode_rd(word)] = op_sll(cpu->regs[decode_rt(word)], decode_shamt(word));
 }
@@ -187,6 +192,11 @@ void inst_sra(MIPS* cpu, uint32_t word) {
 
 void inst_beql(MIPS* cpu, uint32_t word) {
     do_branch("BEQL", cpu->regs[decode_rs(word)] == cpu->regs[decode_rt(word)]);
+    cpu->delay_slot = 0;
+}
+void inst_bnel(MIPS* cpu, uint32_t word) {
+    do_branch("BNEL", cpu->regs[decode_rs(word)] != cpu->regs[decode_rt(word)]);
+    cpu->delay_slot = 0;
 }
 
 void inst_syscall(MIPS* cpu, uint32_t word) {
@@ -203,8 +213,9 @@ void inst_syscall(MIPS* cpu, uint32_t word) {
 }
 
 INT mips_step(MIPS_CPU* pCPU) {
-    uint32_t opcode = *(uint32_t*)(pCPU->mips.pc);
-    printf("%p: ", pCPU->mips.pc);
+    uint32_t opcode = pCPU->mips.delay_slot;
+    pCPU->mips.delay_slot = *(uint32_t*)(pCPU->mips.pc);
+    printf("(DS = %p OP = %p) %p: ", pCPU->mips.delay_slot, opcode, pCPU->mips.pc);
     pCPU->mips.pc += 4;
     pCPU->mips.regs[0] = 0;
 
@@ -256,6 +267,7 @@ INT mips_step(MIPS_CPU* pCPU) {
     exec_op(BGTZ, inst_bgtz);
 
     exec_op(BEQL, inst_beql);
+    exec_op(BNEL, inst_bnel);
 
     exec_op(LB, inst_lb);
     exec_op(LH, inst_lh);
@@ -362,6 +374,8 @@ CPU* AllocMIPS() {
     pCPU->cpu.get_sp = mips_get_sp;
 
     EscapeVector = mips_escape;
+
+    cpu_type = CPU_TYPE_MIPS;
 
     return pCPU;
 }

@@ -15,6 +15,7 @@ typedef struct {
 	uint32_t pc;
 	uint32_t hi;
 	uint32_t lo;
+    uint32_t delay_slot;
 } MIPS;
 
 typedef struct {
@@ -136,6 +137,7 @@ typedef struct {
 
 //Likely branches
 #define BEQL 20
+#define BNEL 21
 
 //Branch and Link
 

@@ -67,6 +67,7 @@ def generate_mips_asm(name, args, cc):
     li $3, {}
     syscall
     j $31
+    nop
     .end
 """.format(name, name, gBase)
     return out_string, ".globl {}\n.extern {} 4\n".format(name, name)
@@ -295,6 +296,7 @@ def parse_file(filename, base):
     current_asm_mips_body = """.ent _DLLMainCRTStartup
 _DLLMainCRTStartup:
     j $31
+    nop
     .end
 """
     current_csv = ""

@@ -6,6 +6,8 @@
 #include "cpu.h"
 #include "pe.h"
 
+int cpu_type;
+
 LPWSTR GetFileNameFromPathW(LPWSTR lpPath) {
 	wchar_t* LastSlash = NULL;
 	for (DWORD i = 0; lpPath[i] != NULL; i++)
@@ -73,9 +75,28 @@ void write_relocations(char* ImageBase, PIMAGE_BASE_RELOCATION base_reloc, DWORD
 		for (i = 0; i < size_blocks; i++) {
 			// 4 first bits is information of type, 12 last bits is the offset
 			patch_addr = (PDWORD)(ImageBase + base_reloc->VirtualAddress + (reloc[i] & 0xfff));
+			//printf("Relocating address %p (reloc[i] >> 12 = %p) %p (%p -> %p, imm:%04x -> %04x\n", patch_addr, reloc[i] >> 12, delta, *patch_addr, *patch_addr + (delta >> 16), (*patch_addr) & 0xFFFF, (*patch_addr + (delta >> 16)) & 0xFFFF);
 
-			if ((reloc[i] >> 12) == IMAGE_REL_BASED_HIGHLOW)
-				*patch_addr += delta;
+			switch (reloc[i] >> 12) {
+				case IMAGE_REL_BASED_HIGHLOW:
+					*patch_addr += delta;
+					break;
+				case IMAGE_REL_BASED_HIGHADJ:
+					*(WORD*)(patch_addr) += (delta >> 16);
+					break;
+				case IMAGE_REL_BASED_HIGH:
+					*(WORD*)(patch_addr) += (delta >> 16);
+					break;
+				case IMAGE_REL_BASED_LOW:
+					*(WORD*)patch_addr += (delta & 0xFFFF);
+					break;
+				case IMAGE_REL_BASED_MIPS_JMPADDR:
+					*patch_addr = (*patch_addr & 0xFC000000) | ((*patch_addr + (delta >> 2)) & 0x3FFFFFF);
+					//*patch_addr += (delta >> 2);
+					break;
+				default:
+					break;
+			}
 		}
 
 		base_reloc = (PIMAGE_BASE_RELOCATION)(((DWORD)base_reloc) + base_reloc->SizeOfBlock);
@@ -111,6 +132,8 @@ LPVOID MapImageIntoMemory(LPCSTR lpLibFileName) {
 	ImageBase = VirtualAlloc(nt_hdr->OptionalHeader.ImageBase, nt_hdr->OptionalHeader.SizeOfImage, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 	if (ImageBase == NULL) {
+
+		//printf("Forced to try second allocation. Couldn't get image base %p with %d bytes\n", nt_hdr->OptionalHeader.ImageBase, nt_hdr->OptionalHeader.SizeOfImage);
 
 		ImageBase = VirtualAlloc(NULL, nt_hdr->OptionalHeader.SizeOfImage, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
@@ -155,15 +178,18 @@ LPVOID EmuLoadLibrary(LPCSTR lpLibFileName, DWORD dwFlags, PPEB pPeb, CPU* pCPU)
 	data_dir = nt_hdr->OptionalHeader.DataDirectory;
 
 	//apply relocations
-	DWORD delta = (DWORD)ImageBase - nt_hdr->OptionalHeader.ImageBase;
+	DWORD_PTR delta = (DWORD_PTR)ImageBase - nt_hdr->OptionalHeader.ImageBase;
 
 	if (delta && data_dir[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress) {
+		//printf("RELOCATING\n");
 		PIMAGE_BASE_RELOCATION base_reloc = ImageBase + data_dir[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
 		write_relocations(ImageBase, base_reloc, delta);
 	}
 
 	PIMAGE_IMPORT_DESCRIPTOR import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)(ImageBase + data_dir[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
-	if (data_dir[IMAGE_DIRECTORY_ENTRY_IMPORT].Size) { resolve_imports(ImageBase, import_descriptor, pPeb, pCPU); }
+	if (data_dir[IMAGE_DIRECTORY_ENTRY_IMPORT].Size) { 
+		resolve_imports(ImageBase, import_descriptor, pPeb, pCPU); 
+	}
 
 	//call DLL entry point
 	if (nt_hdr->FileHeader.Characteristics & IMAGE_FILE_DLL && strcmp(lpLibFileName, "win.dll") != 0) {

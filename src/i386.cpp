@@ -4,6 +4,7 @@
 #include "thunks.h"
 #include "i386.h"
 #include <varargs.h>
+#include "pe.h"
 
 uint8_t escape_routine[3] = { 0xcd, 0xff, 0xc3 };
 
@@ -3290,6 +3291,8 @@ CPU* Alloc386() {
 	cpu->I386.print_addr = 1;
 
 	EscapeVector = escape_routine;
+
+	cpu_type = CPU_TYPE_X86;
 
 	return cpu;
 }

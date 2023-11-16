@@ -44,9 +44,22 @@ void inst_jr(MIPS* mips, uint32_t word) {
 }
 void inst_jalr(MIPS* mips, uint32_t word) {
     printf("JALR $%d, $%d\n", decode_rd(word), decode_rs(word));
-    mips->regs[decode_rd(word)] = mips->pc;
+    mips->regs[decode_rd(word)] = mips->pc + 4;
     mips->pc = mips->regs[decode_rs(word)];
 }
+
+void inst_j(MIPS* cpu, uint32_t word) {
+    uint32_t target = decode_target(cpu, word);
+    printf("J %p\n", target);
+    cpu->pc = target;
+}
+void inst_jal(MIPS* cpu, uint32_t word) {
+    uint32_t target = decode_target(cpu, word);
+    printf("JAL %p\n", target);
+    cpu->regs[31] = cpu->pc + 4;
+    cpu->pc = target;
+}
+
 
 void inst_add(MIPS* cpu, uint32_t word) {
     arith_op("ADD", op_add);
@@ -109,19 +122,6 @@ void inst_slti(MIPS* cpu, uint32_t word) {
 void inst_sltiu(MIPS* cpu, uint32_t word) {
     arith_i_op_zx("SLTIU", op_sltu);
 }
-
-void inst_j(MIPS* cpu, uint32_t word) {
-    uint32_t target = decode_target(cpu, word);
-    printf("J %p\n", target);
-    cpu->pc = target;
-}
-void inst_jal(MIPS* cpu, uint32_t word) {
-    uint32_t target = decode_target(cpu, word);
-    printf("JAL %p\n", target);
-    cpu->regs[31] = cpu->pc;
-    cpu->pc = target;
-}
-
 void inst_lb(MIPS* cpu, uint32_t word) {
     do_load("LB", int8_t);
 }
@@ -191,11 +191,11 @@ void inst_sra(MIPS* cpu, uint32_t word) {
 }
 
 void inst_beql(MIPS* cpu, uint32_t word) {
-    do_branch("BEQL", cpu->regs[decode_rs(word)] == cpu->regs[decode_rt(word)]);
+    do_branch_likely("BEQL", cpu->regs[decode_rs(word)] == cpu->regs[decode_rt(word)]);
     cpu->delay_slot = 0;
 }
 void inst_bnel(MIPS* cpu, uint32_t word) {
-    do_branch("BNEL", cpu->regs[decode_rs(word)] != cpu->regs[decode_rt(word)]);
+    do_branch_likely("BNEL", cpu->regs[decode_rs(word)] != cpu->regs[decode_rt(word)]);
     cpu->delay_slot = 0;
 }
 
@@ -214,8 +214,10 @@ void inst_syscall(MIPS* cpu, uint32_t word) {
 
 INT mips_step(MIPS_CPU* pCPU) {
     uint32_t opcode = pCPU->mips.delay_slot;
+    uint32_t pc = pCPU->mips.ds_addr;
     pCPU->mips.delay_slot = *(uint32_t*)(pCPU->mips.pc);
-    printf("(DS = %p OP = %p) %p: ", pCPU->mips.delay_slot, opcode, pCPU->mips.pc);
+    pCPU->mips.ds_addr = pCPU->mips.pc;
+    printf("(DS = %p OP = %p) %p: ", pCPU->mips.delay_slot, opcode, pc);
     pCPU->mips.pc += 4;
     pCPU->mips.regs[0] = 0;
 

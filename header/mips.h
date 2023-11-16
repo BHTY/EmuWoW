@@ -16,6 +16,7 @@ typedef struct {
 	uint32_t hi;
 	uint32_t lo;
     uint32_t delay_slot;
+    uint32_t ds_addr;
 } MIPS;
 
 typedef struct {
@@ -63,6 +64,10 @@ typedef struct {
 #define do_branch(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2); \
                               printf("%s $%d, $%d, %p\n", name, decode_rs(word), decode_rt(word), target); \
                               if((cond)) cpu->pc = target;
+
+#define do_branch_likely(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2); \
+                              printf("%s $%d, $%d, %p\n", name, decode_rs(word), decode_rt(word), target); \
+                              if((cond)) {cpu->pc = target;} else{cpu->ds_addr = 0; cpu->delay_slot = 0; }
 
 #define do_branch_alt(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2); \
   printf("%s $%d, %p\n", name, decode_rs(word), target); \

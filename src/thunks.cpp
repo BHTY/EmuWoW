@@ -125,19 +125,7 @@ VOID LockTimerForCPU(HWND hwnd, int nIDEvent, CPU* cpu) {
 }
 
 DWORD_PTR ThunkCallback(CPU* cpu, DWORD TargetAddress) {
-	DWORD_PTR oldPC = cpu->get_ip(cpu);
-	INT callbackDepth = cpu->callback_depth;
-	cpu->push_ra(cpu, EscapeVector);
-	cpu->set_ip(cpu, TargetAddress);
-	cpu->callback_depth++;
-
-	while (cpu->callback_depth > callbackDepth) { //execute until cpu callback depth is back to what it was
-		cpu->step(cpu);
-	}
-
-	cpu->set_ip(cpu, oldPC);
-
-	return cpu->get_ret_val(cpu);
+	return cpu->thunk_callback(cpu, TargetAddress);
 }
 
 INT_PTR CALLBACK thunkDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -196,7 +184,7 @@ LRESULT CALLBACK thunkWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		cpu = lpInitLParam->cpu;
 	}
 
-	printf("\nThunking to WndProc with Msg %p (SP=%p)", msg, cpu->get_sp(cpu));
+	printf("\nThunking to WndProc (%p) with Msg %p (SP=%p)\n", lpfnWndProc, msg, cpu->get_sp(cpu));
 
 	cpu->set_params(cpu, 4, lParam, wParam, msg, hWnd);
 

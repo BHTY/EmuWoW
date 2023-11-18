@@ -1,8 +1,9 @@
+#include <stdio.h>
 #include "mips.h"
 #include <varargs.h>
 #include "thunks.h"
 #include "pe.h"
-#undef printf
+//#undef printf
 
 int mips_escape[3] = { 0x30630000, 0x34630fff, 0x0000000c };
 
@@ -463,6 +464,49 @@ VOID mips_dump_regs(MIPS_CPU* cpu) {
     }
 }
 
+VOID mips_prepare_callback(MIPS_CPU* cpu) { //invalidate the current instruction in the delay slot
+    cpu->mips.delay_slot = 0;
+    cpu->mips.ds_addr = 0;
+}
+
+VOID mips_thunk_callback(MIPS_CPU* cpu, DWORD_PTR TargetAddress) {
+    DWORD_PTR oldPC = cpu->cpu.get_ip(cpu);
+    INT callbackDepth = cpu->cpu.callback_depth;
+    uint32_t old_ra = cpu->mips.regs[31];
+
+    printf("ATTENTION! Doing callback from %p to %p!!! ", oldPC, TargetAddress);
+
+    mips_prepare_callback(cpu);
+
+    cpu->cpu.push_ra(cpu, EscapeVector);
+    cpu->cpu.set_ip(cpu, TargetAddress);
+    cpu->cpu.callback_depth++;
+
+    while (cpu->cpu.callback_depth > callbackDepth) { //execute until cpu callback depth is back to what it was
+        cpu->cpu.step(cpu);
+    }
+
+    cpu->cpu.set_ip(cpu, oldPC);
+
+    printf("Escaped from callback at %p back to %p ", TargetAddress, oldPC);
+
+    cpu->mips.regs[31] = old_ra;
+
+    return cpu->cpu.get_ret_val(cpu);
+}
+
+va_list mips_get_va_list(MIPS_CPU* cpu, DWORD offset) {
+    DWORD real_offset;
+    if (offset <= 4) {
+        real_offset = 0;
+    }
+    else {
+        real_offset = offset - 4;
+    }
+
+    return cpu->mips.regs[29] + 16 + 4 * real_offset;
+}
+
 CPU* AllocMIPS() {
     MIPS_CPU* pCPU = malloc(sizeof(MIPS_CPU));
     memset(pCPU, 0x00, sizeof(MIPS_CPU));
@@ -481,6 +525,8 @@ CPU* AllocMIPS() {
     pCPU->cpu.fn_arg = mips_fn_arg;
     pCPU->cpu.get_sp = mips_get_sp;
     pCPU->cpu.dump_regs = mips_dump_regs;
+    pCPU->cpu.thunk_callback = mips_thunk_callback;
+    pCPU->cpu.get_va_list = mips_get_va_list;
 
     EscapeVector = mips_escape;
 

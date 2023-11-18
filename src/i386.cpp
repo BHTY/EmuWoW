@@ -3266,6 +3266,27 @@ va_list i386_get_va_list(i386_CPU* cpu, DWORD offset) {
 	return cpu->I386.esp + 4 + (offset * 4);
 }
 
+VOID i386_thunk_callback(CPU* cpu, DWORD TargetAddress) {
+	DWORD_PTR oldPC = cpu->get_ip(cpu);
+	INT callbackDepth = cpu->callback_depth;
+
+	printf("ATTENTION! Doing callback from %p to %p!!! ", oldPC, TargetAddress);
+
+	cpu->push_ra(cpu, EscapeVector);
+	cpu->set_ip(cpu, TargetAddress);
+	cpu->callback_depth++;
+
+	while (cpu->callback_depth > callbackDepth) { //execute until cpu callback depth is back to what it was
+		cpu->step(cpu);
+	}
+
+	cpu->set_ip(cpu, oldPC);
+
+	printf("Escaped from callback at %p back to %p ", TargetAddress, oldPC);
+
+	return cpu->get_ret_val(cpu);
+}
+
 CPU* Alloc386() {
 	i386_CPU* cpu = malloc(sizeof(i386_CPU));
 	memset(cpu, 0, sizeof(i386_CPU));
@@ -3284,6 +3305,7 @@ CPU* Alloc386() {
 	cpu->cpu.set_params = i386_set_params;
 	cpu->cpu.push_ra = i386_push_ra;
 	cpu->cpu.get_va_list = i386_get_va_list;
+	cpu->cpu.thunk_callback = i386_thunk_callback;
 
 	cpu->cpu.step = i386_step;
 

@@ -68,6 +68,8 @@ def generate_mips_asm(name, args, cc):
     syscall
     j $31
     nop
+    j $31
+    nop
     .end
 """.format(name, name, gBase)
     return out_string, ".globl {}\n.extern {} 4\n".format(name, name)
@@ -381,7 +383,7 @@ _DLLMainCRTStartup:
     save_file("thunk_{}.cpp".format(__MODULE__), current_c)
     save_file("thunk_{}.h".format(__MODULE__), current_h)
     save_file("{}.asm".format(__MODULE__), __asm_hdr__ + current_asm_body + current_asm_end + "\n" + "SYSCALL_THUNK equ 0x80")
-    save_file("{}_mips.asm".format(__MODULE__), current_asm_mips_header + current_asm_mips_body)
+    save_file("C:\\Users\\Will\\Desktop\\pedist\\borg\\i386\\actual\\mips\\{}.asm".format(__MODULE__), current_asm_mips_header + current_asm_mips_body)
     save_file("{}.csv".format(__MODULE__), current_csv)
     save_file("{}.def".format(__MODULE__), current_def)
 

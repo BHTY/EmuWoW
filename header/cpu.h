@@ -66,6 +66,8 @@ typedef struct CPU {
 
 	VOID(*dump_regs)(struct CPU*);
 
+	DWORD_PTR(*thunk_callback)(struct CPU*, DWORD_PTR);
+
 	int callback_depth;
 
 } CPU;

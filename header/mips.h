@@ -17,6 +17,7 @@ typedef struct {
 	uint32_t lo;
     uint32_t delay_slot;
     uint32_t ds_addr;
+    uint32_t teb;
 } MIPS;
 
 typedef struct {
@@ -61,15 +62,15 @@ typedef struct {
 #define do_load(name, type)             print_ls(name); \
                               cpu->regs[decode_rt(word)] = (int32_t)*(type*)calc_ls_addr();
 
-#define do_branch(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2); \
+#define do_branch(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2) - 4; \
                               printf("%s $%d, $%d, %p\n", name, decode_rs(word), decode_rt(word), target); \
                               if((cond)) cpu->pc = target;
 
-#define do_branch_likely(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2); \
+#define do_branch_likely(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2) - 4; \
                               printf("%s $%d, $%d, %p\n", name, decode_rs(word), decode_rt(word), target); \
                               if((cond)) {cpu->pc = target;} else{cpu->ds_addr = 0; cpu->delay_slot = 0; }
 
-#define do_branch_alt(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2); \
+#define do_branch_alt(name, cond) uint32_t target = cpu->pc + ((int32_t)decode_imm(word) << 2) - 4; \
   printf("%s $%d, %p\n", name, decode_rs(word), target); \
   if((cond)) cpu->pc = target;
 
@@ -87,7 +88,7 @@ typedef struct {
 #define SUB 34
 #define SUBU 35
 #define SLT 42
-#define SLTU 41
+#define SLTU 43
 
 //R-Type (Shifts)
 #define SLL 0
@@ -126,10 +127,16 @@ typedef struct {
 #define LHU 37
 #define LW 35
 
+#define LWL 34
+#define LWR 38
+
 //Store Instructions
 #define SB 40
 #define SH 41
 #define SW 43
+
+#define SWL 42
+#define SWR 46
 
 //Branch Instructions
 #define B_REGIMM 1

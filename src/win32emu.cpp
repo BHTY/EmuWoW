@@ -101,7 +101,7 @@ VOID EmuInitProcess(LPCSTR lpApplicationName, LPSTR lpCommandLine) {
     printf("\nExecuting EXE entry point.\n");
 
     while (!(cpu->step(cpu))) {
-
+        
     }
 }
 

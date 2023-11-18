@@ -64,6 +64,8 @@ typedef struct CPU {
 
 	va_list(*get_va_list)(struct CPU*, DWORD_PTR);
 
+	VOID(*dump_regs)(struct CPU*);
+
 	int callback_depth;
 
 } CPU;

@@ -44,7 +44,7 @@ void inst_jr(MIPS* mips, uint32_t word) {
 }
 void inst_jalr(MIPS* mips, uint32_t word) {
     printf("JALR $%d, $%d\n", decode_rd(word), decode_rs(word));
-    mips->regs[decode_rd(word)] = mips->pc + 4;
+    mips->regs[decode_rd(word)] = mips->pc;
     mips->pc = mips->regs[decode_rs(word)];
 }
 
@@ -56,7 +56,7 @@ void inst_j(MIPS* cpu, uint32_t word) {
 void inst_jal(MIPS* cpu, uint32_t word) {
     uint32_t target = decode_target(cpu, word);
     printf("JAL %p\n", target);
-    cpu->regs[31] = cpu->pc + 4;
+    cpu->regs[31] = cpu->pc;
     cpu->pc = target;
 }
 
@@ -192,11 +192,81 @@ void inst_sra(MIPS* cpu, uint32_t word) {
 
 void inst_beql(MIPS* cpu, uint32_t word) {
     do_branch_likely("BEQL", cpu->regs[decode_rs(word)] == cpu->regs[decode_rt(word)]);
-    cpu->delay_slot = 0;
 }
 void inst_bnel(MIPS* cpu, uint32_t word) {
     do_branch_likely("BNEL", cpu->regs[decode_rs(word)] != cpu->regs[decode_rt(word)]);
-    cpu->delay_slot = 0;
+}
+
+void inst_lwl(MIPS* cpu, uint32_t word) {
+    uint32_t offset = calc_ls_addr();
+    print_ls("LWL");
+    uint32_t shift = 8 * (~offset & 3);
+    uint32_t mask = ~(-1 << shift);
+    uint32_t temp = *(uint32_t*)(offset & ~3);
+    cpu->regs[decode_rt(word)] = (cpu->regs[decode_rt(word)] & mask) | (temp << shift);
+}
+void inst_lwr(MIPS* cpu, uint32_t word) {
+    uint32_t offset = calc_ls_addr();
+    print_ls("LWR");
+    uint32_t shift = 8 * (offset & 3);
+    uint32_t mask = ~(-1 >> shift);
+    uint32_t temp = *(uint32_t*)(offset & ~3);
+    cpu->regs[decode_rt(word)] = (cpu->regs[decode_rt(word)] & mask) | (temp >> shift);
+}
+
+
+void inst_swl(MIPS* cpu, uint32_t word) {
+    uint32_t offset = calc_ls_addr();
+    print_ls("SWL");
+    uint32_t shift = 8 * (~offset & 3);
+    uint32_t mask = ~(-1 << shift);
+    *(uint32_t*)(offset & ~3) = (*(uint32_t*)(offset & ~3) & mask) | (cpu->regs[decode_rt(word)] >> shift);
+}
+
+void inst_swr(MIPS* cpu, uint32_t word) {
+    uint32_t offset = calc_ls_addr();
+    print_ls("SWR");
+    uint32_t shift = 8 * (offset & 3);
+    uint32_t mask = ~(-1 >> shift);
+    *(uint32_t*)(offset & ~3) = (*(uint32_t*)(offset & ~3) & mask) | (cpu->regs[decode_rt(word)] << shift);
+}
+
+void inst_mflo(MIPS* cpu, uint32_t word) {
+    printf("MFLO $%d\n", decode_rd(word));
+    cpu->regs[decode_rd(word)] = cpu->lo;
+}void inst_mfhi(MIPS* cpu, uint32_t word) {
+    printf("MFHI $%d\n", decode_rd(word));
+    cpu->regs[decode_rd(word)] = cpu->hi;
+}
+
+void inst_mtlo(MIPS* cpu, uint32_t word) {
+    printf("MTLO $%d\n", decode_rs(word));
+    cpu->lo = cpu->regs[decode_rs(word)];
+}void inst_mthi(MIPS* cpu, uint32_t word) {
+    printf("MTHI $%d\n", decode_rs(word));
+    cpu->hi = cpu->regs[decode_rs(word)];
+}
+
+void inst_mult(MIPS* cpu, uint32_t word) {
+    printf("MULT $%d, $%d\n", decode_rs(word), decode_rt(word));
+    int64_t result = (int32_t)cpu->regs[decode_rs(word)] * (int32_t)cpu->regs[decode_rt(word)];
+    cpu->hi = result >> 32;
+    cpu->lo = result;
+}void inst_multu(MIPS* cpu, uint32_t word) {
+    printf("MULTU $%d, $%d\n", decode_rs(word), decode_rt(word));
+    uint64_t result = (uint32_t)cpu->regs[decode_rs(word)] * (uint32_t)cpu->regs[decode_rt(word)];
+    cpu->hi = result >> 32;
+    cpu->lo = result;
+}
+
+void inst_div(MIPS* cpu, uint32_t word) {
+    printf("DIV $%d, $%d\n", decode_rs(word), decode_rt(word));
+    cpu->lo = (int32_t)cpu->regs[decode_rs(word)] / (int32_t)cpu->regs[decode_rt(word)];
+    cpu->hi = (int32_t)cpu->regs[decode_rs(word)] % (int32_t)cpu->regs[decode_rt(word)];
+}void inst_divu(MIPS* cpu, uint32_t word) {
+    printf("DIVU $%d, $%d\n", decode_rs(word), decode_rt(word));
+    cpu->lo = (uint32_t)cpu->regs[decode_rs(word)] / (uint32_t)cpu->regs[decode_rt(word)];
+    cpu->hi = (uint32_t)cpu->regs[decode_rs(word)] % (uint32_t)cpu->regs[decode_rt(word)];
 }
 
 void inst_syscall(MIPS* cpu, uint32_t word) {
@@ -243,6 +313,17 @@ INT mips_step(MIPS_CPU* pCPU) {
             exec_op(SLL, inst_sll);
             exec_op(SRL, inst_srl);
             exec_op(SRA, inst_sra);
+
+            exec_op(MTHI, inst_mthi);
+            exec_op(MTLO, inst_mtlo);
+            exec_op(MFHI, inst_mfhi);
+            exec_op(MFLO, inst_mflo);
+
+            exec_op(MULT, inst_mult);
+            exec_op(MULTU, inst_multu);
+
+            exec_op(DIV, inst_div);
+            exec_op(DIVU, inst_divu);
         default:
             printf("Unimplemented funct %02x\n", decode_funct(opcode));
             while (1);
@@ -277,9 +358,15 @@ INT mips_step(MIPS_CPU* pCPU) {
     exec_op(LBU, inst_lbu);
     exec_op(LHU, inst_lhu);
 
+    exec_op(LWL, inst_lwl);
+    exec_op(LWR, inst_lwr);
+
     exec_op(SB, inst_sb);
     exec_op(SH, inst_sh);
     exec_op(SW, inst_sw);
+
+    exec_op(SWL, inst_swl);
+    exec_op(SWR, inst_swr);
 
     case B_REGIMM:
         switch (decode_rt(opcode)) {
@@ -304,7 +391,11 @@ INT mips_step(MIPS_CPU* pCPU) {
 }
 
 VOID mips_set_teb(MIPS_CPU* cpu, PTEB pTEB) {
+    cpu->mips.teb = pTEB;
+}
 
+_PTEB mips_get_teb(MIPS_CPU* cpu) {
+    return cpu->mips.teb;
 }
 
 DWORD_PTR mips_get_ret_val(MIPS_CPU* cpu) {
@@ -355,7 +446,21 @@ VOID mips_set_ret_val(MIPS_CPU* cpu, DWORD val) {
 }
 
 DWORD mips_fn_arg(MIPS_CPU* cpu, INT index) {
+    if (index > 3) {
+        return *(uint32_t*)(cpu->mips.regs[29] + 16 + 4 * (index - 4));
+    }
     return cpu->mips.regs[4 + index];
+}
+
+VOID mips_dump_regs(MIPS_CPU* cpu) {
+    int i, p;
+
+    for (i = 0; i < 8; i++) {
+        for (p = 0; p < 4; p++) {
+            printf("$%02d = %p ", i * 4 + p, cpu->mips.regs[i * 4 + p]);
+        }
+        printf("\n");
+    }
 }
 
 CPU* AllocMIPS() {
@@ -369,11 +474,13 @@ CPU* AllocMIPS() {
     pCPU->cpu.set_sp = mips_set_sp;
     pCPU->cpu.push_ra = mips_push_ra;
     pCPU->cpu.set_teb = mips_set_teb;
+    pCPU->cpu.get_teb = mips_get_teb;
     pCPU->cpu.set_params = mips_set_params;
     pCPU->cpu.syscall_id = mips_syscall_id;
     pCPU->cpu.set_ret_val = mips_set_ret_val;
     pCPU->cpu.fn_arg = mips_fn_arg;
     pCPU->cpu.get_sp = mips_get_sp;
+    pCPU->cpu.dump_regs = mips_dump_regs;
 
     EscapeVector = mips_escape;
 

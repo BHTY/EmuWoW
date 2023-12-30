@@ -43,6 +43,17 @@ void cpu_stosd(i386* cpu) {
 	}
 }
 
+void cpu_stosw(i386* cpu) {
+	*(uint16_t*)virtual_to_physical_addr(cpu, cpu->edi) = cpu->ax;
+
+	if (cpu->eflags & 0x400) {
+		cpu->edi-=2;
+	}
+	else {
+		cpu->edi+=2;
+	}
+}
+
 void cpu_stosb(i386* cpu) {
 	*(uint8_t*)virtual_to_physical_addr(cpu, cpu->edi) = cpu->al;
 
@@ -1950,6 +1961,12 @@ void op_AA(i386* cpu) { //stosb
 	cpu->eip++;
 }
 
+void op_AB(i386* cpu) { //stosw
+	printf("STOSW");
+	cpu_stosw(cpu);
+	cpu->eip++;
+}
+
 void op_B8(i386* cpu) { //MOV EAX, imm32
 	printf("MOV ");
 	cpu->eip++;
@@ -3100,7 +3117,7 @@ void(*op_table[256])(i386* cpu) = {
 	op_A8, //0xa8
 	op_A9, //0xa9
 	op_AA, //0xaa
-	0, //0xab
+	op_AB, //0xab
 	0, //0xac
 	0, //0xad
 	0, //0xae

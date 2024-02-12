@@ -19,7 +19,13 @@ typedef struct {
     uint32_t hi;
     uint32_t lo;
     uint32_t branch_state;
+	
+	uint32_t memory_state;
 } MIPS;
+
+#define READING 1
+#define WRITING 2
+#define FETCHING 4
 
 
 

@@ -1,9 +1,82 @@
 #include "r4000.h"
+#include "EmuWoW.h"
 #include <windows.h>
+
+extern char* reg[32];
+
+void display_loaded_libs(PThreadContext pContext){
+	PEmuPEB_LDR_DATA Ldr = pContext->teb.ProcessEnvironmentBlock->Ldr;
+	
+	PLIST_ENTRY rootEntry = &(Ldr->InMemoryOrderModuleList);
+	PLIST_ENTRY pEntry;
+	
+	printf("The loaded libraries were:\n");
+	
+	for(pEntry = rootEntry->Flink; pEntry != rootEntry; pEntry = pEntry->Flink){
+		PEmuLDR_DATA_TABLE_ENTRY pDataEntry = pEntry - 1;
+		printf("	%ls: %p\n", pDataEntry->BaseDllName.Buffer, pDataEntry->DllBase);
+	}
+}
+
+void dump_registers(PThreadContext pContext){
+	int i, p;
+	
+	for(i = 0; i < 32; i++){
+		
+		if(i % 4 == 0){
+			printf("\n");
+		}
+		
+		printf("%s: %p ", reg[i], pContext->cpu.regs[i]);
+	}
+	
+	printf("\n\n");
+}
+
+void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info){
+	printf("\n	HALT! (PC=%p)\n", pContext->cpu.pc);
+	printf("	Thread Stack Base: %p Stack Limit: %p\n", pContext->teb.StackBase, pContext->teb.StackLimit);
+	
+	switch(error_type){
+		case SEGFAULT:
+			printf("	The memory at address %p could not be ", info);
+			
+			if(pContext->cpu.memory_state & READING){
+				printf("\"read\"\n");
+				
+				printf("%p ", *(uint32_t*)(pContext->cpu.pc));
+				mips_disasm(pContext->cpu.pc, *(uint32_t*)(pContext->cpu.pc));
+			} else if(pContext->cpu.memory_state & WRITING){
+				printf("\"written\"\n");
+				
+				printf("%p ", *(uint32_t*)(pContext->cpu.pc));
+				mips_disasm(pContext->cpu.pc, *(uint32_t*)(pContext->cpu.pc));
+				
+				//dump instruction
+			} else if(pContext->cpu.memory_state & FETCHING){
+				printf("\"executed\"\n");
+			} 
+			
+			break;
+		case INVINST:
+			printf("	Invalid instruction %p\n", *(uint32_t*)(pContext->cpu.pc));
+			break;
+		default:
+			break;
+	}
+	
+	//dump registers
+	dump_registers(pContext);
+	
+	//display list of loaded libraries
+	display_loaded_libs(pContext);
+	
+	ExitProcess(0);
+}
 
 void handle_reserved_instruction(uint32_t op) {
 	printf("Unrecognized instruction %x\n", op);
-	while (1);
+	FatalError(TlsGetValue(dwThreadContextIndex), INVINST, 0);
 }
 
 void cp1_execute(MIPS* cpu, uint32_t op) { //FPU
@@ -42,10 +115,13 @@ void cpu_swl(MIPS* cpu, uint32_t op) {
 }
 
 void r4000_step(MIPS* cpu) {
-	uint32_t op = *(uint32_t*)(cpu->pc);
+	uint32_t op;
 
-	/*printf("%p: %p ", cpu->pc, op);
-	mips_disasm(cpu->pc, op);*/
+	cpu->memory_state |= FETCHING;
+	op	= *(uint32_t*)(cpu->pc);
+
+	printf("%p: %p ", cpu->pc, op);
+	mips_disasm(cpu->pc, op);
 
 	r4000_execute(cpu, op);
 
@@ -71,6 +147,8 @@ void r4000_step(MIPS* cpu) {
 		m_branch_state = NONE;
 		break;
 	}
+	
+	cpu->memory_state = 0;
 }
 
 DWORD HandleNativeInstruction(MIPS* cpu, DWORD pc){
@@ -493,43 +571,56 @@ void r4000_execute(MIPS* cpu, uint32_t op) {
 		break;
 	case 0x20: // LB
 
+		cpu->memory_state |= READING;
 		m_r[RTREG] = load(int8_t, ADDR(m_r[RSREG], s16(op)));
 
 		break;
 	case 0x21: // LH
+		cpu->memory_state |= READING;
 		m_r[RTREG] = load(int16_t, ADDR(m_r[RSREG], s16(op)));
 		break;
 	case 0x22: // LWL
+		cpu->memory_state |= READING;
 		cpu_lwl(cpu, op);
 		break;
 	case 0x23: // LW
+		cpu->memory_state |= READING;
 		m_r[RTREG] = load(int32_t, ADDR(m_r[RSREG], s16(op)));
 		break;
 	case 0x24: // LBU
+		cpu->memory_state |= READING;
 		m_r[RTREG] = load(int8_t, ADDR(m_r[RSREG], s16(op)));
 		break;
 	case 0x25: // LHU
+		cpu->memory_state |= READING;
 		m_r[RTREG] = load(uint16_t, ADDR(m_r[RSREG], s16(op)));
 		break;
 	case 0x26: // LWR
+		cpu->memory_state |= READING;
 		cpu_lwr(cpu, op);
 		break;
 	case 0x27: // LWU
+		cpu->memory_state |= READING;
 		m_r[RTREG] = load(uint32_t, ADDR(m_r[RSREG], s16(op)));
 		break;
 	case 0x28: // SB
+		cpu->memory_state |= WRITING;
 		store(uint8_t, ADDR(m_r[RSREG], s16(op)), m_r[RTREG]);
 		break;
 	case 0x29: // SH
+		cpu->memory_state |= WRITING;
 		store(uint16_t, ADDR(m_r[RSREG], s16(op)), m_r[RTREG]);
 		break;
 	case 0x2a: // SWL
+		cpu->memory_state |= WRITING;
 		cpu_swl(cpu, op);
 		break;
 	case 0x2b: // SW
+		cpu->memory_state |= WRITING;
 		store(uint32_t, ADDR(m_r[RSREG], s16(op)), m_r[RTREG]);
 		break;
 	case 0x2e: // SWR
+		cpu->memory_state |= WRITING;
 		cpu_swr(cpu, op);
 		break;
 	case 0x2f: // CACHE

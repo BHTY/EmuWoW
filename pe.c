@@ -1,10 +1,51 @@
 #include "EmuWoW.h"
 #include "pe.h"
 #include <stdio.h>
+#include <string.h>
+#include <windows.h>
 
 #define ALIGN(x, y)	(((x % y) == 0) ? x : (x + y) - x % 4)
 
 PBYTE TextSection = NULL;
+UCS2_STRING LastImageName;
+
+UCS2_STRING AnsiToUnicodeString(char* AnsiString){
+	UCS2_STRING uString;
+	
+	uString.Buffer = malloc(2 * 256);
+	uString.Length = 510;
+	uString.MaximumLength = 512;
+	
+	MultiByteToWideChar(CP_ACP, 0, AnsiString, -1, uString.Buffer, 256);
+	
+	return uString;
+}
+
+LPWSTR GetFileNameFromPathW(LPWSTR lpPath) {
+	wchar_t* LastSlash = NULL;
+	DWORD i;
+	for (i = 0; lpPath[i] != NULL; i++)
+	{
+		if (lpPath[i] == '\\')
+			LastSlash = &lpPath[i + 1];
+	}
+	return LastSlash;
+}
+
+void AddLdrEntry(PEmuPEB_LDR_DATA pLdr, PVOID ImageBase, PUCS2_STRING pFullName){ //put it into the thing
+	PEmuLDR_DATA_TABLE_ENTRY pDataEntry = malloc(sizeof(EmuLDR_DATA_TABLE_ENTRY));
+	
+	pDataEntry->DllBase = ImageBase;
+	pDataEntry->EntryPoint = (PBYTE)ImageBase + EmuGetNtHeader(ImageBase)->OptionalHeader.AddressOfEntryPoint;
+	pDataEntry->SizeOfImage = EmuGetNtHeader(ImageBase)->OptionalHeader.SizeOfImage;
+	pDataEntry->FullDllName = *pFullName;
+	pDataEntry->BaseDllName = *pFullName;
+	
+	pDataEntry->InMemoryOrderLinks.Flink = &(pLdr->InMemoryOrderModuleList);
+	pDataEntry->InMemoryOrderLinks.Blink = pLdr->InMemoryOrderModuleList.Blink;
+	pLdr->InMemoryOrderModuleList.Blink->Flink = &(pDataEntry->InMemoryOrderLinks);
+	pLdr->InMemoryOrderModuleList.Blink = &(pDataEntry->InMemoryOrderLinks);
+}
 
 void WritePESections(PBYTE ImageBase, PBYTE pData, PIMAGE_SECTION_HEADER sections, WORD nSections) {
 	char* addr = NULL;
@@ -122,6 +163,8 @@ LPVOID MapImageIntoMemory(LPCSTR lpLibFileName) {
 	UnmapViewOfFile(pData);
 	CloseHandle(hMapping);
 	CloseHandle(hFile);
+	
+	LastImageName = AnsiToUnicodeString(lpLibFileName);
 
 	return ImageBase;
 }
@@ -165,6 +208,63 @@ VOID StubExports(PIMAGE_DOS_HEADER pModule, HMODULE hModule) {
 	}
 }
 
+HMODULE LoadMIPSLibrary(LPCSTR lpLibFileName){
+		PThreadContext pContext;
+	MIPS* pCPU;
+	
+	DWORD DllMainCRTStartupParams[3];
+
+	DWORD dwStackSpace;
+	PBYTE pStack;
+	
+	HANDLE hHeap;
+	//CPU* pCPU;
+	PBYTE ImageBase = MapImageIntoMemory(lpLibFileName);
+	PIMAGE_DOS_HEADER dos_hdr;
+	PIMAGE_NT_HEADERS nt_hdr;
+	PIMAGE_SECTION_HEADER sections;
+	PIMAGE_DATA_DIRECTORY data_dir;
+	PIMAGE_OPTIONAL_HEADER pImageHdr = &(EmuGetNtHeader(ImageBase)->OptionalHeader);
+	PIMAGE_IMPORT_DESCRIPTOR import_descriptor;
+	DWORD delta;
+
+	if (!ImageBase) return NULL;
+
+	pContext = TlsGetValue(dwThreadContextIndex);
+	pCPU = &(pContext->cpu);
+
+	dos_hdr = ImageBase;
+	nt_hdr = ((PBYTE)dos_hdr) + dos_hdr->e_lfanew;
+	sections = (PIMAGE_SECTION_HEADER)(nt_hdr + 1);
+	data_dir = nt_hdr->OptionalHeader.DataDirectory;
+	
+	if(nt_hdr->FileHeader.Machine != IMAGE_FILE_MACHINE_R4000) return NULL;
+
+	//apply relocations
+	delta = (DWORD)ImageBase - nt_hdr->OptionalHeader.ImageBase;
+
+	if (delta && data_dir[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress) {
+		PIMAGE_BASE_RELOCATION base_reloc = ImageBase + data_dir[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
+		WritePERelocs(ImageBase, base_reloc, delta);
+	}
+	
+	//put EXE into PEB
+	AddLdrEntry(pContext->teb.ProcessEnvironmentBlock->Ldr, ImageBase, &LastImageName);
+
+	//resolve imports
+	import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)(ImageBase + data_dir[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+	if (data_dir[IMAGE_DIRECTORY_ENTRY_IMPORT].Size) { ResolveImports(ImageBase, import_descriptor); }
+	
+	//call DLL entry point
+	DllMainCRTStartupParams[0] = ImageBase;
+	DllMainCRTStartupParams[1] = DLL_PROCESS_ATTACH;
+	
+	ExecuteEmulatedProcedure(pCPU, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint, DllMainCRTStartupParams, 3);
+
+	return ImageBase;
+
+}
+
 HMODULE LoadNativeLibrary(LPCSTR lpLibFileName) {
 	/*
 		Load the actual library using LoadLibrary()
@@ -201,7 +301,7 @@ void ResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descriptor)
 
 	for (i = 0; import_descriptor[i].OriginalFirstThunk; i++) {
 		printf("IMPORTS FROM %s\n", ImageBase + import_descriptor[i].Name);
-		lib = LoadNativeLibrary(ImageBase + import_descriptor[i].Name);
+		lib = EmuLoadLibrary(ImageBase + import_descriptor[i].Name);
 		
 		HINT_TABLE = ImageBase + (DWORD)import_descriptor[i].OriginalFirstThunk; //IDT
 		IAT_TABLE = ImageBase + (DWORD)import_descriptor[i].FirstThunk;
@@ -318,6 +418,9 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into me
 	//patch module filename & real base address
 	PatchModuleFileName(NtTeb->ProcessEnvironmentBlock, ImageBase);
 	NtTeb->ProcessEnvironmentBlock->ImageBaseAddress = ImageBase;
+	
+	//put EXE into PEB
+	AddLdrEntry(pContext->teb.ProcessEnvironmentBlock->Ldr, ImageBase, &LastImageName);
 
 	//resolve imports
 	import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)(ImageBase + data_dir[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
@@ -337,7 +440,7 @@ FARPROC EmuGetProcAddress(LPVOID module, LPCSTR lpProcName) { //convert "#123" t
 	DWORD* exportNamePointerTable = (char*)module + (DWORD)imageExportDirectory->AddressOfNames;
 	int i;
 
-	for (i = 0; i < imageExportDirectory->NumberOfFunctions; i++) {
+	for (i = 0; i < imageExportDirectory->NumberOfNames; i++) {
 		WORD ordinalIndex = nameOrdinalsPointer[i];
 		BYTE* procName = (char*)module + exportNamePointerTable[i];
 		BYTE* fncAddress = (char*)module + exportAddressTable[ordinalIndex];
@@ -361,6 +464,46 @@ FARPROC EmuGetProcAddress(LPVOID module, LPCSTR lpProcName) { //convert "#123" t
 	return NULL;
 }
 
-HMODULE EmuLoadLibrary(LPCSTR lpLibFileName) {
+HMODULE EmuGetModuleHandle(LPCSTR lpLibFileName){ 
+	UCS2_STRING uString = AnsiToUnicodeString(lpLibFileName);
+	
+	PThreadContext pContext = TlsGetValue(dwThreadContextIndex);
+	
+	PEmuPEB_LDR_DATA Ldr = pContext->teb.ProcessEnvironmentBlock->Ldr;
+	
+	PLIST_ENTRY rootEntry = &(Ldr->InMemoryOrderModuleList);
+	PLIST_ENTRY pEntry;
+	
+	for(pEntry = rootEntry->Flink; pEntry != rootEntry; pEntry = pEntry->Flink){
+		PEmuLDR_DATA_TABLE_ENTRY pDataEntry = pEntry - 1;
+		
+		if(_wcsicmp(pDataEntry->BaseDllName.Buffer, uString.Buffer) == 0){
+			return pDataEntry->DllBase;
+		}
+	}
 
+	return NULL;
+}	
+
+HMODULE EmuLoadLibrary(LPCSTR lpLibFileName) {
+	
+	PThreadContext pContext = TlsGetValue(dwThreadContextIndex);
+	HMODULE hExistingModule = EmuGetModuleHandle(lpLibFileName);
+	PVOID ImageBase;
+	
+	if(hExistingModule){ //increment load country
+		return hExistingModule;
+	}
+	
+	//try to load MIPS library
+	ImageBase = LoadMIPSLibrary(lpLibFileName);
+	
+	if(ImageBase == NULL){ //if not, load native lib
+		ImageBase = LoadNativeLibrary(lpLibFileName);
+	}
+	
+	//make entry into peb
+	AddLdrEntry(pContext->teb.ProcessEnvironmentBlock->Ldr, ImageBase, &LastImageName);
+	
+	return ImageBase;	
 }

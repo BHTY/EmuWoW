@@ -7,18 +7,35 @@
 
 /*
 EmuWoW Todo List
+1.) Make shell32 not buggy (DisableThreadLibraryCalls crash)
+2.) Detach the program from the MIPS architecture
+3.) Debugger
+4.) Smarter callback handler (MT-aware and aware of different callback types)
+5.) Fix module relocator
+6.) Fix command line (both for the actual PEB & the MIPS PEB)
+7.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
 
-Now
-1.) Loaded module list (and supporting loading of MIPS DLLs, not double-loading, etc.)
+Changes
+- Shows 16 bit immediates as hex in disassembler
+- Crash screen
+- Inserting items into the PEB LDR list, not double-loading, loading MIPS DLLs when available
 
-Later
-1.) Smarter callback handler (MT-aware and aware of different callback types)
-2.) Fix module relocator
-
-Little todos
-1.) Fix command line (both for the actual PEB & the MIPS PEB)
-2.) 
+Mini-Debugger Commands
+- U <ADDR> <NUM>: Disassemble NUM instructions from ADDR
+- D <ADDR> <NUM>: Dump NUM bytes from ADDR
+- W <ADDR> <NUM>: Dump NUM words from ADDR
+- E <ADDR> ...: Enter words into ADDR
+- R: Dump registers
+- L: List breakpoints
+- B <ADDR>: Remove breakpoint at ADDR
+- S <ADDR>: Set breakpoint at ADDR
+- T <ADDR>: Trace/single-step from ADDR (optional; goes from PC if not)
+- G <ADDR>: Go from ADDR (optional; goes from PC if not) 
+- M: List loaded modules
 */
+
+#define SEGFAULT 1
+#define INVINST 2
 
 extern DWORD dwThreadContextIndex;
 
@@ -26,7 +43,7 @@ typedef struct _UCS2_STRING {
 	USHORT Length;
 	USHORT MaximumLength;
 	PWSTR Buffer;
-} UCS2_STRING, *PCS2_STRING;
+} UCS2_STRING, *PUCS2_STRING;
 
 typedef struct _EmuRTL_USER_PROCESS_PARAMETERS {
 	BYTE Padding[0x30];
@@ -96,7 +113,7 @@ typedef struct _EmuTEB {
 
 typedef struct _ThreadContext {
 
-	EmuTEB teb; 
+	EmuTEB teb;
 
 	MIPS cpu;
 } ThreadContext, *PThreadContext;

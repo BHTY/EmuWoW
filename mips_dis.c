@@ -9,10 +9,23 @@ char* reg[32] = {
 	"$t8",  "$t9",  "$k0",  "$k1",  "$gp",  "$sp",  "$fp",  "$ra"
 };
 
-#define signed_16bit(op) ((uint16_t)op)
+char* display_addr(char* str, int16_t op){
+	if(op < 0){
+		sprintf(str, "-%04x", -op);
+	}
+	else{
+		sprintf(str, "%04x", op);
+	}
+	
+	return str;
+}
+
+//#define signed_16bit(op) ((uint16_t)op)
+#define signed_16bit(op) (display_addr(string, op))
 
 void mips_disasm(uint32_t pc, uint32_t op)
 {
+	char string[20];
 	int rs = (op >> 21) & 31;
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -102,12 +115,12 @@ void mips_disasm(uint32_t pc, uint32_t op)
 		case 0x01:  printf("bgez      %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 		case 0x02:  printf("bltzl     %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 		case 0x03:  printf("bgezl     %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2));  break;
-		case 0x08:  printf("tgei      %s,%p", reg[rs], signed_16bit(op)); break;
-		case 0x09:  printf("tgeiu     %s,%p", reg[rs], signed_16bit(op)); break;
-		case 0x0a:  printf("tlti      %s,%p", reg[rs], signed_16bit(op));  break;
-		case 0x0b:  printf("tltiu     %s,%p", reg[rs], signed_16bit(op));  break;
-		case 0x0c:  printf("teqi      %s,%p", reg[rs], signed_16bit(op));  break;
-		case 0x0e:  printf("tnei      %s,%p", reg[rs], signed_16bit(op)); break;
+		case 0x08:  printf("tgei      %s,%s", reg[rs], signed_16bit(op)); break;
+		case 0x09:  printf("tgeiu     %s,%s", reg[rs], signed_16bit(op)); break;
+		case 0x0a:  printf("tlti      %s,%s", reg[rs], signed_16bit(op));  break;
+		case 0x0b:  printf("tltiu     %s,%s", reg[rs], signed_16bit(op));  break;
+		case 0x0c:  printf("teqi      %s,%s", reg[rs], signed_16bit(op));  break;
+		case 0x0e:  printf("tnei      %s,%s", reg[rs], signed_16bit(op)); break;
 		case 0x10:  printf("bltzal    %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 		case 0x11:  printf("bgezal    %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 		case 0x12:  printf("bltzall   %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
@@ -125,10 +138,10 @@ void mips_disasm(uint32_t pc, uint32_t op)
 	case 0x05:  printf("bne       %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((int16_t)op << 2)); break;
 	case 0x06:  printf("blez      %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2));         break;
 	case 0x07:  printf("bgtz      %s,$%08x", reg[rs], pc + 4 + ((int16_t)op << 2));         break;
-	case 0x08:  printf("addi      %s,%s,%p", reg[rt], reg[rs], signed_16bit(op));         break;
-	case 0x09:  printf("addiu     %s,%s,%p", reg[rt], reg[rs], signed_16bit(op));         break;
-	case 0x0a:  printf("slti      %s,%s,%p", reg[rt], reg[rs], signed_16bit(op));         break;
-	case 0x0b:  printf("sltiu     %s,%s,%p", reg[rt], reg[rs], signed_16bit(op));         break;
+	case 0x08:  printf("addi      %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
+	case 0x09:  printf("addiu     %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
+	case 0x0a:  printf("slti      %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
+	case 0x0b:  printf("sltiu     %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
 	case 0x0c:  printf("andi      %s,%s,$%04x", reg[rt], reg[rs], (uint16_t)op);            break;
 	case 0x0d:  printf("ori       %s,%s,$%04x", reg[rt], reg[rs], (uint16_t)op);            break;
 	case 0x0e:  printf("xori      %s,%s,$%04x", reg[rt], reg[rs], (uint16_t)op);            break;
@@ -137,32 +150,32 @@ void mips_disasm(uint32_t pc, uint32_t op)
 	case 0x15:  printf("bnel      %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((int16_t)op << 2)); break;
 	case 0x16:  printf("blezl     %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((int16_t)op << 2)); break;
 	case 0x17:  printf("bgtzl     %s,%s,$%08x", reg[rs], reg[rt], pc + 4 + ((int16_t)op << 2)); break;
-	case 0x18:  printf("daddi     %s,%s,%p", reg[rt], reg[rs], signed_16bit(op));         break;
-	case 0x19:  printf("daddiu    %s,%s,%p", reg[rt], reg[rs], signed_16bit(op));         break;
-	case 0x1a:  printf("ldl       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x1b:  printf("ldr       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x20:  printf("lb        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x21:  printf("lh        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x22:  printf("lwl       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x23:  printf("lw        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x24:  printf("lbu       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x25:  printf("lhu       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x26:  printf("lwr       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x27:  printf("lwu       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x28:  printf("sb        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x29:  printf("sh        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x2a:  printf("swl       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x2b:  printf("sw        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x2c:  printf("sdl       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x2d:  printf("sdr       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x2e:  printf("swr       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x30:  printf("ll        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x33:  printf("pref      $%x,%d(%s)", rt, signed_16bit(op), reg[rs]);            break;
-	case 0x34:  printf("lld       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x37:  printf("ld        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x38:  printf("sc        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x3c:  printf("scd       %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
-	case 0x3f:  printf("sd        %s,%d(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x18:  printf("daddi     %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
+	case 0x19:  printf("daddiu    %s,%s,%s", reg[rt], reg[rs], signed_16bit(op));         break;
+	case 0x1a:  printf("ldl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x1b:  printf("ldr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x20:  printf("lb        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x21:  printf("lh        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x22:  printf("lwl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x23:  printf("lw        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x24:  printf("lbu       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x25:  printf("lhu       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x26:  printf("lwr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x27:  printf("lwu       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x28:  printf("sb        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x29:  printf("sh        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x2a:  printf("swl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x2b:  printf("sw        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x2c:  printf("sdl       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x2d:  printf("sdr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x2e:  printf("swr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x30:  printf("ll        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x33:  printf("pref      $%x,%s(%s)", rt, signed_16bit(op), reg[rs]);            break;
+	case 0x34:  printf("lld       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x37:  printf("ld        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x38:  printf("sc        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x3c:  printf("scd       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x3f:  printf("sd        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 	}
 	printf("\n");
 }

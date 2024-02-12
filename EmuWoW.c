@@ -23,6 +23,8 @@ PEmuTEB FunctionGetTeb(){
 DWORD ExecuteEmulatedProcedure(MIPS* pCPU, DWORD dwTargetAddress, DWORD* pDwParamList, DWORD nParams) {
 	DWORD dwCurrentArg;
 	DWORD dwOldRA = pCPU->regs[31];
+	
+	pCPU->regs[29] -= 16;
 
 	pCPU->regs[31] = 0xFFFFFF00;
 	pCPU->pc = dwTargetAddress;
@@ -40,6 +42,7 @@ DWORD ExecuteEmulatedProcedure(MIPS* pCPU, DWORD dwTargetAddress, DWORD* pDwPara
 	}
 
 	pCPU->regs[31] = dwOldRA;
+	pCPU->regs[29] += 16;
 
 	printf("	<Callback completed with result %p>\n", pCPU->regs[2]);
 
@@ -52,27 +55,39 @@ DWORD WINAPI CallbackExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo) {
 	DWORD dwCallbackAddress;
 	DWORD *dwEsp;
 	DWORD dwArgList[4];
+	PThreadContext pContext;
 	MIPS* pCPU;
 
-	if (pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && pExceptionInfo->ExceptionRecord->ExceptionInformation[0] == 8) {		
-		pCPU = &(((PThreadContext)(TlsGetValue(dwThreadContextIndex)))->cpu);
+	if (pExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_ACCESS_VIOLATION){
 		
-		dwEsp = pExceptionInfo->ContextRecord->Esp;
-		dwCallbackAddress = pExceptionInfo->ContextRecord->Eip;
-		dwReturnAddress = *dwEsp;
+		pContext = TlsGetValue(dwThreadContextIndex);
+		pCPU = &(pContext->cpu);
 		
-		printf("Access Violation executing %p (return address = %p)\n", dwCallbackAddress, dwReturnAddress);
+		if(pExceptionInfo->ExceptionRecord->ExceptionInformation[0] == 8) {		
+			
+			dwEsp = pExceptionInfo->ContextRecord->Esp;
+			dwCallbackAddress = pExceptionInfo->ContextRecord->Eip;
+			dwReturnAddress = *dwEsp;
+			
+			printf("Access Violation executing %p (return address = %p)\n", dwCallbackAddress, dwReturnAddress);
 
-		dwArgList[0] = dwEsp[1];
-		dwArgList[1] = dwEsp[2];
-		dwArgList[2] = dwEsp[3];
-		dwArgList[3] = dwEsp[4];
+			dwArgList[0] = dwEsp[1];
+			dwArgList[1] = dwEsp[2];
+			dwArgList[2] = dwEsp[3];
+			dwArgList[3] = dwEsp[4];
 
-		pExceptionInfo->ContextRecord->Eip = dwReturnAddress;
-		pExceptionInfo->ContextRecord->Eax = ExecuteEmulatedProcedure(pCPU, dwCallbackAddress, dwArgList, 4); //DefWindowProcA(dwEsp[1], dwEsp[2], dwEsp[3], dwEsp[4]);
-		pExceptionInfo->ContextRecord->Esp += 20;
+			pExceptionInfo->ContextRecord->Eip = dwReturnAddress;
+			pExceptionInfo->ContextRecord->Eax = ExecuteEmulatedProcedure(pCPU, dwCallbackAddress, dwArgList, 4); //DefWindowProcA(dwEsp[1], dwEsp[2], dwEsp[3], dwEsp[4]);
+			pExceptionInfo->ContextRecord->Esp += 20;
 
-		return EXCEPTION_CONTINUE_EXECUTION;
+			return EXCEPTION_CONTINUE_EXECUTION;
+		}
+		
+		else{
+			if(pCPU->memory_state & READING || pCPU->memory_state & WRITING || pCPU->memory_state & FETCHING){
+				FatalError(pContext, SEGFAULT, pExceptionInfo->ExceptionRecord->ExceptionAddress);
+			}
+		}
 	}
 
 	return EXCEPTION_CONTINUE_SEARCH;

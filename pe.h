@@ -9,6 +9,9 @@ LPVOID MapImageIntoMemory(LPCSTR lpLibFileName);
 HMODULE LoadNativeLibrary(LPCSTR lpLibFileName);
 FARPROC EmuGetProcAddress(LPVOID module, LPCSTR lpProcName);
 PVOID EmuLoadModule(LPCSTR lpLibFileName);
+HMODULE EmuGetModuleHandle(LPCSTR lpLibFileName);
+HMODULE EmuLoadLibrary(LPCSTR lpLibFileName);
+void ResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descriptor);
 
 /*
 Process of Loading a Library under EmuWoW

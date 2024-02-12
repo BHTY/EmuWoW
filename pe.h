@@ -1,0 +1,22 @@
+#pragma once
+
+#include <windows.h>
+//#include <winnt.h>
+
+VOID WritePESections(PBYTE ImageBase, PBYTE pData, PIMAGE_SECTION_HEADER sections, WORD nSections);
+IMAGE_NT_HEADERS* EmuGetNtHeader(LPVOID module);
+LPVOID MapImageIntoMemory(LPCSTR lpLibFileName);
+HMODULE LoadNativeLibrary(LPCSTR lpLibFileName);
+FARPROC EmuGetProcAddress(LPVOID module, LPCSTR lpProcName);
+PVOID EmuLoadModule(LPCSTR lpLibFileName);
+
+/*
+Process of Loading a Library under EmuWoW
+
+EmuLoadLibrary first calls EmuGetModuleHandle() to determine if the module is loaded or not
+If it is, its load count is incremented and if not, and the existing image base is returned
+If not, a MIPS DLL is first searched for. If found, LoadMIPSLibrary is called, which calls the image
+entry point, performs relocations, the whole lot
+If not, LoadNativeLibrary is called
+In either case, an entry into the PEB module list is made
+*/

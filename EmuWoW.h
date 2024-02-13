@@ -7,13 +7,12 @@
 
 /*
 EmuWoW Todo List
-1.) Make shell32 not buggy (DisableThreadLibraryCalls crash)
-2.) Detach the program from the MIPS architecture
-3.) Debugger
-4.) Smarter callback handler (MT-aware and aware of different callback types)
-5.) Fix module relocator
-6.) Fix command line (both for the actual PEB & the MIPS PEB)
-7.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
+1.) Detach the program from the MIPS architecture
+2.) Debugger
+3.) Smarter callback handler (MT-aware and aware of different callback types)
+4.) Fix module relocator
+5.) Fix command line (both for the actual PEB & the MIPS PEB)
+6.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
 
 Changes
 - Shows 16 bit immediates as hex in disassembler

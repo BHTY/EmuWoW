@@ -413,7 +413,7 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into me
 	InitTEB(pContext, ImageBase, pStack + dwStackSpace, pStack);
 
 	//set values into SP
-	pCPU->regs[29] = pStack + dwStackSpace;// (PBYTE)malloc(65536) + 32768;
+	pCPU->regs[29] = pStack + dwStackSpace - 64;// (PBYTE)malloc(65536) + 32768;
 
 	//patch module filename & real base address
 	PatchModuleFileName(NtTeb->ProcessEnvironmentBlock, ImageBase);

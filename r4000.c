@@ -119,6 +119,7 @@ void r4000_step(MIPS* cpu) {
 
 	cpu->memory_state |= FETCHING;
 	op	= *(uint32_t*)(cpu->pc);
+	cpu->memory_state &= ~FETCHING;
 
 	printf("%p: %p ", cpu->pc, op);
 	mips_disasm(cpu->pc, op);

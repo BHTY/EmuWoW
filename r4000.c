@@ -4,6 +4,9 @@
 
 extern char* reg[32];
 
+BOOLEAN logging_instructions = 0;
+BOOLEAN logging_functions = 1;
+
 void display_loaded_libs(PThreadContext pContext){
 	PEmuPEB_LDR_DATA Ldr = pContext->teb.ProcessEnvironmentBlock->Ldr;
 	
@@ -121,8 +124,10 @@ void r4000_step(MIPS* cpu) {
 	op	= *(uint32_t*)(cpu->pc);
 	cpu->memory_state &= ~FETCHING;
 
-	printf("%p: %p ", cpu->pc, op);
-	mips_disasm(cpu->pc, op);
+	if (logging_instructions) {
+		printf("%p: %p ", cpu->pc, op);
+		mips_disasm(cpu->pc, op);
+	}
 
 	r4000_execute(cpu, op);
 
@@ -169,7 +174,9 @@ DWORD HandleNativeInstruction(MIPS* cpu, DWORD pc){
 	}
 
 	res = ExecuteNativeFunction(*(DWORD*)(pc+4), arg_list, 16);
-	printf("	<%s returned %p> (error = %d)\n", *(DWORD*)(pc+8), res, GetLastError());
+	if (logging_functions) {
+		printf("	<%s returned %p> (error = %d)\n", *(DWORD*)(pc + 8), res, GetLastError());
+	}
 	return res;
 }
 

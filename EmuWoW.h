@@ -25,22 +25,28 @@ CPU control operations (refactor and reorg)
 - Set PC and SP
 
 Sample applications (MIPS)
-- Clock: PARTIALLY WORKING
+- Clock v3.51: PARTIALLY WORKING
 	The text doesn't draw but the analog clock does
-- Notepad: NOT WORKING
+- Notepad v4.0: NOT WORKING
 	_initterm crash
-- Freecell: UNTESTED
-- Paintbrush: NOT WORKING
+- Freecell v3.51: WORKING
+- Paintbrush v3.51: NOT WORKING
 	Crashes when loading OLESVR32
 - Reversi: PARTIALLY WORKING (but with rebasing issues)
 	The game is buggy when win32emu wasn't
-- Sol: NOT WORKING
-	_initterm crash
-- WinMine: WORKING
-- Winver: WORKING
+- Sol v3.51: WORKING
+- WinMine v3.51: WORKING
+- Winver v3.51: WORKING
+- Winver v3.10: WORKING
 - Command line hello world: UNTESTED
 - Menu (Win32 SDK sample): UNTESTED
 - SimplePaint: WORKING (but with rebasing issues)
+
+Why do Notepad and Freecell cause FP errors???????????????
+
+The _initterm crash (affects apps with dynamically linked C/C++ runtimes):
+	_initterm involves some weirdness with calling function pointers to initialize C++ objects
+	It can be avoided by using MIPS versions of CRTDLL.DLL and MSVCRT.DLL
 
 Mini-Debugger Commands
 - U <ADDR> <NUM>: Disassemble NUM instructions from ADDR

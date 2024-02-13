@@ -21,6 +21,17 @@ UCS2_STRING AnsiToUnicodeString(char* AnsiString){
 	return uString;
 }
 
+LPSTR GetFileNameFromPathA(LPSTR lpPath) {
+	char* LastSlash = NULL;
+	DWORD i;
+	for (i = 0; lpPath[i] != NULL; i++)
+	{
+		if (lpPath[i] == '\\')
+			LastSlash = &lpPath[i + 1];
+	}
+	return LastSlash;
+}
+
 LPWSTR GetFileNameFromPathW(LPWSTR lpPath) {
 	wchar_t* LastSlash = NULL;
 	DWORD i;
@@ -169,14 +180,15 @@ LPVOID MapImageIntoMemory(LPCSTR lpLibFileName) {
 	return ImageBase;
 }
 
-VOID StubExport(PDWORD pFn, LPVOID pReal, LPSTR pName) {
+VOID StubExport(PDWORD pFn, LPVOID pReal, LPSTR pName, LPSTR DllName) {
 	pFn[0] = 0x4C000000; //APICALL
 	pFn[1] = pReal;
 	pFn[2] = pName;
+	pFn[3] = DllName;
 }
 
 
-VOID StubExports(PIMAGE_DOS_HEADER pModule, HMODULE hModule) {
+VOID StubExports(PIMAGE_DOS_HEADER pModule, HMODULE hModule, LPSTR DllName) {
 	PIMAGE_NT_HEADERS nt_headers = (char*)pModule + pModule->e_lfanew;
 	PIMAGE_OPTIONAL_HEADER optional_header = &(nt_headers->OptionalHeader);
 	PIMAGE_DATA_DIRECTORY data_dir = &(optional_header->DataDirectory[0]);
@@ -204,7 +216,7 @@ VOID StubExports(PIMAGE_DOS_HEADER pModule, HMODULE hModule) {
 			printf("%s: %p\n", procName, fncAddress);
 		}
 
-		StubExport(fncAddress, pRealFn, procName);
+		StubExport(fncAddress, pRealFn, procName, DllName);
 	}
 }
 
@@ -274,11 +286,12 @@ HMODULE LoadNativeLibrary(LPCSTR lpLibFileName) {
 
 	HMODULE hModule;
 	PBYTE ImageBase;
+	LPSTR DllName = GetFileNameFromPathA(lpLibFileName);
 
 	hModule = LoadLibraryA(lpLibFileName);
 	ImageBase = MapImageIntoMemory(lpLibFileName);
 
-	StubExports(ImageBase, hModule);
+	StubExports(ImageBase, hModule, lpLibFileName);
 
 	return ImageBase;
 }

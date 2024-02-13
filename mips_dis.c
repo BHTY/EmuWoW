@@ -35,7 +35,7 @@ void mips_disasm(uint32_t pc, uint32_t op)
 	switch (op >> 26)
 	{
 	case 0x13:
-		printf("APICALL %s", *(DWORD*)(pc + 8));
+		printf("APICALL %s!%s", *(DWORD*)(pc + 12), *(DWORD*)(pc+8));
 		break;
 		
 	case 0x00:  /* SPECIAL */

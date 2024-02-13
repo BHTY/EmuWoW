@@ -85,7 +85,7 @@ DWORD WINAPI CallbackExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo) {
 		
 		else{
 			if(pCPU->memory_state & READING || pCPU->memory_state & WRITING || pCPU->memory_state & FETCHING){
-				FatalError(pContext, SEGFAULT, pExceptionInfo->ExceptionRecord->ExceptionAddress);
+				FatalError(pContext, SEGFAULT, pExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
 			}
 		}
 	}

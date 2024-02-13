@@ -6,18 +6,41 @@
 #include "mips.h"
 
 /*
-EmuWoW Todo List
+EmuWoW Todo List (eventually do the FPU)
 1.) Detach the program from the MIPS architecture
 2.) Debugger
-3.) Smarter callback handler (MT-aware and aware of different callback types)
+3.) Smarter callback handler (MT-aware and aware of different callback types, like _initterm)
+	Should help in getting lots of the sample apps working
 4.) Fix module relocator
 5.) Fix command line (both for the actual PEB & the MIPS PEB)
 6.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
 
-Changes
-- Shows 16 bit immediates as hex in disassembler
-- Crash screen
-- Inserting items into the PEB LDR list, not double-loading, loading MIPS DLLs when available
+CPU control operations (refactor and reorg)
+- Step
+- Disassemble
+- Dump registers
+- Execute Emulated Procedure
+- Get arguments for NATIVECALL
+  - Set return value
+- Set PC and SP
+
+Sample applications (MIPS)
+- Clock: PARTIALLY WORKING
+	The text doesn't draw but the analog clock does
+- Notepad: NOT WORKING
+	_initterm crash
+- Freecell: UNTESTED
+- Paintbrush: NOT WORKING
+	Crashes when loading OLESVR32
+- Reversi: PARTIALLY WORKING (but with rebasing issues)
+	The game is buggy when win32emu wasn't
+- Sol: NOT WORKING
+	_initterm crash
+- WinMine: WORKING
+- Winver: WORKING
+- Command line hello world: UNTESTED
+- Menu (Win32 SDK sample): UNTESTED
+- SimplePaint: WORKING (but with rebasing issues)
 
 Mini-Debugger Commands
 - U <ADDR> <NUM>: Disassemble NUM instructions from ADDR
@@ -31,6 +54,11 @@ Mini-Debugger Commands
 - T <ADDR>: Trace/single-step from ADDR (optional; goes from PC if not)
 - G <ADDR>: Go from ADDR (optional; goes from PC if not) 
 - M: List loaded modules
+
+Printing options
+- Debugger
+- Instruction logging
+- Function call logging
 */
 
 #define SEGFAULT 1

@@ -7,8 +7,9 @@ extern char* reg[32];
 BOOLEAN logging_instructions = 0;
 BOOLEAN logging_functions = 1;
 
-void display_loaded_libs(PThreadContext pContext){
-	PEmuPEB_LDR_DATA Ldr = pContext->teb.ProcessEnvironmentBlock->Ldr;
+extern DWORD OriginalImageBase;
+
+void display_loaded_libs(PEmuPEB_LDR_DATA Ldr){
 	
 	PLIST_ENTRY rootEntry = &(Ldr->InMemoryOrderModuleList);
 	PLIST_ENTRY pEntry;
@@ -37,7 +38,7 @@ void dump_registers(PThreadContext pContext){
 }
 
 void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info){
-	printf("\n	HALT! (PC=%p)\n", pContext->cpu.pc);
+	printf("\n	HALT! (PC=%p, EmuWOW Image Base = %p)\n", pContext->cpu.pc, OriginalImageBase);
 	printf("	Thread Stack Base: %p Stack Limit: %p\n", pContext->teb.StackBase, pContext->teb.StackLimit);
 	
 	switch(error_type){
@@ -70,19 +71,22 @@ void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info){
 	
 	//dump registers
 	dump_registers(pContext);
-	
+
 	//display list of loaded libraries
-	display_loaded_libs(pContext);
-	
+	display_loaded_libs(pContext->teb.ProcessEnvironmentBlock->Ldr);
+
 	ExitProcess(0);
 }
 
 void handle_reserved_instruction(uint32_t op) {
-	printf("Unrecognized instruction %x\n", op);
+	printf("Unrecognized instruction %x (opcode 0x%02x)\n", op, op >> 26);
 	FatalError(TlsGetValue(dwThreadContextIndex), INVINST, 0);
 }
 
 void cp1_execute(MIPS* cpu, uint32_t op) { //FPU
+
+	handle_reserved_instruction(op);
+
 	printf("Floating point fuck you!\n");
 	while (1);
 }

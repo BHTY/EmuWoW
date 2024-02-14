@@ -15,7 +15,7 @@ EmuWoW Todo List (eventually do the FPU)
 5.) Fix command line (both for the actual PEB & the MIPS PEB)
 6.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
 
-CPU control operations (refactor and reorg)
+CPU control operations (refactor and reorg stuff too)
 - Step
 - Disassemble
 - Dump registers
@@ -27,26 +27,20 @@ CPU control operations (refactor and reorg)
 Sample applications (MIPS)
 - Clock v3.51: PARTIALLY WORKING
 	The text doesn't draw but the analog clock does
-- Notepad v4.0: NOT WORKING
-	_initterm crash
-- Freecell v3.51: WORKING
-- Paintbrush v3.51: NOT WORKING
-	Crashes when loading OLESVR32
-- Reversi: PARTIALLY WORKING (but with rebasing issues)
-	The game is buggy when win32emu wasn't
-- Sol v3.51: WORKING
+- Notepad v3.51: NOT WORKING
+	Floating point instructions IN CRTDLL?!?!?!?!?!?!
+- Freecell v3.51: PARTIALLY WORKING
+	The auto-win dialog has FPU instructions?!?!?!?!?!
+- Paintbrush v3.51: MOSTLY WORKING
+- Reversi SDK Sample: PARTIALLY WORKING (but with rebasing issues)
+	The game is buggy when win32emu wasn't?!?!?!?!
+- Sol v3.51: PARTIALLY WORKING
+	Can't test properly since idk how Solitaire works but something is clearly broken
 - WinMine v3.51: WORKING
 - Winver v3.51: WORKING
 - Winver v3.10: WORKING
 - Command line hello world: UNTESTED
-- Menu (Win32 SDK sample): UNTESTED
 - SimplePaint: WORKING (but with rebasing issues)
-
-Why do Notepad and Freecell cause FP errors???????????????
-
-The _initterm crash (affects apps with dynamically linked C/C++ runtimes):
-	_initterm involves some weirdness with calling function pointers to initialize C++ objects
-	It can be avoided by using MIPS versions of CRTDLL.DLL and MSVCRT.DLL
 
 Mini-Debugger Commands
 - U <ADDR> <NUM>: Disassemble NUM instructions from ADDR

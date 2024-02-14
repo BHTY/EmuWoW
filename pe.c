@@ -323,9 +323,14 @@ void ResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descriptor)
 			function_addr = HINT_TABLE[0].u1.AddressOfData;
 			by_name = (PIMAGE_IMPORT_BY_NAME)(ImageBase + function_addr);
 
-			IAT_TABLE[0].u1.Function = (function_addr & IMAGE_ORDINAL_FLAG) ? EmuGetProcAddress(lib, (LPSTR)function_addr) : EmuGetProcAddress(lib, (LPSTR)&by_name->Name);
-
-			printf("  (%p) %s (%p)\n", &(IAT_TABLE[0].u1.Function), by_name->Name, IAT_TABLE[0].u1.Function);
+			if (function_addr & IMAGE_ORDINAL_FLAG) {
+				IAT_TABLE[0].u1.Function = EmuGetProcAddress(lib, (LPSTR)function_addr); 
+				printf("  (%p) #%d (%p)\n", &(IAT_TABLE[0].u1.Function), (DWORD)function_addr & ~IMAGE_ORDINAL_FLAG, IAT_TABLE[0].u1.Function);
+			}
+			else {
+				IAT_TABLE[0].u1.Function = EmuGetProcAddress(lib, (LPSTR)&by_name->Name);
+				printf("  (%p) %s (%p)\n", &(IAT_TABLE[0].u1.Function), by_name->Name, IAT_TABLE[0].u1.Function);
+			}
 		}
 		
 	}
@@ -452,6 +457,10 @@ FARPROC EmuGetProcAddress(LPVOID module, LPCSTR lpProcName) { //convert "#123" t
 	WORD* nameOrdinalsPointer = (char*)module + (DWORD)imageExportDirectory->AddressOfNameOrdinals;
 	DWORD* exportNamePointerTable = (char*)module + (DWORD)imageExportDirectory->AddressOfNames;
 	int i;
+
+	if ((DWORD)lpProcName & IMAGE_ORDINAL_FLAG) {
+		lpProcName = (DWORD)(lpProcName) & ~IMAGE_ORDINAL_FLAG;
+	}
 
 	for (i = 0; i < imageExportDirectory->NumberOfNames; i++) {
 		WORD ordinalIndex = nameOrdinalsPointer[i];

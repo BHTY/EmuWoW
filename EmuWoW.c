@@ -146,11 +146,15 @@ DWORD ExecuteNativeFunction(LPVOID pTargetAddress, DWORD* pParamList, DWORD dwPa
 	};
 }
 
+DWORD OriginalImageBase;
+
 int main(int argc, char** argv) {
 
 	PThreadContext pContext;
 	LPVOID pExe;
 	DWORD dwImageEntryPoint;
+
+	OriginalImageBase = GetModuleHandle(NULL);
 
 	dwThreadContextIndex = TlsAlloc();
 	TlsSetValue(dwThreadContextIndex, calloc(1, sizeof(ThreadContext)));

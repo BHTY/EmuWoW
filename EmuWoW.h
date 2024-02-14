@@ -6,7 +6,7 @@
 #include "mips.h"
 
 /*
-EmuWoW Todo List (try to nail down #1 and #2 tonight)
+EmuWoW Todo List
 1.) Detach the program from the MIPS architecture
 2.) Debugger
 3.) Get FPU support working
@@ -15,15 +15,6 @@ EmuWoW Todo List (try to nail down #1 and #2 tonight)
 6.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
 
 Later: Smarter, MT-aware callback handler
-
-CPU control operations (refactor and reorg stuff too) -- access via struct of function pointers
-- Step
-- Disassemble
-- Dump registers
-- Execute Emulated Procedure
-- Get arguments for NATIVECALL
-  - Set return value
-- Set PC and SP
 
 Sample applications (MIPS)
 - Control Panel v3.51: EHHHHHHH
@@ -61,6 +52,8 @@ Mini-Debugger Commands
 - T <ADDR>: Trace/single-step from ADDR (optional; goes from PC if not)
 - G <ADDR>: Go from ADDR (optional; goes from PC if not) 
 - M: List loaded modules
+- ?: Help
+- Q: Quit
 
 Printing options
 - Debugger
@@ -145,11 +138,32 @@ typedef struct _EmuTEB {
 
 } EmuTEB, *PEmuTEB;
 
+/*
+CPU control operations (refactor and reorg stuff too) -- access via struct of function pointers
+- Step
+- Disassemble
+- Dump registers
+- Execute Emulated Procedure
+- Get arguments for NATIVECALL
+  - Set return value
+- Set PC and SP
+*/
+
+typedef struct _CPUVTable { //set/get retval
+	void(*step)(PThreadContext);
+	void(*disasm)(DWORD, DWORD);
+	void(*dump_regs)();
+	void(*set_pc)(DWORD);
+	void(*set_sp)(DWORD);
+	DWORD(*ExecuteEmulatedProcedure)(PThreadContext, DWORD, PDWORD, DWORD);
+} CPUVTable, *PCPUVTable;
+
 typedef struct _ThreadContext {
 
 	EmuTEB teb;
-
+	PCPUVTable fn_ptrs;
 	MIPS cpu;
+
 } ThreadContext, *PThreadContext;
 
 PEmuTEB FunctionGetTeb();

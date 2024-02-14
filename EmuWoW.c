@@ -93,33 +93,8 @@ DWORD WINAPI CallbackExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo) {
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
-/*
-MESSAGEBOXA CALL TEST
-	LI $a0, 0
-	LA $a1, str_text
-	LA $a2, str_caption
-	LA $a3, MB_OK
-	LA $1, imp_MessageBoxA
-	LW $1, 0($1)
-	JALR $1
-loop: J loop
 
-CALLBACK FUNCTION TEST (returns input value + 1)
-	ADDI $sp, $sp, -4
-	SW $ra, 0($sp)
-	ADD $1, $a0, $0
-	LI $a0, 0
-	LA $a1, str_text
-	LA $a2, str_caption
-	LA $a3, MB_OK
-	LA $1, imp_MessageBoxA
-	LW $1, 0($1)
-	JALR $1
-	ADDI $v0, $1, 1
-	LW $ra, 0($sp)
-	ADDI $sp, $sp, 4
-	JR $ra
-*/
+
 
 DWORD ExecuteNativeFunction(LPVOID pTargetAddress, DWORD* pParamList, DWORD dwParamCount) {
 	DWORD old_esp;

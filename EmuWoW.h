@@ -6,16 +6,17 @@
 #include "mips.h"
 
 /*
-EmuWoW Todo List (eventually do the FPU)
+EmuWoW Todo List (try to nail down #1 and #2 tonight)
 1.) Detach the program from the MIPS architecture
 2.) Debugger
-3.) Smarter callback handler (MT-aware and aware of different callback types, like _initterm)
-	Should help in getting lots of the sample apps working
+3.) Get FPU support working
 4.) Fix module relocator
-5.) Fix command line (both for the actual PEB & the MIPS PEB)
+5.) Fix command line (both for the actual PEB & the MIPS PEB) & hook image loader-related functions
 6.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
 
-CPU control operations (refactor and reorg stuff too)
+Later: Smarter, MT-aware callback handler
+
+CPU control operations (refactor and reorg stuff too) -- access via struct of function pointers
 - Step
 - Disassemble
 - Dump registers
@@ -25,6 +26,8 @@ CPU control operations (refactor and reorg stuff too)
 - Set PC and SP
 
 Sample applications (MIPS)
+- Control Panel v3.51: EHHHHHHH
+	Seems to launch but crashes immediately
 - Clock v3.51: PARTIALLY WORKING
 	The text doesn't draw but the analog clock does
 - Notepad v3.51: NOT WORKING
@@ -32,6 +35,10 @@ Sample applications (MIPS)
 - Freecell v3.51: PARTIALLY WORKING
 	The auto-win dialog has FPU instructions?!?!?!?!?!
 - Paintbrush v3.51: MOSTLY WORKING
+	Saving breaks everything
+	The cursor gets "stuck"
+	And there's just some random weirdness
+	And what's with colors turning to black when any component >127 the palette slider? (signing issue somewhere?)
 - Reversi SDK Sample: PARTIALLY WORKING (but with rebasing issues)
 	The game is buggy when win32emu wasn't?!?!?!?!
 - Sol v3.51: PARTIALLY WORKING

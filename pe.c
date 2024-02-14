@@ -50,7 +50,9 @@ void AddLdrEntry(PEmuPEB_LDR_DATA pLdr, PVOID ImageBase, PUCS2_STRING pFullName)
 	pDataEntry->EntryPoint = (PBYTE)ImageBase + EmuGetNtHeader(ImageBase)->OptionalHeader.AddressOfEntryPoint;
 	pDataEntry->SizeOfImage = EmuGetNtHeader(ImageBase)->OptionalHeader.SizeOfImage;
 	pDataEntry->FullDllName = *pFullName;
-	pDataEntry->BaseDllName = *pFullName;
+	pDataEntry->BaseDllName = *pFullName;/* .Buffer = GetFileNameFromPathW(pFullName->Buffer);
+	pDataEntry->BaseDllName.Length = wcslen(pDataEntry->BaseDllName.Buffer) * 2;
+	pDataEntry->BaseDllName.MaximumLength = wcslen(pDataEntry->BaseDllName.Buffer) * 2 + 2;*/
 	
 	pDataEntry->InMemoryOrderLinks.Flink = &(pLdr->InMemoryOrderModuleList);
 	pDataEntry->InMemoryOrderLinks.Blink = pLdr->InMemoryOrderModuleList.Blink;
@@ -356,10 +358,11 @@ void PatchModuleFileName(EmuPEB* peb, PVOID NewDllBase) {
 
 }
 
-void InitPEB(PEmuPEB pPeb, PVOID ImageBase) {
+void InitPEB(PEmuPEB pPeb, PVOID ImageBase, DWORD HeapReserve, DWORD HeapCommit) {
 	PEmuPEB_LDR_DATA pLdr = malloc(sizeof(EmuPEB_LDR_DATA));
 
 	pPeb->ImageBaseAddress = ImageBase;
+	pPeb->ProcessHeap = HeapCreate(0, HeapReserve, HeapCommit);
 
 	//initialize DLL loading structures
 	pLdr->InLoadOrderModuleList.Blink = &(pLdr->InLoadOrderModuleList);
@@ -372,13 +375,13 @@ void InitPEB(PEmuPEB pPeb, PVOID ImageBase) {
 	pPeb->Ldr = pLdr;
 }
 
-void InitTEB(PThreadContext pContext, PVOID ImageBase, PVOID StackBase, PVOID StackLimit) {
+void InitTEB(PThreadContext pContext, PVOID ImageBase, PVOID StackBase, PVOID StackLimit, DWORD HeapReserve, DWORD HeapCommit) {
 	pContext->teb.StackBase = StackBase;
 	pContext->teb.StackLimit = StackLimit;
 	pContext->teb.Self = &(pContext->teb);
 	pContext->teb.ProcessEnvironmentBlock = malloc(sizeof(EmuPEB));
 
-	InitPEB(pContext->teb.ProcessEnvironmentBlock, ImageBase);
+	InitPEB(pContext->teb.ProcessEnvironmentBlock, ImageBase, HeapReserve, HeapCommit);
 }
 
 PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into memory
@@ -428,7 +431,7 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into me
 	pStack = VirtualAlloc(NULL, dwStackSpace, MEM_COMMIT, PAGE_READWRITE);
 
 	//set values into TEB
-	InitTEB(pContext, ImageBase, pStack + dwStackSpace, pStack);
+	InitTEB(pContext, ImageBase, pStack + dwStackSpace, pStack, nt_hdr->OptionalHeader.SizeOfHeapReserve, nt_hdr->OptionalHeader.SizeOfHeapCommit);
 
 	//set values into SP
 	pCPU->regs[29] = pStack + dwStackSpace - 64;// (PBYTE)malloc(65536) + 32768;

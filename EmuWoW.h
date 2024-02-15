@@ -123,15 +123,15 @@ typedef struct _EmuTEB {
 } EmuTEB, *PEmuTEB;
 
 typedef struct _CPUVTable { //set/get retval
-	INT(*step)(PThreadContext);
+	INT(*step)(struct _ThreadContext*);
 	void(*disasm)(DWORD, DWORD);
-	void(*dump_regs)(PThreadContext);
-	void(*set_pc)(PThreadContext, DWORD);
-	void(*set_sp)(PThreadContext, DWORD);
-	DWORD(*get_pc)(PThreadContext);
-	DWORD(*get_ra)(PThreadContext);
-	DWORD(*ExecuteEmulatedProcedure)(PThreadContext, DWORD, PDWORD, DWORD);
-	DWORD(*QueryMemoryState)(PThreadContext);
+	void(*dump_regs)(struct _ThreadContext*);
+	void(*set_pc)(struct _ThreadContext*, DWORD);
+	void(*set_sp)(struct _ThreadContext*, DWORD);
+	DWORD(*get_pc)(struct _ThreadContext*);
+	DWORD(*get_ra)(struct _ThreadContext*);
+	DWORD(*ExecuteEmulatedProcedure)(struct _ThreadContext*, DWORD, PDWORD, DWORD);
+	DWORD(*QueryMemoryState)(struct _ThreadContext*);
 	VOID(*StubExport)(PDWORD, LPVOID, LPSTR, LPSTR);
 	VOID(*AddBreakpoint)(DWORD);
 	VOID(*RemoveBreakpoint)(DWORD);

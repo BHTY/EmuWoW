@@ -3,7 +3,7 @@
 #include <windows.h>
 #include "axp_dis.h"
 
-INT AXP_step(PThreadContext pContext) {
+INT AXP_step(PThreadContext_Alpha pContext) {
 	//fetch instruction
 	//increment PC
 	//execute instruction
@@ -16,35 +16,57 @@ INT AXP_QueryMemoryState(PThreadContext pContext) {
 	return 1;
 }
 
-void AXP_dump_regs(PThreadContext pContext) {
+void AXP_dump_regs(PThreadContext_Alpha pContext) {
+	int i, p;
 
+	for (i = 0; i < 32; i++) {
+
+		if (i % 4 == 0) {
+			printf("\n");
+		}
+
+		printf("%s: %p ", R[i], pContext->cpu.r_i[i]);
+	}
+
+	printf("\n\n");
+
+	for (i = 0; i < 32; i++) {
+
+		if (i % 4 == 0) {
+			printf("\n");
+		}
+
+		printf("%s: %p ", F[i], pContext->cpu.r_f[i]);
+	}
+
+	printf("\n\n");
 }
 
-void AXP_set_pc(PThreadContext pContext, DWORD pc) {
-
+void AXP_set_pc(PThreadContext_Alpha pContext, DWORD pc) {
+	pContext->cpu.pc = pc;
 }
 
-void AXP_set_sp(PThreadContext pContext, DWORD sp) {
-
+void AXP_set_sp(PThreadContext_Alpha pContext, DWORD sp) {
+	pContext->cpu.r_i[30] = sp;
 }
 
-DWORD AXP_get_pc(PThreadContext pContext) {
-
+DWORD AXP_get_pc(PThreadContext_Alpha pContext) {
+	return pContext->cpu.pc;
 }
 
-DWORD AXP_get_ra(PThreadContext pContext) {
-
+DWORD AXP_get_ra(PThreadContext_Alpha pContext) {
+	return pContext->cpu.r_i[26];
 }
 
 void InitializeAlphaCPU(PCPUVTable pVTable) {
 	pVTable->machine_type = IMAGE_FILE_MACHINE_ALPHA;
 	pVTable->step = AXP_step;
 	pVTable->disasm = AXP_disasm;
-	pVTable->dump_regs = NULL; //do rn
-	pVTable->set_pc = NULL; //do rn
-	pVTable->set_sp = NULL; //do rn
-	pVTable->get_pc = NULL; //do rn
-	pVTable->get_ra = NULL; //do rn
+	pVTable->dump_regs = AXP_dump_regs;
+	pVTable->set_pc = AXP_set_pc;
+	pVTable->set_sp = AXP_set_sp;
+	pVTable->get_pc = AXP_get_pc;
+	pVTable->get_ra = AXP_get_ra;
 	pVTable->ExecuteEmulatedProcedure = NULL;
 	pVTable->QueryMemoryState = AXP_QueryMemoryState; //we also need a better way to SET memory state
 	pVTable->StubExport = NULL;

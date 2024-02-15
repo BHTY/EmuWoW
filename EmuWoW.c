@@ -303,6 +303,11 @@ INT debug_step(PThreadContext pContext){
 			
 			case 'u':
 			case 'U':
+				if (res < 3) {
+					printf("Please input in the correct format.\n");
+					break;
+				}
+
 				for (i = 0; i < arg2; i++) {
 					printf("%p: %p ", arg1 + i * 4, *(DWORD*)(arg1 + i * 4));
 					pContext->fn_ptrs->disasm(arg1 + i * 4, *(DWORD*)(arg1 + i * 4));
@@ -312,6 +317,11 @@ INT debug_step(PThreadContext pContext){
 			
 			case 'd':
 			case 'D':
+				if (res < 3) {
+					printf("Please input in the correct format.\n");
+					break;
+				}
+
 				for (i = 0; i < arg2; i += 16) {
 					printf("%p: ", arg1 + i);
 
@@ -331,6 +341,11 @@ INT debug_step(PThreadContext pContext){
 				
 			case 'w':
 			case 'W':
+				if (res < 3) {
+					printf("Please input in the correct format.\n");
+					break;
+				}
+
 				for (i = 0; i < arg2; i += 32) {
 					printf("%p: ", arg1 + i);
 

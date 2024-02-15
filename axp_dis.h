@@ -43,4 +43,15 @@
 #define RESERVED(opcode)                 printf("%-10s",              opcode)
 #define UNKNOWN(type)                    printf("unknown %s",         type)
 
+#undef Disp_M
+#undef Disp_P
+#undef Disp_B
+
+#define Disp_M(x) (s32(s16(x)))            // memory instruction 16-bit signed offset
+#define Disp_P(x) (s32(sext(x, 12))) // hardware load/store 12-bit signed offset
+#define Disp_B(x) (s32(sext(x << 2, 23))) // branch instruction offset
+
+extern char* F[];
+extern char* R[];
+
 void AXP_disasm(uint32_t pc, uint32_t instruction);

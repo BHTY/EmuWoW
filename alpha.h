@@ -3,11 +3,27 @@
 #include "int.h"
 #include "emuwow.h"
 
+/*
+	DEC Alpha Implementation Todo List
+1.) Finish ExecuteEmulatedProcedure, StubExport, and AddBreakpoint
+2.) Implement sext()
+3.) Test and work out the bugs - get it working!
+*/
+
 typedef struct _AXP64 {
 	uint64_t pc;
 	uint64_t r_i[32];
 	uint64_t r_f[32];
 } AXP64, *PAXP64;
+
+typedef struct _ThreadContext_Alpha {
+
+	EmuTEB teb;
+	PCPUVTable fn_ptrs;
+	DebugState dbg_state;
+	AXP64 cpu;
+
+} ThreadContext_Alpha, *PThreadContext_Alpha;
 
 // instruction field extraction
 #define Ra(x)     ((x >> 21) & 31)         // 'a' register field

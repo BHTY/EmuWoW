@@ -1,5 +1,5 @@
-#include "axp_dis.h"
 #include "alpha.h"
+#include "axp_dis.h"
 
 // register names
 char* R[] =
@@ -43,7 +43,7 @@ void AXP_disasm(uint32_t pc, uint32_t instruction) {
 	uint32_t flags;
 
 	switch (instruction >> 26) {
-	case 0x00: printf("PALCODE\n"); break;
+	case 0x00: printf("PALCODE"); break;
 	case 0x01: RESERVED("opc01"); break; // OPC01
 	case 0x02: RESERVED("opc02"); break; // OPC02
 	case 0x03: RESERVED("opc03"); break; // OPC03
@@ -59,7 +59,9 @@ void AXP_disasm(uint32_t pc, uint32_t instruction) {
 		else
 			MEMORY_R("lda", Ra(instruction), Disp_M(instruction), Rb(instruction)); // LDA
 		break;
-	case 0x09: MEMORY_R("ldah", Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDAH
+	case 0x09: 
+		MEMORY_R("ldah", Ra(instruction), Disp_M(instruction), Rb(instruction)); 
+		break; // LDAH
 	case 0x0a: MEMORY_R("ldbu", Ra(instruction), Disp_M(instruction), Rb(instruction)); break; // LDBU (BWX)
 	case 0x0b:
 		if (Ra(instruction) == 31 && Disp_M(instruction) == 0)
@@ -972,4 +974,6 @@ void AXP_disasm(uint32_t pc, uint32_t instruction) {
 	case 0x3e: BRANCH_R("bge", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BGE
 	case 0x3f: BRANCH_R("bgt", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BGT
 	}
+
+	printf("\n");
 }

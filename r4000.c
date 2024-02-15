@@ -157,7 +157,7 @@ INT r4000_step(MIPS* cpu) {
 	op	= *(uint32_t*)(cpu->pc);
 	cpu->memory_state &= ~FETCHING;
 
-	if (logging_instructions) {
+	if (((PThreadContext)TlsGetValue(dwThreadContextIndex))->dbg_state.print_instructions) {
 		printf("%p: %p ", cpu->pc, op);
 		mips_disasm(cpu->pc, op);
 	}
@@ -211,7 +211,7 @@ DWORD HandleNativeInstruction(MIPS* cpu, DWORD pc){
 	}
 
 	res = ExecuteNativeFunction(*(DWORD*)(pc+4), arg_list, 16);
-	if (logging_functions) {
+	if (  ((PThreadContext)TlsGetValue(dwThreadContextIndex))->dbg_state.print_functions ) {
 		printf("	<%s returned %p> (error = %d)\n", *(DWORD*)(pc + 8), res, GetLastError());
 	}
 	return res;

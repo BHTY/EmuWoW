@@ -1,6 +1,7 @@
 #include "alpha.h"
 #include "EmuWoW.h"
 #include <windows.h>
+#include "axp_dis.h"
 
 INT AXP_step(PThreadContext pContext) {
 	//fetch instruction
@@ -11,17 +12,41 @@ INT AXP_step(PThreadContext pContext) {
 	return 0;
 }
 
+INT AXP_QueryMemoryState(PThreadContext pContext) {
+	return 1;
+}
+
+void AXP_dump_regs(PThreadContext pContext) {
+
+}
+
+void AXP_set_pc(PThreadContext pContext, DWORD pc) {
+
+}
+
+void AXP_set_sp(PThreadContext pContext, DWORD sp) {
+
+}
+
+DWORD AXP_get_pc(PThreadContext pContext) {
+
+}
+
+DWORD AXP_get_ra(PThreadContext pContext) {
+
+}
+
 void InitializeAlphaCPU(PCPUVTable pVTable) {
 	pVTable->machine_type = IMAGE_FILE_MACHINE_ALPHA;
 	pVTable->step = AXP_step;
-	pVTable->disasm = NULL;
-	pVTable->dump_regs = NULL;
-	pVTable->set_pc = NULL;
-	pVTable->set_sp = NULL;
-	pVTable->get_pc = NULL;
-	pVTable->get_ra = NULL;
+	pVTable->disasm = AXP_disasm;
+	pVTable->dump_regs = NULL; //do rn
+	pVTable->set_pc = NULL; //do rn
+	pVTable->set_sp = NULL; //do rn
+	pVTable->get_pc = NULL; //do rn
+	pVTable->get_ra = NULL; //do rn
 	pVTable->ExecuteEmulatedProcedure = NULL;
-	pVTable->QueryMemoryState = NULL;
+	pVTable->QueryMemoryState = AXP_QueryMemoryState; //we also need a better way to SET memory state
 	pVTable->StubExport = NULL;
 	pVTable->AddBreakpoint = NULL;
 }

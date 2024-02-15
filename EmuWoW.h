@@ -6,12 +6,14 @@
 #include "mips.h"
 
 /*
-EmuWoW Todo List (fix misc bugs & finish the debugger)
+EmuWoW Todo List (fix misc bugs)
 1.) Preliminary DEC Alpha AXP support
 2.) MIPS & Alpha FPU support
 3.) Fix module relocator
 4.) Fix command line (both for the actual PEB & the MIPS PEB) & hook image loader-related functions
 Later: Smarter, MT-aware callback handler
+
+Debugger breakpoints on APICALL instructions are broken... idk why
 
 Sample applications (MIPS)
 - Control Panel v3.51: EHHHHHHH
@@ -142,12 +144,14 @@ typedef struct _CPUVTable { //set/get retval
 typedef struct _Breakpoint {
 	DWORD addr;
 	DWORD og_word;
-	struct Breakpoint* next;
+	struct _Breakpoint* next;
 } Breakpoint, *PBreakpoint;
 
 typedef struct _DebugState{
 	int status; //0 = running, 1 = not running, 2 = broken
-	struct Breakpoint *bp;
+	int print_instructions;
+	int print_functions;
+	struct _Breakpoint bp;
 } DebugState, *PDebugState;
 
 typedef struct _ThreadContext {

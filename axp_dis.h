@@ -1,5 +1,11 @@
 #pragma once
 
+#include "int.h"
+
+#define STEP_OVER 0
+#define STEP_OUT 0
+#define STEP_COND 0
+
 #define OPERATE_RRR(opcode, ra, rb, rc)  printf("%-10s %s, %s, %s",   opcode, R[ra], R[rb], R[rc])
 #define OPERATE_FFF(opcode, ra, rb, rc)  printf("%-10s %s, %s, %s",   opcode, F[ra], F[rb], F[rc])
 #define OPERATE_RIR(opcode, ra, im, rc)  printf("%-10s %s, #%d, %s",  opcode, R[ra], im, R[rc])
@@ -37,3 +43,4 @@
 #define RESERVED(opcode)                 printf("%-10s",              opcode)
 #define UNKNOWN(type)                    printf("unknown %s",         type)
 
+void AXP_disasm(uint32_t pc, uint32_t instruction);

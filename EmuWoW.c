@@ -26,12 +26,14 @@ void display_loaded_libs(PEmuPEB_LDR_DATA Ldr){
 	
 	PLIST_ENTRY rootEntry = &(Ldr->InMemoryOrderModuleList);
 	PLIST_ENTRY pEntry;
+	PBYTE DllBase;
 	
 	printf("The loaded libraries were:\n");
 	
 	for(pEntry = rootEntry->Flink; pEntry != rootEntry; pEntry = pEntry->Flink){
 		PEmuLDR_DATA_TABLE_ENTRY pDataEntry = pEntry - 1;
-		printf("	%ls: %p\n", pDataEntry->BaseDllName.Buffer, pDataEntry->DllBase);
+		DllBase = pDataEntry->DllBase;
+			printf("	%ls: %p (entry point = %p)\n", pDataEntry->BaseDllName.Buffer, DllBase, DllBase + EmuGetNtHeader(DllBase)->OptionalHeader.AddressOfEntryPoint);
 	}
 }
 
@@ -99,7 +101,9 @@ DWORD WINAPI CallbackExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo) {
 			dwReturnAddress = *dwEsp;
 			
 			//printf("Access Violation executing %p (return address = %p)\n", dwCallbackAddress, dwReturnAddress);
-			printf("	[Callback to address %p, return address = %p]\n", dwCallbackAddress, pContext->fn_ptrs->get_ra(pContext));
+			if (pContext->dbg_state.print_functions) {
+				printf("	[Callback to address %p, return address = %p]\n", dwCallbackAddress, pContext->fn_ptrs->get_ra(pContext));
+			}
 
 			dwArgList[0] = dwEsp[1];
 			dwArgList[1] = dwEsp[2];
@@ -158,42 +162,60 @@ void InitializeProcessEnvironment(){
 	pSetProcessDEPPolicy(1);
 }
 
-PBreakpoint FindBreakpoint(PThreadContext pContext, DWORD addr) {
-	PBreakpoint pBP = pContext->dbg_state.bp;
-
+PBreakpoint	FindBPBefore(PThreadContext pContext, DWORD dwAddr) {
+	PBreakpoint pBP, pOld;
+	pBP = &(pContext->dbg_state.bp);
 	while (pBP) {
-		if (pBP->addr == addr) {
-			return pBP;
-		}
-
+		if (pBP->addr == dwAddr) return pOld;
+		pOld = pBP;
 		pBP = pBP->next;
 	}
-
 	return NULL;
 }
 
-void ListBreakpoints(PThreadContext pContext) {
+void RemoveBreakpoint(PThreadContext pContext, DWORD dwAddr) {
+	PBreakpoint pBP = FindBPBefore(pContext, dwAddr);
+	PBreakpoint pNext;
 
+	if (pBP) {
+		*(PDWORD)dwAddr = pBP->next->og_word;
+		pNext = pBP->next->next;
+		free(pBP->next);
+		pBP->next = pNext;
+	}
+	else {
+		printf("No breakpoint was found at %p\n", dwAddr);
+	}
 }
 
-void RemoveBreakpoint(PThreadContext pContext, DWORD addr) {
+void SetBreakpoint(PThreadContext pContext, DWORD dwAddr) {
+	PBreakpoint pBP = &(pContext->dbg_state.bp);
+	PBreakpoint pOld;
 
-}
-
-void SetBreakpoint(PThreadContext pContext, DWORD addr) {
-	PBreakpoint pBP = pContext->dbg_state.bp;
-
-	while (pBP) {
-		pBP = pBP->next;
+	if (FindBPBefore(pContext, dwAddr)) {
+		printf("Breakpoint already exists at %p\n", dwAddr);
+		return;
 	}
 
-	pBP = malloc(sizeof(Breakpoint));
-	pBP->addr = addr;
-	pBP->og_word = *(DWORD*)addr;
-	pBP->next = NULL;
+	while (pBP) {
+		pOld = pBP; pBP = pBP->next;
+	}
+	pBP = pOld;
+	pBP->next = malloc(sizeof(Breakpoint));
+	pBP->next->addr = dwAddr;
+	pBP->next->next = NULL;
+	pBP->next->og_word = *(PDWORD)dwAddr;
+	pContext->fn_ptrs->AddBreakpoint(dwAddr);
+	printf("Set breakpoint at %p\n", dwAddr);
+}
 
-	printf("Set breakpoint at 0x%p\n", addr);
-	pContext->fn_ptrs->AddBreakpoint(addr);
+void ListBreakpoints(PThreadContext pContext) {
+	PBreakpoint pBP = &(pContext->dbg_state.bp);
+	while (pBP->next) {
+		printf("\t%p\n", pBP->next->addr);
+		pBP = pBP->next;
+	}
+	printf("\n");
 }
 
 void DisplayDebuggerHelp(){
@@ -211,13 +233,14 @@ void DisplayDebuggerHelp(){
 	printf("T <ADDR>: Trace/single-step from ADDR (optional; goes from PC if not)\n");
 	printf("G <ADDR>: Go from ADDR (optional; goes from PC if not)\n");
 	printf("M: List loaded modules\n");
+	printf("X <MODNAME> <PROCNAME>: Get address of export from loaded image\n");
 	printf("P: Toggle instruction printing on/off\n");
 	printf("C: Toggle callback/function printing on/off\n");
 	printf("?: Help (that's me!)\n");
 	printf("Q: Quit\n");
-	printf("Commands are case-insensitive. Addresses and constant numbers are given in hex. Most of all, have fun!\n\n");
+	printf("Commands are case-insensitive. Addresses and constant numbers are given in hex.\nMost of all, have fun!\n\n");
 
-	//TODO: implement L, B, S, T, G
+	//TODO: fully implement T, G
 	//for good measure, also do P and C
 	//E can wait
 }
@@ -225,9 +248,13 @@ void DisplayDebuggerHelp(){
 INT debug_step(PThreadContext pContext){
 	INT (*cpu_step)(PThreadContext) = pContext->fn_ptrs->ExtraData[0];
 	char input_string[512];
+	char module_name[32];
+	char proc_name[32];
 	char cmd;
 	int c, res, i, n, p;
 	DWORD arg1, arg2, pc;
+	DWORD old_print_functions;
+	DWORD old_print_instructions;
 	
 	if(pContext->dbg_state.status){
 		pc = pContext->fn_ptrs->get_pc(pContext);
@@ -253,12 +280,25 @@ INT debug_step(PThreadContext pContext){
 			
 			case 'p':
 			case 'P':
-				printf("Not yet implemented!\n");
+				if (pContext->dbg_state.print_instructions) {
+					printf("No longer printing disassembly.\n");
+					pContext->dbg_state.print_instructions = 0;
+				}
+				else {
+					printf("Now printing disassembly.\n");
+					pContext->dbg_state.print_instructions = 1;
+				}
 				break;
 			
 			case 'c':
 			case 'C':
-				printf("Not yet implemented!\n");
+				if (pContext->dbg_state.print_functions) {
+					printf("No longer printing function calls.\n");
+					pContext->dbg_state.print_functions = 0;
+				} else {
+					printf("Now printing function calls.\n");
+					pContext->dbg_state.print_functions = 1;
+				}
 				break;
 			
 			case 'u':
@@ -324,28 +364,74 @@ INT debug_step(PThreadContext pContext){
 			
 			case 't':
 			case 'T':
-				if (pContext->dbg_state.status == 2) {
-					//retrieve old value for bp addr
-					*(DWORD*)pc = FindBreakpoint(pContext, pc)->og_word;
-					//printf("Restored value %p\n", FindBreakpoint(pContext, pc)->og_word);
-					//step the cpu
+				old_print_functions = pContext->dbg_state.print_functions;
+				old_print_instructions = pContext->dbg_state.print_instructions;
+				pContext->dbg_state.print_functions = 1;
+				pContext->dbg_state.print_instructions = 1;
+
+				if (pContext->dbg_state.status == 2) { //broken
+					//restore word
+					*(PDWORD)(pc) = FindBPBefore(pContext, pc)->next->og_word;
+					//step
 					cpu_step(pContext);
-					//restore the BREAK instruction
+					//reset breakpoint
 					pContext->fn_ptrs->AddBreakpoint(pc);
 				}
 				else {
-					cpu_step(pContext);
+					if (cpu_step(pContext)) { //we weren't broken, but now we are
+						pContext->dbg_state.status = 2;
+						printf("Breakpoint hit at address 0x%p\n", pContext->fn_ptrs->get_pc(pContext));
+					}
 				}
+				pContext->dbg_state.print_functions = old_print_functions;
+				pContext->dbg_state.print_instructions = old_print_instructions;
 				break;
 				
 			case 'g':
 			case 'G':			
 				if(res == 2){
 					pContext->fn_ptrs->set_pc(pContext, arg1);
+					pContext->dbg_state.status = 0;
+				}
+				else {
+					if (pContext->dbg_state.status == 2) {
+						//restore word
+						*(PDWORD)(pc) = FindBPBefore(pContext, pc)->next->og_word;
+						//step once
+						n = cpu_step(pContext);
+						//reset breakpoint
+						pContext->fn_ptrs->AddBreakpoint(pc);
+
+						if (n == 0) {
+							pContext->dbg_state.status = 0;
+						}
+						else {
+							printf("Breakpoint hit at address 0x%p\n", pContext->fn_ptrs->get_pc(pContext));
+						}
+					}
+					else {
+						pContext->dbg_state.status = 0;
+					}
 				}
 				
-				pContext->dbg_state.status = 0;
-				
+				break;
+
+			case 'x':
+			case 'X':
+				if (sscanf(input_string, "%c %s %s", &cmd, module_name, proc_name) != 3) {
+					printf("Please enter commands in the format X KERNEL32.DLL GetProcAddress\n");
+				}
+				else {
+					HMODULE hModule = EmuGetModuleHandle(module_name);
+					if (hModule) {
+						FARPROC pFn = EmuGetProcAddress(hModule, proc_name);
+						printf("%s!%s = %p\n", module_name, proc_name, pFn);
+					}
+					else {
+						printf("Module %s is not loaded into memory\n");
+					}
+				}
+
 				break;
 			
 			case '?':
@@ -373,6 +459,8 @@ void HookDebugger(PThreadContext pContext){
 	pVTable->ExtraData[0] = pVTable->step;
 	pVTable->step = debug_step;
 	pContext->dbg_state.status = 1;
+	pContext->dbg_state.print_functions = 1;
+	pContext->dbg_state.print_instructions = 1;
 }
 
 int main(int argc, char** argv) {

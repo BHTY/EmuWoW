@@ -6,14 +6,11 @@
 #include "mips.h"
 
 /*
-EmuWoW Todo List
-1.) Detach the program from the MIPS architecture
-2.) Debugger
-3.) Get FPU support working
-4.) Fix module relocator
-5.) Fix command line (both for the actual PEB & the MIPS PEB) & hook image loader-related functions
-6.) DEC Alpha support (post to VirtuallyFun at this point and publish a release on the GitHub repo)
-
+EmuWoW Todo List (fix misc bugs & finish the debugger)
+1.) Preliminary DEC Alpha AXP support
+2.) MIPS & Alpha FPU support
+3.) Fix module relocator
+4.) Fix command line (both for the actual PEB & the MIPS PEB) & hook image loader-related functions
 Later: Smarter, MT-aware callback handler
 
 Sample applications (MIPS)
@@ -40,25 +37,10 @@ Sample applications (MIPS)
 - Command line hello world: UNTESTED
 - SimplePaint: WORKING (but with rebasing issues)
 
-Mini-Debugger Commands
-- U <ADDR> <NUM>: Disassemble NUM instructions from ADDR
-- D <ADDR> <NUM>: Dump NUM bytes from ADDR
-- W <ADDR> <NUM>: Dump NUM words from ADDR
-- E <ADDR> ...: Enter words into ADDR
-- R: Dump registers
-- L: List breakpoints
-- B <ADDR>: Remove breakpoint at ADDR
-- S <ADDR>: Set breakpoint at ADDR
-- T <ADDR>: Trace/single-step from ADDR (optional; goes from PC if not)
-- G <ADDR>: Go from ADDR (optional; goes from PC if not) 
-- M: List loaded modules
-- ?: Help
-- Q: Quit
+Sample applications (Alpha)
 
-Printing options
-- Debugger
-- Instruction logging
-- Function call logging
+Breakpoints will use the MIPS BREAK instructions
+When you step past a breakpoint, it will fill in the breakpoint address with the original instruction, do the CPU step, and then fill it back in with the breakpoint
 */
 
 #define SEGFAULT 1
@@ -138,32 +120,45 @@ typedef struct _EmuTEB {
 
 } EmuTEB, *PEmuTEB;
 
-/*
-CPU control operations (refactor and reorg stuff too) -- access via struct of function pointers
-- Step
-- Disassemble
-- Dump registers
-- Execute Emulated Procedure
-- Get arguments for NATIVECALL
-  - Set return value
-- Set PC and SP
-*/
-
 typedef struct _CPUVTable { //set/get retval
-	void(*step)(PThreadContext);
+	INT(*step)(PThreadContext);
 	void(*disasm)(DWORD, DWORD);
-	void(*dump_regs)();
-	void(*set_pc)(DWORD);
-	void(*set_sp)(DWORD);
+	void(*dump_regs)(PThreadContext);
+	void(*set_pc)(PThreadContext, DWORD);
+	void(*set_sp)(PThreadContext, DWORD);
+	DWORD(*get_pc)(PThreadContext);
+	DWORD(*get_ra)(PThreadContext);
 	DWORD(*ExecuteEmulatedProcedure)(PThreadContext, DWORD, PDWORD, DWORD);
+	DWORD(*QueryMemoryState)(PThreadContext);
+	VOID(*StubExport)(PDWORD, LPVOID, LPSTR, LPSTR);
+	VOID(*AddBreakpoint)(DWORD);
+	VOID(*RemoveBreakpoint)(DWORD);
+	
+	int machine_type;
+	
+	DWORD ExtraData[8];
 } CPUVTable, *PCPUVTable;
+
+typedef struct _Breakpoint {
+	DWORD addr;
+	DWORD og_word;
+	struct Breakpoint* next;
+} Breakpoint, *PBreakpoint;
+
+typedef struct _DebugState{
+	int status; //0 = running, 1 = not running, 2 = broken
+	struct Breakpoint *bp;
+} DebugState, *PDebugState;
 
 typedef struct _ThreadContext {
 
 	EmuTEB teb;
 	PCPUVTable fn_ptrs;
+	DebugState dbg_state;
 	MIPS cpu;
 
 } ThreadContext, *PThreadContext;
 
 PEmuTEB FunctionGetTeb();
+void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info);
+void display_loaded_libs(PEmuPEB_LDR_DATA Ldr);

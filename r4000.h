@@ -3,6 +3,7 @@
 
 #include "int.h"
 #include "mips.h"
+#include "emuwow.h"
 
 #define m_pc cpu->pc
 #define m_r cpu->regs
@@ -53,5 +54,9 @@
 
 #define BIT(num, index)  ((num >> index) & 1)
 
-void r4000_step(MIPS*);
-void r4000_execute(MIPS*, uint32_t);
+void InitializeMIPSCPU(PCPUVTable pVTable);
+
+INT r4000_step(MIPS*);
+INT r4000_execute(MIPS*, uint32_t);
+
+#define BRK 0xD

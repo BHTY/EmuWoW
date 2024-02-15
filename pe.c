@@ -182,6 +182,8 @@ LPVOID MapImageIntoMemory(LPCSTR lpLibFileName) {
 	return ImageBase;
 }
 
+
+
 VOID StubExport(PDWORD pFn, LPVOID pReal, LPSTR pName, LPSTR DllName) {
 	pFn[0] = 0x4C000000; //APICALL
 	pFn[1] = pReal;
@@ -198,6 +200,7 @@ VOID StubExports(PIMAGE_DOS_HEADER pModule, HMODULE hModule, LPSTR DllName) {
 	DWORD* exportAddressTable = (char*)pModule + (DWORD)imageExportDirectory->AddressOfFunctions;
 	WORD* nameOrdinalsPointer = (char*)pModule + (DWORD)imageExportDirectory->AddressOfNameOrdinals;
 	DWORD* exportNamePointerTable = (char*)pModule + (DWORD)imageExportDirectory->AddressOfNames;
+	PThreadContext pContext = TlsGetValue(dwThreadContextIndex);
 
 	DWORD i;
 
@@ -218,13 +221,12 @@ VOID StubExports(PIMAGE_DOS_HEADER pModule, HMODULE hModule, LPSTR DllName) {
 			printf("%s: %p\n", procName, fncAddress);
 		}
 
-		StubExport(fncAddress, pRealFn, procName, DllName);
+		pContext->fn_ptrs->StubExport(fncAddress, pRealFn, procName, DllName);
 	}
 }
 
 HMODULE LoadMIPSLibrary(LPCSTR lpLibFileName){
-		PThreadContext pContext;
-	MIPS* pCPU;
+	PThreadContext pContext;
 	
 	DWORD DllMainCRTStartupParams[3];
 
@@ -245,14 +247,18 @@ HMODULE LoadMIPSLibrary(LPCSTR lpLibFileName){
 	if (!ImageBase) return NULL;
 
 	pContext = TlsGetValue(dwThreadContextIndex);
-	pCPU = &(pContext->cpu);
 
 	dos_hdr = ImageBase;
 	nt_hdr = ((PBYTE)dos_hdr) + dos_hdr->e_lfanew;
 	sections = (PIMAGE_SECTION_HEADER)(nt_hdr + 1);
 	data_dir = nt_hdr->OptionalHeader.DataDirectory;
 	
-	if(nt_hdr->FileHeader.Machine != IMAGE_FILE_MACHINE_R4000) return NULL;
+	if(nt_hdr->FileHeader.Machine != pContext->fn_ptrs->machine_type){
+		printf("This is %s not registering as a valid MIPS lib!\n", lpLibFileName);
+		printf("Its machine type is %x and ours is %x and IMAGE_FILE_MACHINE_R4000 is %x\n", nt_hdr->FileHeader.Machine, pContext->fn_ptrs->machine_type, IMAGE_FILE_MACHINE_R4000);
+		
+		return NULL;
+	}
 
 	//apply relocations
 	delta = (DWORD)ImageBase - nt_hdr->OptionalHeader.ImageBase;
@@ -273,7 +279,7 @@ HMODULE LoadMIPSLibrary(LPCSTR lpLibFileName){
 	DllMainCRTStartupParams[0] = ImageBase;
 	DllMainCRTStartupParams[1] = DLL_PROCESS_ATTACH;
 	
-	ExecuteEmulatedProcedure(pCPU, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint, DllMainCRTStartupParams, 3);
+	pContext->fn_ptrs->ExecuteEmulatedProcedure(pContext, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint, DllMainCRTStartupParams, 3);
 
 	return ImageBase;
 
@@ -386,7 +392,6 @@ void InitTEB(PThreadContext pContext, PVOID ImageBase, PVOID StackBase, PVOID St
 
 PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into memory
 	PThreadContext pContext;
-	MIPS* pCPU;
 
 	DWORD dwStackSpace;
 	PBYTE pStack;
@@ -405,7 +410,6 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into me
 	if (!ImageBase) return NULL;
 
 	pContext = TlsGetValue(dwThreadContextIndex);
-	pCPU = &(pContext->cpu);
 
 	dos_hdr = ImageBase;
 	nt_hdr = ((PBYTE)dos_hdr) + dos_hdr->e_lfanew;
@@ -434,7 +438,7 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into me
 	InitTEB(pContext, ImageBase, pStack + dwStackSpace, pStack, nt_hdr->OptionalHeader.SizeOfHeapReserve, nt_hdr->OptionalHeader.SizeOfHeapCommit);
 
 	//set values into SP
-	pCPU->regs[29] = pStack + dwStackSpace - 64;// (PBYTE)malloc(65536) + 32768;
+	pContext->fn_ptrs->set_sp(pContext, pStack + dwStackSpace - 64);
 
 	//patch module filename & real base address
 	PatchModuleFileName(NtTeb->ProcessEnvironmentBlock, ImageBase);

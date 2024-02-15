@@ -4,29 +4,67 @@
 
 extern char* reg[32];
 
-BOOLEAN logging_instructions = 0;
+BOOLEAN logging_instructions = 1;
 BOOLEAN logging_functions = 1;
 
-extern DWORD OriginalImageBase;
+void mips_disasm(uint32_t pc, uint32_t op);
 
-void display_loaded_libs(PEmuPEB_LDR_DATA Ldr){
+DWORD MIPS_ExecuteEmulatedProcedure(PThreadContext pContext, DWORD dwTargetAddress, DWORD* pDwParamList, DWORD nParams) {
+	MIPS* pCPU = &(pContext->cpu);
+	DWORD dwCurrentArg;
+	DWORD dwOldRA = pCPU->regs[31];
 	
-	PLIST_ENTRY rootEntry = &(Ldr->InMemoryOrderModuleList);
-	PLIST_ENTRY pEntry;
-	
-	printf("The loaded libraries were:\n");
-	
-	for(pEntry = rootEntry->Flink; pEntry != rootEntry; pEntry = pEntry->Flink){
-		PEmuLDR_DATA_TABLE_ENTRY pDataEntry = pEntry - 1;
-		printf("	%ls: %p\n", pDataEntry->BaseDllName.Buffer, pDataEntry->DllBase);
+	pCPU->regs[29] -= 16;
+
+	pCPU->regs[31] = 0xFFFFFF00;
+	pCPU->pc = dwTargetAddress;
+
+	for (dwCurrentArg = 0; dwCurrentArg < nParams; dwCurrentArg++) {
+		if (dwCurrentArg < 4) {
+			pCPU->regs[dwCurrentArg + 4] = pDwParamList[dwCurrentArg];
+		}
 	}
+
+	//printf("Executing callback with parameters (%p, %p, %p, %p)\n", pDwParamList[0], pDwParamList[1], pDwParamList[2], pDwParamList[3]);
+
+	while (pCPU->pc != 0xFFFFFF00) {
+		//r4000_step(pCPU);
+		pContext->fn_ptrs->step(pContext);
+	}
+
+	pCPU->regs[31] = dwOldRA;
+	pCPU->regs[29] += 16;
+
+	printf("	<Callback completed with result %p>\n", pCPU->regs[2]);
+
+	return pCPU->regs[2];
+
 }
 
-void dump_registers(PThreadContext pContext){
+VOID MIPS_StubExport(PDWORD pFn, LPVOID pReal, LPSTR pName, LPSTR DllName) {
+	pFn[0] = 0x4C000000; //APICALL
+	pFn[1] = pReal;
+	pFn[2] = pName;
+	pFn[3] = DllName;
+}
+
+DWORD MIPS_QueryMemoryState(PThreadContext pContext){
+	return pContext->cpu.memory_state;
+}
+
+DWORD MIPS_get_pc(PThreadContext pContext){
+	return pContext->cpu.pc;
+}
+
+DWORD MIPS_get_ra(PThreadContext pContext) {
+	return pContext->cpu.regs[31];
+}
+
+void MIPS_dump_registers(PThreadContext pContext){
 	int i, p;
 	
 	for(i = 0; i < 32; i++){
-		
+			
 		if(i % 4 == 0){
 			printf("\n");
 		}
@@ -37,45 +75,35 @@ void dump_registers(PThreadContext pContext){
 	printf("\n\n");
 }
 
-void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info){
-	printf("\n	HALT! (PC=%p, EmuWOW Image Base = %p)\n", pContext->cpu.pc, OriginalImageBase);
-	printf("	Thread Stack Base: %p Stack Limit: %p\n", pContext->teb.StackBase, pContext->teb.StackLimit);
-	
-	switch(error_type){
-		case SEGFAULT:
-			printf("	The memory at address %p could not be ", info);
-			
-			if(pContext->cpu.memory_state & READING){
-				printf("\"read\"\n");
-				
-				printf("%p ", *(uint32_t*)(pContext->cpu.pc));
-				mips_disasm(pContext->cpu.pc, *(uint32_t*)(pContext->cpu.pc));
-			} else if(pContext->cpu.memory_state & WRITING){
-				printf("\"written\"\n");
-				
-				printf("%p ", *(uint32_t*)(pContext->cpu.pc));
-				mips_disasm(pContext->cpu.pc, *(uint32_t*)(pContext->cpu.pc));
-				
-				//dump instruction
-			} else if(pContext->cpu.memory_state & FETCHING){
-				printf("\"executed\"\n");
-			} 
-			
-			break;
-		case INVINST:
-			printf("	Invalid instruction %p\n", *(uint32_t*)(pContext->cpu.pc));
-			break;
-		default:
-			break;
-	}
-	
-	//dump registers
-	dump_registers(pContext);
+void MIPS_set_sp(PThreadContext pContext, DWORD val){
+	pContext->cpu.regs[29] = val;
+}
 
-	//display list of loaded libraries
-	display_loaded_libs(pContext->teb.ProcessEnvironmentBlock->Ldr);
+void MIPS_set_pc(PThreadContext pContext, DWORD val){
+	pContext->cpu.pc = val;
+}
 
-	ExitProcess(0);
+void MIPS_step(PThreadContext pContext){
+	r4000_step(&(pContext->cpu));
+}
+
+void MIPS_AddBreakpoint(DWORD addr) {
+	*(DWORD*)(addr) = BRK;
+}
+
+void InitializeMIPSCPU(PCPUVTable pVTable){
+	pVTable->machine_type = IMAGE_FILE_MACHINE_R4000;
+	pVTable->step = MIPS_step;
+	pVTable->disasm = mips_disasm;
+	pVTable->dump_regs = MIPS_dump_registers;
+	pVTable->set_pc = MIPS_set_pc;
+	pVTable->set_sp = MIPS_set_sp;
+	pVTable->get_pc = MIPS_get_pc;
+	pVTable->get_ra = MIPS_get_ra;
+	pVTable->ExecuteEmulatedProcedure = MIPS_ExecuteEmulatedProcedure;
+	pVTable->QueryMemoryState = MIPS_QueryMemoryState;
+	pVTable->StubExport = MIPS_StubExport;
+	pVTable->AddBreakpoint = MIPS_AddBreakpoint;
 }
 
 void handle_reserved_instruction(uint32_t op) {
@@ -121,8 +149,9 @@ void cpu_swl(MIPS* cpu, uint32_t op) {
 	store(uint32_t, offset & ~3, (m_r[RTREG] << shift) | (load(uint32_t, offset & ~3) & mask));
 }
 
-void r4000_step(MIPS* cpu) {
+INT r4000_step(MIPS* cpu) {
 	uint32_t op;
+	INT res;
 
 	cpu->memory_state |= FETCHING;
 	op	= *(uint32_t*)(cpu->pc);
@@ -133,7 +162,9 @@ void r4000_step(MIPS* cpu) {
 		mips_disasm(cpu->pc, op);
 	}
 
-	r4000_execute(cpu, op);
+	res = r4000_execute(cpu, op);
+
+	if (res) return res;
 
 	m_r[0] = 0;
 
@@ -159,6 +190,8 @@ void r4000_step(MIPS* cpu) {
 	}
 	
 	cpu->memory_state = 0;
+
+	return res;
 }
 
 DWORD HandleNativeInstruction(MIPS* cpu, DWORD pc){
@@ -184,7 +217,7 @@ DWORD HandleNativeInstruction(MIPS* cpu, DWORD pc){
 	return res;
 }
 
-void r4000_execute(MIPS* cpu, uint32_t op) {
+INT r4000_execute(MIPS* cpu, uint32_t op) {
 
 
 	switch (op >> 26)
@@ -231,6 +264,7 @@ void r4000_execute(MIPS* cpu, uint32_t op) {
 			
 			break;
 		case 0x0d: // BREAK
+			return 1;
 			break;
 			//case 0x0e: // *
 		case 0x0f: // SYNC
@@ -671,4 +705,6 @@ void r4000_execute(MIPS* cpu, uint32_t op) {
 		handle_reserved_instruction(op);
 		break;
 	}
+
+	return 0;
 }

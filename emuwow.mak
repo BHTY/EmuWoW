@@ -2,7 +2,7 @@
 
 all: EmuWoW.exe
 
-EmuWoW.exe: EmuWoW.obj EmuWoW.res mips_dis.obj r4000.obj pe.obj
+EmuWoW.exe: EmuWoW.obj EmuWoW.res mips_dis.obj r4000.obj pe.obj alpha.obj axp_dis.obj
   $(link) /base:0x800000 /SUBSYSTEM:CONSOLE,3.10 $(ldebug) $(conlflags) -out:$*.exe $** $(conlibs)
 
 {src}.c{src}.obj:

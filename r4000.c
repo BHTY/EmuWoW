@@ -35,7 +35,9 @@ DWORD MIPS_ExecuteEmulatedProcedure(PThreadContext pContext, DWORD dwTargetAddre
 	pCPU->regs[31] = dwOldRA;
 	pCPU->regs[29] += 16;
 
-	printf("	<Callback completed with result %p>\n", pCPU->regs[2]);
+	if (pContext->dbg_state.print_functions) {
+		printf("	<Callback completed with result %p>\n", pCPU->regs[2]);
+	}
 
 	return pCPU->regs[2];
 

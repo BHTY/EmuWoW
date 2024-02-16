@@ -5,9 +5,9 @@
 
 /*
 	DEC Alpha Implementation Todo List
-1.) Finish ExecuteEmulatedProcedure, StubExport, and AddBreakpoint
-2.) Implement sext()
-3.) Test and work out the bugs - get it working!
+1.) Implement sext()
+2.) Test and work out the bugs - get it working!
+	
 */
 
 typedef struct _AXP64 {
@@ -50,8 +50,11 @@ typedef struct _ThreadContext_Alpha {
 
 #define BIT(num, index)  ((num >> index) & 1)
 
-#define load(type, addr)	( (int64_t)*(type*)addr  )
+#define load(type, addr)	( (int64_t)*(type*)(addr)  )
 
 #define store(type, addr, val) *(type*)(addr) = val
 
 void InitializeAlphaCPU(PCPUVTable pVTable);
+INT AXP_execute(PAXP64 pCPU, uint32_t op);
+DWORD AlphaHandleNativeInstruction(AXP64* pCPU, DWORD pc);
+DWORD Alpha_ExecuteEmulatedProcedure(PThreadContext_Alpha pContext, DWORD dwTargetAddress, DWORD* pDwParamList, DWORD nParams);

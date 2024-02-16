@@ -41,15 +41,18 @@
 #define CALL_PAL(fnc)                    printf("%-10s %s",           "call_pal", fnc)
 
 #define RESERVED(opcode)                 printf("%-10s",              opcode)
+#define APICALL(pc)						 printf("APICALL %s!%s", *(DWORD*)(pc + 12), *(DWORD*)(pc+8))
 #define UNKNOWN(type)                    printf("unknown %s",         type)
 
 #undef Disp_M
 #undef Disp_P
 #undef Disp_B
+#undef Im
 
 #define Disp_M(x) (s32(s16(x)))            // memory instruction 16-bit signed offset
 #define Disp_P(x) (s32(sext(x, 12))) // hardware load/store 12-bit signed offset
 #define Disp_B(x) (s32(sext(x << 2, 23))) // branch instruction offset
+#define Im(x)     (u32(u8(x >> 13)))       // literal immediate field
 
 extern char* F[];
 extern char* R[];

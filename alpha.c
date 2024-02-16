@@ -1,15 +1,30 @@
+#include "axp_dis.h"
 #include "alpha.h"
 #include "EmuWoW.h"
 #include <windows.h>
-#include "axp_dis.h"
 
 INT AXP_step(PThreadContext_Alpha pContext) {
-	//fetch instruction
-	//increment PC
-	//execute instruction
-	//reset always-zero registers
+	PAXP64 pCPU = &(pContext->cpu);
+	INT res;
 
-	return 0;
+	//fetch instruction
+	uint32_t op = *(DWORD*)(m_pc);
+
+	//print?
+	if (pContext->dbg_state.print_instructions) {
+		printf("%p: %p ", (DWORD)m_pc, op);
+		AXP_disasm(m_pc, op);
+	}
+
+	//increment PC
+	m_pc += 4;
+	//execute instruction
+	res = AXP_execute(pCPU, op);
+	//reset always-zero registers
+	m_r[31] = 0;
+
+
+	return res;
 }
 
 INT AXP_QueryMemoryState(PThreadContext pContext) {
@@ -25,7 +40,7 @@ void AXP_dump_regs(PThreadContext_Alpha pContext) {
 			printf("\n");
 		}
 
-		printf("%s: %p ", R[i], pContext->cpu.r_i[i]);
+		printf("%s: %p'%p ", R[i], (DWORD)(pContext->cpu.r_i[i] >> 32), (DWORD)(pContext->cpu.r_i[i]));
 	}
 
 	printf("\n\n");
@@ -58,6 +73,25 @@ DWORD AXP_get_ra(PThreadContext_Alpha pContext) {
 	return pContext->cpu.r_i[26];
 }
 
+void AXP_AddBreakpoint(DWORD addr) {
+	*(DWORD*)addr = 1 << 26;
+}
+
+LPCH WINAPI Hook_GetEnvironmentStrings() {
+	return "Var1=1\0\0";
+}
+
+VOID AXP_StubExport(PDWORD pFn, LPVOID pReal, LPSTR pName, LPSTR DllName) {
+	if (strcmp(pName, "GetEnvironmentStrings") == 0) {
+		pReal = Hook_GetEnvironmentStrings;
+	}
+
+	pFn[0] = 2 << 26; //APICALL
+	pFn[1] = pReal;
+	pFn[2] = pName;
+	pFn[3] = DllName;
+}
+
 void InitializeAlphaCPU(PCPUVTable pVTable) {
 	pVTable->machine_type = IMAGE_FILE_MACHINE_ALPHA;
 	pVTable->step = AXP_step;
@@ -67,17 +101,21 @@ void InitializeAlphaCPU(PCPUVTable pVTable) {
 	pVTable->set_sp = AXP_set_sp;
 	pVTable->get_pc = AXP_get_pc;
 	pVTable->get_ra = AXP_get_ra;
-	pVTable->ExecuteEmulatedProcedure = NULL;
+	pVTable->ExecuteEmulatedProcedure = Alpha_ExecuteEmulatedProcedure;
 	pVTable->QueryMemoryState = AXP_QueryMemoryState; //we also need a better way to SET memory state
-	pVTable->StubExport = NULL;
-	pVTable->AddBreakpoint = NULL;
+	pVTable->StubExport = AXP_StubExport;
+	pVTable->AddBreakpoint = AXP_AddBreakpoint;
 }
 
-int sext(int a, int b) { //FIXME
-	return 0;
-}
+uint64_t sext(uint64_t num, int bits) { //FIXME
+	bits -= 1;
 
-//load, store, vars, zapmask
+	if (num & (1 << bits)) {
+		return ((-1) << bits) | num;
+	}
+
+	return num & ~((-1) << bits);
+}
 
 uint64_t zap_mask(uint8_t zap_bits)
 {
@@ -91,11 +129,73 @@ uint64_t zap_mask(uint8_t zap_bits)
 	return mask;
 }
 
+DWORD Alpha_ExecuteEmulatedProcedure(PThreadContext_Alpha pContext, DWORD dwTargetAddress, DWORD* pDwParamList, DWORD nParams) {
+	PAXP64 pCPU = &(pContext->cpu);
+	DWORD dwCurrentArg;
+	DWORD dwOldRA = m_r[26];
+
+	m_r[26] = 0xFFFFFF00;
+	m_pc = dwTargetAddress;
+
+	for (dwCurrentArg = 0; dwCurrentArg < nParams; dwCurrentArg++) {
+		if (dwCurrentArg < 4) {
+			m_r[dwCurrentArg + 16] = pDwParamList[dwCurrentArg];
+		}
+	}
+
+	while ((DWORD)m_pc != 0xFFFFFF00) {
+		pContext->fn_ptrs->step(pContext);
+	}
+
+	m_r[26] = dwOldRA;
+
+	if (pContext->dbg_state.print_functions) {
+		printf("	<Callback completed with result %p>\n", m_r[0]);
+	}
+
+	return m_r[0];
+}
+
+DWORD AlphaHandleNativeInstruction(AXP64* pCPU, DWORD pc) {
+	DWORD arg_list[16];
+	DWORD* StackArgList;
+	DWORD res;
+	int i;
+
+	for (i = 0; i < 6; i++) {
+		arg_list[i] = m_r[i + 16];
+	}
+
+	StackArgList = m_r[30];
+
+	for (i = 6; i < 16; i++) {
+		arg_list[i] = StackArgList[i - 6];
+	}
+
+	res = ExecuteNativeFunction(*(DWORD*)(pc + 4), arg_list, 16);
+
+	if (((PThreadContext)TlsGetValue(dwThreadContextIndex))->dbg_state.print_functions) {
+		printf("	<%s returned %p> (error = %d)\n", *(DWORD*)(pc + 8), res, GetLastError());
+	}
+
+	return res;
+}
+
 INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 	unsigned i;
 
 	switch ((op >> 26) & 0x3f)
 	{
+	case 0x01: //BREAK
+		return 1;
+		break;
+
+	case 0x02: //APICALL
+		m_r[0] = AlphaHandleNativeInstruction(pCPU, m_pc - 4);
+		m_pc = m_r[26];
+		break;
+
+	
 	case 0x08: m_r[Ra(op)] = m_r[Rb(op)] + Disp_M(op); break; // lda
 	case 0x09: m_r[Ra(op)] = m_r[Rb(op)] + (Disp_M(op) << 16); break; // ldah
 	case 0x0b: m_r[Ra(op)] = load(uint64_t, (m_r[Rb(op)] + Disp_M(op)) & ~7); break; // ldq_u
@@ -374,7 +474,10 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 	*/
 	case 0x27: store(uint64_t, m_r[Rb(op)] + Disp_M(op), m_f[Ra(op)]); break; // stt
 	case 0x28: m_r[Ra(op)] = s64(load(int32_t, m_r[Rb(op)] + Disp_M(op))); break; // ldl
-	case 0x29: m_r[Ra(op)] = load(uint64_t, m_r[Rb(op)] + Disp_M(op)); break; // ldq
+	case 0x29:  //ldq
+		//printf("Loading from address %p\n", m_r[Rb(op)] + Disp_M(op));
+		m_r[Ra(op)] = load(uint64_t, m_r[Rb(op)] + Disp_M(op));
+		break;
 	/*case 0x2a: // ldl_l
 		load_l<u32>(m_r[Rb(op)] + Disp_M(op),
 			[this, op](address_space &space, u64 address, s32 data)
@@ -476,8 +579,11 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 			m_pc += Disp_B(op);
 		break;
 	case 0x39: // beq
-		if (m_r[Ra(op)] == 0)
+		if (m_r[Ra(op)] == 0) {
+			//printf("PC=%p Disp=%p (%p:%p)\n", (DWORD)m_pc, (DWORD)Disp_B(op), Disp_B(op));
 			m_pc += Disp_B(op);
+			//printf("Now the PC = %p\n", (DWORD)m_pc);
+		}
 		break;
 	case 0x3a: // blt
 		if (s64(m_r[Ra(op)]) < 0)
@@ -504,4 +610,6 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 			m_pc += Disp_B(op);
 		break;
 	}
+
+	return 0;
 }

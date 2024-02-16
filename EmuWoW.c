@@ -8,6 +8,7 @@
 #include "pe.h"
 #include "mips.h"
 #include "r4000.h"
+#include "alpha.h"
 
 PVOID(WINAPI* pAddVectoredExceptionHandler)(ULONG, PVOID) = NULL;
 BOOL(WINAPI* pSetProcessDEPPolicy)(DWORD) = NULL;
@@ -51,13 +52,17 @@ void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info){
 			if(memory_state & READING){
 				printf("\"read\"\n");
 				
-				printf("%p ", *(uint32_t*)(pc_halted));
-				mips_disasm(pContext->cpu.pc, *(uint32_t*)(pc_halted));
+				if (pc_halted != info) {
+					printf("%p ", *(uint32_t*)(pc_halted));
+					pContext->fn_ptrs->disasm(pc_halted, *(uint32_t*)(pc_halted));
+				}
 			} else if(memory_state & WRITING){
 				printf("\"written\"\n");
 				
-				printf("%p ", *(uint32_t*)(pc_halted));
-				pContext->fn_ptrs->disasm(pc_halted, *(uint32_t*)(pc_halted));
+				if (pc_halted != info) {
+					printf("%p ", *(uint32_t*)(pc_halted));
+					pContext->fn_ptrs->disasm(pc_halted, *(uint32_t*)(pc_halted));
+				}
 				
 				//dump instruction
 			} else if(memory_state & FETCHING){
@@ -484,10 +489,24 @@ int main(int argc, char** argv) {
 	LPVOID pExe;
 	DWORD dwImageEntryPoint;
 
+#if defined(ARCH_ALPHA)
+	InitializeAlphaCPU(&vtable);
+#elif defined(ARCH_MIPS)
 	InitializeMIPSCPU(&vtable);
+#else
+#error "Unsupported Architecture"
+#endif
 	
 	dwThreadContextIndex = TlsAlloc();
+
+#if defined(ARCH_ALPHA)
+	TlsSetValue(dwThreadContextIndex, calloc(1, sizeof(ThreadContext_Alpha)));
+#elif defined(ARCH_MIPS)
 	TlsSetValue(dwThreadContextIndex, calloc(1, sizeof(ThreadContext)));
+#else
+	#error "Unsupported Architecture"
+#endif
+
 	pContext = TlsGetValue(dwThreadContextIndex);
 	pContext->fn_ptrs = &vtable;
 	HookDebugger(pContext);

@@ -5,9 +5,12 @@
 //#include <winnt.h>
 #include "mips.h"
 
+#define ARCH_ALPHA
+//#define ARCH_MIPS
+
 /*
 EmuWoW Todo List (fix misc bugs)
-1.) Preliminary DEC Alpha AXP support
+1.) Get DEC Alpha applications working (sign extension and 64-bit stuff is WEIRD!)
 2.) MIPS & Alpha FPU support
 3.) Fix module relocator
 4.) Fix command line (both for the actual PEB & the MIPS PEB) & hook image loader-related functions
@@ -166,3 +169,4 @@ typedef struct _ThreadContext {
 PEmuTEB FunctionGetTeb();
 void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info);
 void display_loaded_libs(PEmuPEB_LDR_DATA Ldr);
+DWORD ExecuteNativeFunction(LPVOID pTargetAddress, DWORD* pParamList, DWORD dwParamCount);

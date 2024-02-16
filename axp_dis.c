@@ -40,12 +40,12 @@ char* IBX[] = {
 };
 
 void AXP_disasm(uint32_t pc, uint32_t instruction) {
-	uint32_t flags;
+	uint32_t flags = 0;
 
 	switch (instruction >> 26) {
 	case 0x00: printf("PALCODE"); break;
-	case 0x01: RESERVED("opc01"); break; // OPC01
-	case 0x02: RESERVED("opc02"); break; // OPC02
+	case 0x01: RESERVED("BREAK"); break; // OPC01
+	case 0x02: APICALL(pc); break; // OPC02
 	case 0x03: RESERVED("opc03"); break; // OPC03
 	case 0x04: RESERVED("opc04"); break; // OPC04
 	case 0x05: RESERVED("opc05"); break; // OPC05

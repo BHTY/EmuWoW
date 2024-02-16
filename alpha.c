@@ -81,9 +81,15 @@ LPCH WINAPI Hook_GetEnvironmentStrings() {
 	return "Var1=1\0\0";
 }
 
+LPSTR WINAPI Hook_GetCommandLineA(){
+	return "notepad.exe";
+}
+
 VOID AXP_StubExport(PDWORD pFn, LPVOID pReal, LPSTR pName, LPSTR DllName) {
 	if (strcmp(pName, "GetEnvironmentStrings") == 0) {
 		pReal = Hook_GetEnvironmentStrings;
+	}if (strcmp(pName, "GetCommandLineA") == 0) {
+		pReal = Hook_GetCommandLineA;
 	}
 
 	pFn[0] = 2 << 26; //APICALL
@@ -158,7 +164,7 @@ DWORD Alpha_ExecuteEmulatedProcedure(PThreadContext_Alpha pContext, DWORD dwTarg
 
 DWORD AlphaHandleNativeInstruction(AXP64* pCPU, DWORD pc) {
 	DWORD arg_list[16];
-	DWORD* StackArgList;
+	uint64_t* StackArgList;
 	DWORD res;
 	int i;
 
@@ -171,6 +177,27 @@ DWORD AlphaHandleNativeInstruction(AXP64* pCPU, DWORD pc) {
 	for (i = 6; i < 16; i++) {
 		arg_list[i] = StackArgList[i - 6];
 	}
+	
+	if(strcmp(*(DWORD*)(pc + 8), "CreateWindowExA") == 0){
+		printf("dwExStyle = %p\n", arg_list[0]);
+		printf("lpClassName = %p\n", arg_list[1]);
+		printf("lpWindowName = %p\n", arg_list[2]);
+		printf("dwStyle = %p\n", arg_list[3]);
+		printf("X = %p\n", arg_list[4]);
+		printf("Y = %p\n", arg_list[5]);
+		printf("nWidth = %p\n", arg_list[6]);
+		printf("nHeight = %p\n", arg_list[7]);
+		printf("hWndParent = %p\n", arg_list[8]);
+		printf("hMenu = %p\n", arg_list[9]);
+		printf("hInstance = %p\n", arg_list[10]);
+		printf("lpParam = %p\n", arg_list[11]);
+	}
+	/*if(strcmp(*(DWORD*)(pc + 8), "LoadStringA") == 0){
+		printf("hInstance = %p\n", arg_list[0]);
+		printf("uID = %p\n", arg_list[1]);
+		printf("lpBuffer = %p\n", arg_list[2]);
+		printf("cchBufferMax = %p\n", arg_list[3]);
+	}*/
 
 	res = ExecuteNativeFunction(*(DWORD*)(pc + 4), arg_list, 16);
 
@@ -187,6 +214,7 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 	switch ((op >> 26) & 0x3f)
 	{
 	case 0x01: //BREAK
+		m_pc -= 4;
 		return 1;
 		break;
 
@@ -608,6 +636,10 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 	case 0x3f: // bgt
 		if (s64(m_r[Ra(op)]) > 0)
 			m_pc += Disp_B(op);
+		break;
+	default:
+		//printf("Unknown instruction %x\n", op >> 26);
+		//while(1);
 		break;
 	}
 

@@ -3,13 +3,6 @@
 #include "int.h"
 #include "emuwow.h"
 
-/*
-	DEC Alpha Implementation Todo List
-1.) Implement sext()
-2.) Test and work out the bugs - get it working!
-	
-*/
-
 typedef struct _AXP64 {
 	uint64_t pc;
 	uint64_t r_i[32];

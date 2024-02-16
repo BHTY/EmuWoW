@@ -438,7 +438,7 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into me
 	InitTEB(pContext, ImageBase, pStack + dwStackSpace, pStack, nt_hdr->OptionalHeader.SizeOfHeapReserve, nt_hdr->OptionalHeader.SizeOfHeapCommit);
 
 	//set values into SP
-	pContext->fn_ptrs->set_sp(pContext, pStack + dwStackSpace - 64);
+	pContext->fn_ptrs->set_sp(pContext, pStack + dwStackSpace - 256); // - 64
 
 	//patch module filename & real base address
 	PatchModuleFileName(NtTeb->ProcessEnvironmentBlock, ImageBase);

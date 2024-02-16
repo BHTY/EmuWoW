@@ -10,7 +10,7 @@
 
 /*
 EmuWoW Todo List (fix misc bugs)
-1.) Get DEC Alpha applications working (sign extension and 64-bit stuff is WEIRD!)
+1.) Get more DEC Alpha applications working
 2.) MIPS & Alpha FPU support
 3.) Fix module relocator
 4.) Fix command line (both for the actual PEB & the MIPS PEB) & hook image loader-related functions
@@ -43,6 +43,23 @@ Sample applications (MIPS)
 - SimplePaint: WORKING (but with rebasing issues)
 
 Sample applications (Alpha)
+- Clock v3.51: PARTIALLY WORKING
+	Same issue as on MIPS (text isn't drawing)
+- Notepad v3.10: PARTIALLY WORKING
+- Paintbrush v3.51: PARTIALLY WORKING
+	The UI and everything is squished to the left side. I think this is because the Alpha lacks integer division and the FPU instructions aren't implemented.
+- Solitaire v3.51: NOT WORKING
+- FreeCell v3.51: NOT WORKING
+- WinMine v3.10: NOT WORKING
+- WinMine v3.51: NOT WORKING
+- Winver v3.51: PARTIALLY WORKING
+	The top-left quarter of the Windows logo is missing, and the format strings aren't formatting.
+- Winver v3.10: WORKING
+- Hello, Windows! Sample: UNTESTED
+- Command line hello world: UNTESTED
+
+Notepad, Paintbrush, and Clock all have an issue with their menus being totally nonfunctional. They show up, but clicking on them doesn't do anything.
+All of the games share an issue where the calls to CreateWindowExA return 0 even when they *SHOULD* work.
 
 Breakpoints will use the MIPS BREAK instructions
 When you step past a breakpoint, it will fill in the breakpoint address with the original instruction, do the CPU step, and then fill it back in with the breakpoint

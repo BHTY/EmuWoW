@@ -117,8 +117,8 @@ void cp1_execute(MIPS* cpu, uint32_t op) { //FPU
 
 	handle_reserved_instruction(op);
 
-	printf("Floating point fuck you!\n");
-	while (1);
+	//printf("Floating point fuck you!\n");
+	//while (1);
 }
 
 void cpu_lwr(MIPS* cpu, uint32_t op) {

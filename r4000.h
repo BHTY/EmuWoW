@@ -7,6 +7,7 @@
 
 #define m_pc cpu->pc
 #define m_r cpu->regs
+#define m_f cpu->f_regs
 #define m_lo cpu->lo
 #define m_hi cpu->hi
 #define m_branch_state cpu->branch_state
@@ -46,7 +47,8 @@
 #define cp2_execute(ex)
 
 //#define load(type, addr)	((int32_t)*(type*)addr)
-#define load(type, addr)	(   (addr == 0x7FFFF4A8) ? (DWORD)(TlsGetValue(dwThreadContextIndex)) :             ((int32_t)*(type*)addr)    )
+#define load(type, addr)	(   (addr == 0x7FFFF4A8) ? (DWORD)(TlsGetValue(dwThreadContextIndex)) :             ((int32_t)*(type*)(addr))    )
+#define load64(addr)    (*(int64_t*)(addr))
 #define store(type, addr, val) *(type*)(addr) = val
 
 #define mul_32x32(a,b) ((int64_t)((int32_t)a * (int32_t)b))

@@ -115,7 +115,35 @@ void handle_reserved_instruction(uint32_t op) {
 
 void cp1_execute(MIPS* cpu, uint32_t op) { //FPU
 
-	handle_reserved_instruction(op);
+	switch(op >> 26){
+		case 0x11: //COP1
+			switch((op >> 21) & 0x1f){
+				default:
+					printf("Unimplemented FPU operation 0x%02x: ", (op >> 21) & 0x1f);
+					handle_reserved_instruction(op);
+					break;
+			}
+			break;
+
+		case 0x31: //LWC1
+			m_f[RTREG] = load(uint32_t, ADDR(m_r[RSREG], s16(op)));
+			break;
+
+		case 0x35: //LDC1
+			m_f[RTREG] = load64(ADDR(m_r[RSREG], s16(op)));
+			break;
+
+		case 0x39: //SWC1
+			store(uint32_t, ADDR(m_r[RSREG], s16(op)), m_f[RTREG]);
+			break;
+
+		case 0x3d: //SDC1
+			store(uint64_t, ADDR(m_r[RSREG], s16(op)), m_f[RTREG]);
+			break;
+
+		default:
+			handle_reserved_instruction(op);
+	}
 
 	//printf("Floating point fuck you!\n");
 	//while (1);

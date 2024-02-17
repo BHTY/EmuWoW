@@ -170,11 +170,15 @@ void mips_disasm(uint32_t pc, uint32_t op)
 	case 0x2d:  printf("sdr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 	case 0x2e:  printf("swr       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 	case 0x30:  printf("ll        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x31:	printf("lwc1	  f%d,%s(%s)", rt, signed_16bit(op), reg[rs]);			  break;
 	case 0x33:  printf("pref      $%x,%s(%s)", rt, signed_16bit(op), reg[rs]);            break;
 	case 0x34:  printf("lld       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x35:	printf("ldc1	  f%d,%s(%s)", rt, signed_16bit(op), reg[rs]);			  break;
 	case 0x37:  printf("ld        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 	case 0x38:  printf("sc        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x39:	printf("swc1	  f%d,%s(%s)", rt, signed_16bit(op), reg[rs]);			  break;
 	case 0x3c:  printf("scd       %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
+	case 0x3d:	printf("sdc1	  f%d,%s(%s)", rt, signed_16bit(op), reg[rs]);			  break;
 	case 0x3f:  printf("sd        %s,%s(%s)", reg[rt], signed_16bit(op), reg[rs]);        break;
 	}
 	printf("\n");

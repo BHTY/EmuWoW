@@ -19,6 +19,8 @@ typedef struct {
     uint32_t hi;
     uint32_t lo;
     uint32_t branch_state;
+
+	uint64_t f_regs[32];
 	
 	uint32_t memory_state;
 } MIPS;

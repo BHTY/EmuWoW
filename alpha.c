@@ -180,7 +180,7 @@ DWORD AlphaHandleNativeInstruction(AXP64* pCPU, DWORD pc) {
 	
 	if(strcmp(*(DWORD*)(pc + 8), "CreateWindowExA") == 0){
 		printf("dwExStyle = %p\n", arg_list[0]);
-		printf("lpClassName = %p\n", arg_list[1]);
+		printf("lpClassName = %p (%s)\n", arg_list[1], arg_list[1]);
 		printf("lpWindowName = %p\n", arg_list[2]);
 		printf("dwStyle = %p\n", arg_list[3]);
 		printf("X = %p\n", arg_list[4]);

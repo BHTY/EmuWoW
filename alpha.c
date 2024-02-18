@@ -208,6 +208,15 @@ DWORD AlphaHandleNativeInstruction(AXP64* pCPU, DWORD pc) {
 	return res;
 }
 
+uint64_t mulu_64x64(uint64_t a, uint64_t b){
+	uint64_t high_a = a >> 32;
+	uint64_t low_a = (a & 0xFFFFFFFF);
+	uint64_t high_b = b >> 32;
+	uint64_t low_b = (b & 0xFFFFFFFF);
+
+	return (high_a * high_b) + (high_a * low_b) >> 16 + (low_a * high_b) >> 16;
+}
+
 INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 	unsigned i;
 
@@ -452,14 +461,14 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 			// register variants
 		case 0x00: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(m_r[Rb(op)]))); break; // mull
 		case 0x20: m_r[Rc(op)] = m_r[Ra(op)] * m_r[Rb(op)]; break; // mulq
-		//case 0x30: mulu_64x64(m_r[Ra(op)], m_r[Rb(op)], m_r[Rc(op)]); break; // umulh
+		case 0x30: m_r[Rc(op)] = mulu_64x64(m_r[Ra(op)], m_r[Rb(op)]); break; // umulh
 		case 0x40: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(m_r[Rb(op)]))); break; // mull/v
 		case 0x60: m_r[Rc(op)] = m_r[Ra(op)] * m_r[Rb(op)]; break; // mulq/v
 
 			// immediate variants
 		case 0x80: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(Im(op)))); break; // mull
 		case 0xa0: m_r[Rc(op)] = m_r[Ra(op)] * Im(op); break; // mulq
-		//case 0xb0: mulu_64x64(m_r[Ra(op)], Im(op), m_r[Rc(op)]); break; // umulh
+		case 0xb0: m_r[Rc(op)] = mulu_64x64(m_r[Ra(op)], Im(op)); break; // umulh
 		case 0xc0: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(Im(op)))); break; // mull/v
 		case 0xe0: m_r[Rc(op)] = m_r[Ra(op)] * Im(op); break; // mulq/v
 		}
@@ -638,8 +647,9 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 			m_pc += Disp_B(op);
 		break;
 	default:
-		//printf("Unknown instruction %x\n", op >> 26);
-		//while(1);
+		/*printf("Unknown instruction %x\n", op >> 26);
+		FatalError(TlsGetValue(dwThreadContextIndex), INVINST, 0);
+		while(1);*/
 		break;
 	}
 

@@ -9,6 +9,8 @@
 PBYTE TextSection = NULL;
 UCS2_STRING LastImageName;
 
+DWORD dwImageBaseGot, dwImageBaseWanted;
+
 UCS2_STRING AnsiToUnicodeString(char* AnsiString){
 	UCS2_STRING uString;
 	
@@ -83,6 +85,13 @@ void WritePESections(PBYTE ImageBase, PBYTE pData, PIMAGE_SECTION_HEADER section
 void WritePERelocs(char* ImageBase, PIMAGE_BASE_RELOCATION base_reloc, DWORD delta)
 {
 	DWORD size_blocks = 0, * patch_addr = NULL, i = 0;
+	PThreadContext pContext = TlsGetValue(dwThreadContextIndex);
+
+	PWORD pwNextValue;
+	WORD wExistingValue16;
+	PBYTE pCurrRelocTargetPtr;
+	DWORD dwBaseDelta;
+	PBYTE pCurrRelocEntryPtr;
 
 	while (base_reloc->VirtualAddress) {
 
@@ -94,12 +103,27 @@ void WritePERelocs(char* ImageBase, PIMAGE_BASE_RELOCATION base_reloc, DWORD del
 			patch_addr = (PDWORD)(ImageBase + base_reloc->VirtualAddress + (reloc[i] & 0xfff));
 			//printf("Relocating address %p (reloc[i] >> 12 = %p) %p (%p -> %p, imm:%04x -> %04x\n", patch_addr, reloc[i] >> 12, delta, *patch_addr, *patch_addr + (delta >> 16), (*patch_addr) & 0xFFFF, (*patch_addr + (delta >> 16)) & 0xFFFF);
 
+			//printf("%p (%p -> %p) Type %d:\n", patch_addr, dwImageBaseWanted, dwImageBaseGot, reloc[i] >> 12);
+			//printf("\tBefore: ");
+			//pContext->fn_ptrs->disasm(patch_addr, *patch_addr);
+
+				pwNextValue;
+				wExistingValue16 = *(WORD*)patch_addr;
+				pCurrRelocTargetPtr = patch_addr;
+				dwBaseDelta = delta;
+				pCurrRelocEntryPtr = (BYTE*)((BYTE*)base_reloc + sizeof(IMAGE_BASE_RELOCATION) + (i * sizeof(WORD)));;
+
 			switch (reloc[i] >> 12) {
+
 				case IMAGE_REL_BASED_HIGHLOW:
 					*patch_addr += delta;
 					break;
 				case IMAGE_REL_BASED_HIGHADJ:
-					*(WORD*)(patch_addr) += (delta >> 16);
+					//*(WORD*)(patch_addr) += (delta >> 16);
+					pwNextValue = (WORD*)((BYTE*)pCurrRelocEntryPtr + sizeof(WORD));
+					i++;
+					*(WORD*)pCurrRelocTargetPtr = (WORD)((((DWORD)wExistingValue16 << 16) + ((DWORD)((short)*pwNextValue)) + dwBaseDelta + 0x8000) >> 16);
+
 					break;
 				case IMAGE_REL_BASED_HIGH:
 					*(WORD*)(patch_addr) += (delta >> 16);
@@ -114,9 +138,157 @@ void WritePERelocs(char* ImageBase, PIMAGE_BASE_RELOCATION base_reloc, DWORD del
 				default:
 					break;
 			}
+
+			//printf("\tAfter:  ");
+			//pContext->fn_ptrs->disasm(patch_addr, *patch_addr);
+
+			//printf("\n");
 		}
 
 		base_reloc = (PIMAGE_BASE_RELOCATION)(((DWORD)base_reloc) + base_reloc->SizeOfBlock);
+	}
+}
+
+#pragma pack(push,1)
+
+typedef struct _CoffSymbol{
+	char name[4];
+	DWORD index;
+	DWORD value;
+	WORD section_number;
+	WORD type;
+	BYTE storage_class;
+	BYTE number_of_aux_symbols;
+} CoffSymbol, *PCoffSymbol;
+#pragma pack(pop)
+
+PBYTE GetStringFromStrTable(PBYTE pStrTable, DWORD index){
+	PBYTE current_ptr = pStrTable + 4;
+	int current_index = 0;
+
+	while(1){
+		if(index == current_index) return current_ptr;
+		if(*current_ptr == 0){
+			current_index++;
+		}
+
+		current_ptr++;
+	}
+
+	return NULL;
+}
+
+/*
+	COFF Symbols are magic... when we load debug symbols, we should load them all into a standard data structure
+
+Types
+0: Not Function
+32: Function
+
+Storage Classes (relevant)
+2: External symbol
+3: Internal symbol (offset to section)
+*/
+
+SymbolEntry root_symbol;
+
+void AddSymbol(char* image_base, DWORD offset, char* name){
+	PSymbolEntry pSym = &root_symbol;
+	PSymbolEntry pOld;
+	
+	while (pSym) {
+		pOld = pSym; pSym = pSym->next;
+	}
+	pSym = pOld;
+	pSym->next = malloc(sizeof(SymbolEntry));
+	pSym->next->image_base = image_base;
+	pSym->next->name = name;
+	pSym->next->offset = offset;
+	pSym->next->next = NULL;
+	
+	//printf("Adding %p:%p (%s)\n", image_base, offset, name);
+}
+
+PSymbolEntry FindSymbol(char* name){
+	PSymbolEntry pSym = &root_symbol;
+
+	while(pSym){
+		if(pSym->name){
+			if(strcmp(pSym->name, name) == 0) return pSym;
+		}
+
+		pSym = pSym->next;
+	}
+
+	return NULL;
+}
+
+PSymbolEntry ResolveClosestSymbol(char* image_base, DWORD offset){ //  ? _ .
+	PSymbolEntry pSym = &root_symbol;
+	
+	PSymbolEntry pCurrentSmallest = NULL;
+	
+	ULONG LastDelta = -1;
+	
+	
+	while(pSym){
+		//printf("Found %p:%p (%s) and looking for %p:%p - last delta = %p and this delta would be %p\n", pSym->image_base, pSym->offset, pSym->name, image_base, offset, LastDelta, offset - pSym->offset);
+		
+		if(pSym->image_base == image_base && offset >= pSym->offset && ((ULONG)(offset - pSym->offset) < LastDelta)){
+			
+			pCurrentSmallest = pSym;
+			LastDelta = offset - pSym->offset;
+		}
+		
+		pSym = pSym->next;
+	}
+	
+	return pCurrentSmallest;
+}
+
+void ParseSymbolTable(PBYTE fPtr, PBYTE ImageBase){
+	PIMAGE_DOS_HEADER dos_hdr = fPtr;
+	PIMAGE_NT_HEADERS nt_hdr = fPtr + dos_hdr->e_lfanew;
+	PIMAGE_DATA_DIRECTORY data_dir = nt_hdr->OptionalHeader.DataDirectory;
+	PCoffSymbol pSyms = fPtr + nt_hdr->FileHeader.PointerToSymbolTable;
+	PBYTE pStrTable = (PBYTE)pSyms + nt_hdr->FileHeader.NumberOfSymbols * sizeof(CoffSymbol);
+	char string[9];
+	
+	char* temp_str;
+
+	int i;
+
+	string[8] = 0;
+	//memset(&root_symbol, 0, sizeof(SymbolEntry));
+
+	if(nt_hdr->FileHeader.NumberOfSymbols && nt_hdr->FileHeader.PointerToSymbolTable){
+		printf("This file has %d symbols located at %p\n", nt_hdr->FileHeader.NumberOfSymbols, fPtr + nt_hdr->FileHeader.PointerToSymbolTable);
+		
+		for(i = 0; i < nt_hdr->FileHeader.NumberOfSymbols; i++){
+
+			if(pSyms[i].name[0] == 0){ //GetStringFromStrTable(pStrTable, pSyms[i].index)
+				temp_str = malloc(strlen(pStrTable + pSyms[i].index) + 1);
+				strcpy(temp_str, pStrTable + pSyms[i].index);
+			
+				//printf("#%d %p: %s (str#%d) (type %d SC %d)\n", i, pSyms[i].value, pStrTable + pSyms[i].index, pSyms[i].index, pSyms[i].type, pSyms[i].storage_class);
+			}
+
+			else{
+
+				temp_str = malloc(9);
+				memcpy(string, pSyms[i].name, 8);
+				strcpy(temp_str, string);
+
+				//printf("#%d %p: %s (type %d SC %d) fuck\n", i, pSyms[i].value, string, pSyms[i].type, pSyms[i].storage_class);
+			}
+			
+			if((pSyms[i].storage_class == 3 || pSyms[i].storage_class == 2) && (pSyms[i].type == 32)){
+				AddSymbol(ImageBase, pSyms[i].value, temp_str);
+			}
+
+		}
+
+		//getchar();
 	}
 }
 
@@ -161,10 +333,15 @@ LPVOID MapImageIntoMemory(LPCSTR lpLibFileName) {
 
 	}
 
+	ParseSymbolTable(pData, ImageBase);
+	
+	dwImageBaseGot = ImageBase;
+	dwImageBaseWanted = nt_hdr->OptionalHeader.ImageBase;
+
 	memset(ImageBase, 0, nt_hdr->OptionalHeader.SizeOfImage);
 
 	printf("Loading PE image %s\n", lpLibFileName);
-	printf("  Image Base: %p | Entry Point: %p\n", ImageBase, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint);
+	printf("  Image Base: %p | Entry Point: %p | Size: %d bytes\n", ImageBase, ImageBase + nt_hdr->OptionalHeader.AddressOfEntryPoint, nt_hdr->OptionalHeader.SizeOfImage);
 	printf("  Desired Image Base: %p | Has Relocations: %d | Is DLL: %d\n", nt_hdr->OptionalHeader.ImageBase, data_dir[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress != 0, (nt_hdr->FileHeader.Characteristics & IMAGE_FILE_DLL) != 0);
 	printf("  Stack Size: %d bytes committed (%d bytes reserved)\n", nt_hdr->OptionalHeader.SizeOfStackCommit, nt_hdr->OptionalHeader.SizeOfStackReserve);
 	printf("  Heap Size: %d bytes committed (%d bytes reserved)\n", nt_hdr->OptionalHeader.SizeOfHeapCommit, nt_hdr->OptionalHeader.SizeOfHeapReserve);
@@ -268,7 +445,7 @@ HMODULE LoadMIPSLibrary(LPCSTR lpLibFileName){
 		WritePERelocs(ImageBase, base_reloc, delta);
 	}
 	
-	//put EXE into PEB
+	//put DLL into PEB
 	AddLdrEntry(pContext->teb.ProcessEnvironmentBlock->Ldr, ImageBase, &LastImageName);
 
 	//resolve imports
@@ -295,11 +472,14 @@ HMODULE LoadNativeLibrary(LPCSTR lpLibFileName) {
 	HMODULE hModule;
 	PBYTE ImageBase;
 	LPSTR DllName = GetFileNameFromPathA(lpLibFileName);
+	PThreadContext pContext = TlsGetValue(dwThreadContextIndex);
 
 	hModule = LoadLibraryA(lpLibFileName);
 	ImageBase = MapImageIntoMemory(lpLibFileName);
 
 	StubExports(ImageBase, hModule, lpLibFileName);
+
+	AddLdrEntry(pContext->teb.ProcessEnvironmentBlock->Ldr, ImageBase, &LastImageName);
 
 	return ImageBase;
 }
@@ -391,8 +571,8 @@ void InitTEB(PThreadContext pContext, PVOID ImageBase, PVOID StackBase, PVOID St
 }
 
 PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into memory
-	PThreadContext pContext;
 
+	PThreadContext pContext;
 	DWORD dwStackSpace;
 	PBYTE pStack;
 	
@@ -405,6 +585,7 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName) { //loads main EXE file (MIPS) into me
 	PIMAGE_DATA_DIRECTORY data_dir;
 	PIMAGE_OPTIONAL_HEADER pImageHdr = &(EmuGetNtHeader(ImageBase)->OptionalHeader);
 	PIMAGE_IMPORT_DESCRIPTOR import_descriptor;
+	PIMAGE_DEBUG_DIRECTORY debug_dir;
 	DWORD delta;
 
 	if (!ImageBase) return NULL;
@@ -530,9 +711,6 @@ HMODULE EmuLoadLibrary(LPCSTR lpLibFileName) {
 	if(ImageBase == NULL){ //if not, load native lib
 		ImageBase = LoadNativeLibrary(lpLibFileName);
 	}
-	
-	//make entry into peb
-	AddLdrEntry(pContext->teb.ProcessEnvironmentBlock->Ldr, ImageBase, &LastImageName);
 	
 	return ImageBase;	
 }

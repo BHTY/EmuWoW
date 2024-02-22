@@ -81,6 +81,10 @@ LPCH WINAPI Hook_GetEnvironmentStrings() {
 	return "Var1=1\0\0";
 }
 
+LPWSTR WINAPI Hook_GetEnvironmentStringsW() {
+	return L"Var1=1\0\0";
+}
+
 LPSTR WINAPI Hook_GetCommandLineA(){
 	return "notepad.exe";
 }
@@ -88,6 +92,8 @@ LPSTR WINAPI Hook_GetCommandLineA(){
 VOID AXP_StubExport(PDWORD pFn, LPVOID pReal, LPSTR pName, LPSTR DllName) {
 	if (strcmp(pName, "GetEnvironmentStrings") == 0) {
 		pReal = Hook_GetEnvironmentStrings;
+	}if (strcmp(pName, "GetEnvironmentStringsW") == 0) {
+		pReal = Hook_GetEnvironmentStringsW;
 	}if (strcmp(pName, "GetCommandLineA") == 0) {
 		pReal = Hook_GetCommandLineA;
 	}
@@ -191,6 +197,8 @@ DWORD AlphaHandleNativeInstruction(AXP64* pCPU, DWORD pc) {
 		printf("hMenu = %p\n", arg_list[9]);
 		printf("hInstance = %p\n", arg_list[10]);
 		printf("lpParam = %p\n", arg_list[11]);
+
+		//while(1);
 	}
 	/*if(strcmp(*(DWORD*)(pc + 8), "LoadStringA") == 0){
 		printf("hInstance = %p\n", arg_list[0]);
@@ -233,7 +241,9 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 		break;
 
 	
-	case 0x08: m_r[Ra(op)] = m_r[Rb(op)] + Disp_M(op); break; // lda
+	case 0x08: // lda
+		m_r[Ra(op)] = m_r[Rb(op)] + Disp_M(op); 
+		break; 
 	case 0x09: m_r[Ra(op)] = m_r[Rb(op)] + (Disp_M(op) << 16); break; // ldah
 	case 0x0b: m_r[Ra(op)] = load(uint64_t, (m_r[Rb(op)] + Disp_M(op)) & ~7); break; // ldq_u
 	case 0x0f: store(uint64_t, (m_r[Rb(op)] + Disp_M(op)) & ~7, m_r[Ra(op)]); break; // stq_u
@@ -437,7 +447,9 @@ INT AXP_execute(PAXP64 pCPU, uint32_t op) {
 		case 0xa6: m_r[Rc(op)] = (m_r[Ra(op)] >> ((Im(op) & 7) * 8)) & zap_mask(~u8(0x0f)); break; // extll
 		case 0xab: m_r[Rc(op)] = (m_r[Ra(op)] << ((Im(op) & 7) * 8)) & zap_mask(~(u8(0x0f) << (Im(op) & 7))); break; // insll
 		case 0xb0: m_r[Rc(op)] = m_r[Ra(op)] & zap_mask(Im(op)); break; // zap
-		case 0xb1: m_r[Rc(op)] = m_r[Ra(op)] & ~zap_mask(Im(op)); break; // zapnot
+		case 0xb1: // zapnot
+			m_r[Rc(op)] = m_r[Ra(op)] & ~zap_mask(Im(op)); 
+			break;
 		case 0xb2: m_r[Rc(op)] = m_r[Ra(op)] & zap_mask(u8(0xff) << (Im(op) & 7)); break; // mskql
 		case 0xb4: m_r[Rc(op)] = m_r[Ra(op)] >> (Im(op) & 63); break; // srl
 		case 0xb6: m_r[Rc(op)] = (m_r[Ra(op)] >> ((Im(op) & 7) * 8)) & zap_mask(u8(~u8(0xff))); break; // extql

@@ -5,8 +5,8 @@
 //#include <winnt.h>
 #include "mips.h"
 
-#define ARCH_ALPHA
-//#define ARCH_MIPS
+//#define ARCH_ALPHA
+#define ARCH_MIPS
 
 /*
 EmuWoW Todo List (fix misc bugs)

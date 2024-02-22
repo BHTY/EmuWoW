@@ -12,6 +12,7 @@
 
 PVOID(WINAPI* pAddVectoredExceptionHandler)(ULONG, PVOID) = NULL;
 BOOL(WINAPI* pSetProcessDEPPolicy)(DWORD) = NULL;
+SHORT(WINAPI* pGetAsyncKeyState)(int) = NULL;
 
 DWORD dwThreadContextIndex = -1;
 CPUVTable vtable;
@@ -82,6 +83,8 @@ void FatalError(PThreadContext pContext, uint32_t error_type, uint32_t info){
 
 	//display list of loaded libraries
 	display_loaded_libs(pContext->teb.ProcessEnvironmentBlock->Ldr);
+
+	getchar();
 
 	ExitProcess(0);
 }
@@ -165,6 +168,8 @@ void InitializeProcessEnvironment(){
 
 	pSetProcessDEPPolicy = GetProcAddress(GetModuleHandleA("KERNEL32.DLL"), "SetProcessDEPPolicy");
 	pSetProcessDEPPolicy(1);
+
+	pGetAsyncKeyState = GetProcAddress(LoadLibraryA("USER32.DLL"), "GetAsyncKeyState");
 }
 
 PBreakpoint	FindBPBefore(PThreadContext pContext, DWORD dwAddr) {
@@ -226,7 +231,7 @@ void ListBreakpoints(PThreadContext pContext) {
 void DisplayDebuggerHelp(){
 	printf("\nEmuWoW v0.5 Mini Debugger Help\n");
 	printf("By Will Klees aka Captain Will Starblazer\n");
-	printf("Current Machine Type: MIPS R4000 32-bit\n");
+	printf("Current Machine Type: \n");
 	printf("U <ADDR> <NUM>: Disassemble NUM instructions from ADDR\n");
 	printf("D <ADDR> <NUM>: Dump NUM bytes from ADDR\n");
 	printf("W <ADDR> <NUM>: Dump NUM words from ADDR\n");
@@ -241,6 +246,9 @@ void DisplayDebuggerHelp(){
 	printf("X <MODNAME> <PROCNAME>: Get address of export from loaded image\n");
 	printf("P: Toggle instruction printing on/off\n");
 	printf("C: Toggle callback/function printing on/off\n");
+	printf("Y <IMAGEBASE> <ADDR>: \n");
+	printf("O <SYMBOLNAME>: Get address of symbol\n");
+	printf("N <SYMPATH>: Load DBG symbol file\n");
 	printf("?: Help (that's me!)\n");
 	printf("Q: Quit\n");
 	printf("Commands are case-insensitive. Addresses and constant numbers are given in hex.\nMost of all, have fun!\n\n");
@@ -260,6 +268,7 @@ INT debug_step(PThreadContext pContext){
 	DWORD arg1, arg2, pc;
 	DWORD old_print_functions;
 	DWORD old_print_instructions;
+	PSymbolEntry pSym;
 	
 	if(pContext->dbg_state.status){
 		pc = pContext->fn_ptrs->get_pc(pContext);
@@ -271,6 +280,24 @@ INT debug_step(PThreadContext pContext){
 			case 'Q':
 			case 'q':
 				ExitProcess(0);
+				break;
+
+			case 'O':
+			case 'o':
+				if(sscanf(input_string, "%c %s", &cmd, proc_name) != 2){
+					printf("Please enter in the proper format.\n");
+					break;
+				}
+				pSym = FindSymbol(proc_name);
+				if(pSym) printf("\t%p\n", pSym->image_base + (DWORD)(pSym->offset));
+				break;
+			
+			case 'Y':
+			case 'y':
+				pSym = ResolveClosestSymbol(arg1, arg2 - arg1);
+				if(pSym){
+					printf("\t%s+0x%x\n", pSym->name, (arg2 - arg1) - pSym->offset);
+				}
 				break;
 			
 			case 'm':
@@ -375,6 +402,11 @@ INT debug_step(PThreadContext pContext){
 			case 'b': //remove breakpoint
 			case 'B':
 				RemoveBreakpoint(pContext, arg1);
+
+				if(arg1 == pc && pContext->dbg_state.status == 2){
+					pContext->dbg_state.status = 1;
+				}
+
 				break;
 			
 			case 's': //set breakpoint
@@ -396,6 +428,7 @@ INT debug_step(PThreadContext pContext){
 					cpu_step(pContext);
 					//reset breakpoint
 					pContext->fn_ptrs->AddBreakpoint(pc);
+					pContext->dbg_state.status = 1;
 				}
 				else {
 					if (cpu_step(pContext)) { //we weren't broken, but now we are
@@ -463,6 +496,14 @@ INT debug_step(PThreadContext pContext){
 		}
 	}
 	else{	
+		SHORT keyDown = GetKeyState(65);
+
+		if((keyDown & 0x8000)){
+			pContext->dbg_state.status = 1;
+			printf("\nBroken.\n");
+			return 0;
+		}
+
 		n = cpu_step(pContext);
 
 		if (n) {
@@ -511,7 +552,7 @@ int main(int argc, char** argv) {
 	pContext->fn_ptrs = &vtable;
 	HookDebugger(pContext);
 	
-	printf("Currently, machine type = %x\n", pContext->fn_ptrs->machine_type);
+	printf("Currently, machine type = %x and image base = %p\n", pContext->fn_ptrs->machine_type, GetModuleHandle(NULL));
 	
 	InitializeProcessEnvironment();
 

@@ -3,6 +3,15 @@
 #include <windows.h>
 //#include <winnt.h>
 
+
+
+typedef struct _SymbolEntry{
+	char* image_base;
+	DWORD offset;
+	char* name;
+	struct _SymbolEntry* next;
+} SymbolEntry, *PSymbolEntry;
+
 VOID WritePESections(PBYTE ImageBase, PBYTE pData, PIMAGE_SECTION_HEADER sections, WORD nSections);
 IMAGE_NT_HEADERS* EmuGetNtHeader(LPVOID module);
 LPVOID MapImageIntoMemory(LPCSTR lpLibFileName);
@@ -12,6 +21,8 @@ PVOID EmuLoadModule(LPCSTR lpLibFileName);
 HMODULE EmuGetModuleHandle(LPCSTR lpLibFileName);
 HMODULE EmuLoadLibrary(LPCSTR lpLibFileName);
 void ResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descriptor);
+PSymbolEntry ResolveClosestSymbol(char* image_base, DWORD offset);
+PSymbolEntry FindSymbol(char* name);
 
 /*
 Process of Loading a Library under EmuWoW

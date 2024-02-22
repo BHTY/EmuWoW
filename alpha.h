@@ -41,7 +41,7 @@ typedef struct _ThreadContext_Alpha {
 #define m_f (pCPU->r_f)
 #define m_pc (pCPU->pc)
 
-#define BIT(num, index)  ((num >> index) & 1)
+#define BIT(num, index)  ((num >> (index)) & 1)
 
 #define load(type, addr)	( (int64_t)*(type*)(addr)  )
 

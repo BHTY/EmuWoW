@@ -80,7 +80,15 @@ int main() {
 
     InitSSDT();
 
-    LdrLoadEXE(L"REVERSI.EXE");
+    LdrLoadEXE(L"HELLO.EXE");
 
     HeapDestroy(hHeap);
 }
+
+/*
+TODO LIST
+1.) Fix the 386 emulator
+2.) Integrate the MIPS emulator
+3.) Integrate the Alpha emulator
+4.) Add a debugger that isn't total shit
+*/

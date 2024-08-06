@@ -365,6 +365,8 @@ int dis386(unsigned char* address, int vaddr, int op_sz, int addr_sz, int segmen
 	rm = 0;
 	mod = 0;
 
+	if (byte == 0x39) DebugBreak();
+
 	//prefixes
 	switch (inst.op_type) {
 	case LOCK:

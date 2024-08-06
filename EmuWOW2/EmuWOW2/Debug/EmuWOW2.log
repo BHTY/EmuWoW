@@ -1,0 +1,21 @@
+﻿  i386.c
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(7,13): warning C4047: 'return': 'uint8_t *' differs in levels of indirection from 'uint32_t'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(52,32): warning C4244: '=': conversion from 'DWORD' to 'WORD', possible loss of data
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(58,15): warning C4047: 'return': 'FARPROC' differs in levels of indirection from 'PBYTE'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(79,38): warning C4047: '=': 'uint32_t' differs in levels of indirection from 'EmuTEB *'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(102,3): warning C4013: 'printf' undefined; assuming extern returning int
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(103,31): warning C4047: 'function': 'unsigned char *' differs in levels of indirection from 'uint32_t'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(103,26): warning C4024: 'dis386': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(112,9): warning C4013: 'i386_step' undefined; assuming extern returning int
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(95,6): warning C4101: 'res': unreferenced local variable
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(121,3): warning C4013: 'i386_push' undefined; assuming extern returning int
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(125,29): warning C4047: '=': 'uint32_t' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(143,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(140,9): warning C4047: 'initializing': 'DWORD *' differs in levels of indirection from 'uint32_t'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(148,26): warning C4133: 'initializing': incompatible types - from 'PThreadContextI386 (__cdecl *)(DWORD_PTR)' to 'PThreadContext (__cdecl *)(DWORD_PTR)'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(148,35): warning C4113: 'void (__cdecl *)(PThreadContextI386,DWORD_PTR *,DWORD)' differs in parameter lists from 'void (__cdecl *)(PThreadContext,DWORD_PTR *,DWORD)'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(148,55): warning C4113: 'DWORD_PTR (__cdecl *)(PThreadContextI386,FARPROC,DWORD_PTR *,DWORD)' differs in parameter lists from 'DWORD_PTR (__cdecl *)(PThreadContext,FARPROC,DWORD_PTR *,DWORD)'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(11): warning C4716: 'io_read_32': must return a value
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(17): warning C4716: 'io_read_8': must return a value
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(14): warning C4716: 'io_read_16': must return a value
+  EmuWOW2.vcxproj -> C:\Users\Will\source\repos\EmuWOW2\Debug\EmuWOW2.exe

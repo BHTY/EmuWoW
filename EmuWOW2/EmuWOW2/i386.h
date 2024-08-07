@@ -151,6 +151,7 @@ static const char* seg_regs[] = { "ES", "CS", "SS", "DS", "FS", "GS" };
 #define CMC 47
 #define MOVSX 48
 #define MOVZX 49
+#define CMPXCHG 50
 #define INVALID -1
 
 //Operand Size
@@ -710,8 +711,8 @@ static i386_op ExtendedInstructionTable[256] = { {INVALID},
 	{INVALID},
 	{INVALID},
 	{ALU_SPECIAL, ALU_IMUL, USE_MODRM, 0, {REG_MODRM, SZ_1632}, {REG_MODRM, SZ_1632}, {RM_MODRM, SZ_1632}}, //IMUL r32, r/m32
-	{INVALID},
-	{INVALID},
+	{ CMPXCHG, 0, USE_MODRM, 0, {NONE}, {RM_MODRM, SZ_8}, {REG_MODRM, SZ_8} }, //CMPXCHG r/m8, r8
+	{ CMPXCHG, 0, USE_MODRM, 0, {NONE}, {RM_MODRM, SZ_1632}, {REG_MODRM, SZ_1632} }, //CMPXCHG r/m16, r16
 	{INVALID},
 	{INVALID},
 	{INVALID},

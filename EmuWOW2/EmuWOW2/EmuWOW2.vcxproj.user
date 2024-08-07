@@ -11,6 +11,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\i386</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>thread.exe</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>pbrush.exe</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

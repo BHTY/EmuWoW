@@ -442,6 +442,9 @@ int dis386(unsigned char* address, int vaddr, int op_sz, int addr_sz, int segmen
 		alu_op = (inst.sub_type == ALU_MULTI) ? reg : inst.sub_type;
 		printf("%s %s, %s\n", alux_op_names[alu_op], source1, source2);
 		break;
+	case CMPXCHG:
+		printf("CMPXCHG %s, %s\n", source1, source2);
+		break;
 	case XCHG:
 		printf("XCHG %s, %s\n", source1, source2);
 		break;

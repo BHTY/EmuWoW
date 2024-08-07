@@ -996,6 +996,31 @@ int do_xchg(i386* pCPU, decoded_op* src1, decoded_op* src2) {
 	return 0;
 }
 
+int do_cmpxchg(i386* pCPU, decoded_op* src1, decoded_op* src2) {
+	uint32_t value1 = read_source(pCPU, src1);
+	uint32_t value2 = read_source(pCPU, src2);
+
+	if (value1 == value2) {
+		SET_FLAG(ZERO);
+		write_dest(pCPU, src1, value2);
+	}
+	else {
+		CLEAR_FLAG(ZERO);
+		
+		switch (src1->size) {
+		case SZ_8:
+			pCPU->al = value1;
+			break;
+		case SZ_16:
+			pCPU->ax = value1;
+			break;
+		case SZ_32:
+			pCPU->eax = value1;
+			break;
+		}
+	}
+}
+
 int do_inp(i386* pCPU, decoded_op* dst, decoded_op* src) {
 	uint16_t port = read_source(pCPU, src);
 	uint32_t value = io_read_32(port);
@@ -1567,6 +1592,8 @@ int i386_step(i386* pCPU) {
 		return do_cbw_cwde(pCPU, &dst, &src1);
 	case CWD_CDQ:
 		return do_cwd_cdq(pCPU, &dst, &src1);
+	case CMPXCHG:
+		return do_cmpxchg(pCPU, &src1, &src2);
 	case XCHG:
 		return do_xchg(pCPU, &src1, &src2);
 	case IO_IN:

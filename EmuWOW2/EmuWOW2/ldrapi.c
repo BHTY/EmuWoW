@@ -128,6 +128,7 @@ VOID LdrResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descript
 	int i;
 	HRESULT hResult;
 	FARPROC ProcAddr;
+	int r;
 
 	ZeroMemory(&null_desc, sizeof(null_desc));
 
@@ -167,10 +168,17 @@ VOID LdrResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descript
 			}
 
 			if (ProcAddr == NULL) {
-				MessageBoxA(NULL, string, "EmuWOW", MB_OK | MB_ICONERROR);
+				r = MessageBoxA(NULL, string, "EmuWOW", MB_ABORTRETRYIGNORE | MB_ICONERROR);
 				/*fprintf(stderr, string);
 				getchar();*/
-				ExitProcess(-1);
+
+				if (r == IDABORT) {
+					ExitProcess(-1);
+				}
+				else if (r == IDRETRY) {
+					MessageBoxA(NULL, "What does that even mean in this context? You should sit down for a bit to think about what you did.", "EmuWOW", MB_OK | MB_ICONEXCLAMATION);
+					ExitProcess(-1);
+				}
 			}
 
 			IAT_TABLE[0].u1.Function = ProcAddr;

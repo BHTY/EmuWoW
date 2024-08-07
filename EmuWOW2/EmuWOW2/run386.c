@@ -1588,6 +1588,7 @@ int i386_step(i386* pCPU) {
 	default:
 		printf("0x%02x: Undefined op type %d:%d!\n", byte, inst.op_type, inst.sub_type);
 		dump_386(pCPU);
+		DisplayLoadedLibs(pPeb->Ldr);
 
 		while (1);
 		break;

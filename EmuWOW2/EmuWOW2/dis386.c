@@ -367,7 +367,7 @@ int dis386(unsigned char* address, int vaddr, int op_sz, int addr_sz, int segmen
 	mod = 0;
 
 	if ((WORD)(vaddr) == 0x1535) {
-		DebugBreak();
+		//DebugBreak();
 	}
 
 	//prefixes

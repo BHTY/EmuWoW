@@ -108,9 +108,8 @@ int wmain(int argc, wchar_t** argv) {
 }
 
 /*
-TODO LIST
-1.) Fix the 386 emulator
-2.) Integrate the MIPS emulator
-3.) Integrate the Alpha emulator
-4.) Add a debugger that isn't total shit
+TODO LIST (FIX THE HEAP CORRUPTION!!!)
+1.) Fix the 386 emulator (add things like CMPXCHG or maybe just rewrite it)
+2.) Integrate the Alpha emulator
+3.) Add a debugger that isn't total shit
 */

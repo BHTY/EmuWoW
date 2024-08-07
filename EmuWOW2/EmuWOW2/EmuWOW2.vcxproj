@@ -87,9 +87,10 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +132,8 @@
     <ClCompile Include="EmuWOW.c" />
     <ClCompile Include="i386.c" />
     <ClCompile Include="ldrapi.c" />
+    <ClCompile Include="mips_dis.c" />
+    <ClCompile Include="r4000.c" />
     <ClCompile Include="run386.c" />
     <ClCompile Include="ssdt.c" />
     <ClCompile Include="thunk.c" />
@@ -139,6 +142,8 @@
     <ClInclude Include="EmuWoW.h" />
     <ClInclude Include="i386.h" />
     <ClInclude Include="ldrapi.h" />
+    <ClInclude Include="mips.h" />
+    <ClInclude Include="r4000.h" />
     <ClInclude Include="ssdt.h" />
     <ClInclude Include="thunk.h" />
   </ItemGroup>

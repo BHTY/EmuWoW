@@ -45,6 +45,7 @@ int dis_sib(unsigned char* address, char mod, char reg, char rm) {
 
 	if (BASE(sib) == 5 && mod == 0) {
 		sprintf(index, "0x%08x", *(uint32_t*)address);
+		strcat(rm_str, index);
 		sz += 4;
 	}
 	else {
@@ -365,7 +366,9 @@ int dis386(unsigned char* address, int vaddr, int op_sz, int addr_sz, int segmen
 	rm = 0;
 	mod = 0;
 
-	if (byte == 0x39) DebugBreak();
+	if ((WORD)(vaddr) == 0x1535) {
+		DebugBreak();
+	}
 
 	//prefixes
 	switch (inst.op_type) {
@@ -461,6 +464,12 @@ int dis386(unsigned char* address, int vaddr, int op_sz, int addr_sz, int segmen
 	case MOV_TO_SR:
 	case MOV:
 		printf("MOV %s, %s\n", destination, source1);
+		break;
+	case MOVZX:
+		printf("MOVZX %s, %s\n", destination, source1);
+		break;
+	case MOVSX:
+		printf("MOVSX %s, %s\n", destination, source1);
 		break;
 	case INT_OP:
 		printf("INT %s\n", source1);

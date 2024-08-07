@@ -307,6 +307,22 @@ int do_shift(i386* pCPU, int op, decoded_op* dst, decoded_op* src1, decoded_op* 
 	case SHR:
 		res = value >> shamt;
 		break;
+	case SAR:
+		switch (dst->size) {
+		case SZ_8:
+			DebugBreak();
+			break;
+		case SZ_16:
+			DebugBreak();
+			break;
+		case SZ_32:
+			res = (int32_t)value >> shamt;
+			break;
+		default:
+			DebugBreak();
+			break;
+		}
+		break;
 	default:
 		printf("Unsupported shift operation %d\n", op);
 		dump_386(pCPU);
@@ -320,8 +336,8 @@ int do_shift(i386* pCPU, int op, decoded_op* dst, decoded_op* src1, decoded_op* 
 }
 
 int do_alu_op(i386* pCPU, int op, decoded_op* dst, decoded_op* src1, decoded_op* src2, int reg) {
-	uint32_t val_src1, val_src2;
-	uint32_t res = 0;
+	uint64_t val_src1, val_src2;
+	uint64_t res = 0;
 	int wb = 1;
 
 	if (op == ALU_MULTI) {
@@ -371,6 +387,7 @@ int do_alu_op(i386* pCPU, int op, decoded_op* dst, decoded_op* src1, decoded_op*
 	case ALU_CMP:
 		wb = 0;
 	case ALU_SUB:
+		//printf("%p - %p = %p\n", val_src1, val_src2, val_src1 - val_src2);
 		res = val_src1 - val_src2;
 		SetOF_Sub(val_src1, val_src2, res);
 		SetSF(res);
@@ -378,6 +395,10 @@ int do_alu_op(i386* pCPU, int op, decoded_op* dst, decoded_op* src1, decoded_op*
 		SetAF(val_src1, val_src2, res);
 		SetCF(res);
 		SetPF(res);
+
+		//dump_386(pCPU);
+		//printf("\n");
+
 		break;
 	case ALU_OR:
 		res = val_src1 | val_src2;
@@ -550,6 +571,21 @@ int jump_condition(i386* pCPU, int condition) {
 int do_mov(i386* pCPU, decoded_op* dst, decoded_op* src) {
 	uint32_t val = read_source(pCPU, src);
 	write_dest(pCPU, dst, val);
+	return 0;
+}
+
+int do_movsx(i386* pCPU, decoded_op* dst, decoded_op* src) {
+	int16_t val = read_source(pCPU, src);
+	int32_t val_sx;
+
+	if (src->size == SZ_16) {
+		val_sx = (int32_t)val;
+	}
+	else if (src->size == SZ_8) {
+		val_sx = (int32_t)(int8_t)val;
+	}
+
+	write_dest(pCPU, dst, val_sx);
 	return 0;
 }
 
@@ -964,66 +1000,6 @@ int do_inp(i386* pCPU, decoded_op* dst, decoded_op* src) {
 	return 0;
 }
 
-int tick_count = 0;
-
-DWORD ExecuteNativeFunction_i386(LPVOID pTargetAddress, DWORD* pParamList, DWORD dwParamCount, DWORD* diff) {
-	DWORD old_esp;
-	DWORD mid_esp;
-
-	__asm {
-		mov old_esp, esp
-
-		mov ecx, dwParamCount
-		mov edx, pParamList
-		lea eax, [edx + ecx * 4 - 4]
-
-		loop_start:
-		cmp eax, edx
-			jb call_function
-			push dword ptr[eax]
-			sub eax, 4
-			jmp loop_start
-
-			call_function :
-		mov mid_esp, esp
-			mov eax, pTargetAddress
-			call eax
-
-			mov ebx, mid_esp
-			sub ebx, esp
-			mov edx, diff
-			mov dword ptr[diff], 9
-
-			mov esp, old_esp
-	};
-}
-
-DWORD HandleNativeInstruction_i386(i386* pCPU) {
-	DWORD res;
-	DWORD arg_list[16];
-	DWORD* StackArgList;
-	int i;
-	DWORD pc = pCPU->eip;
-	DWORD diff = -1;
-
-	StackArgList = pCPU->esp + 4;
-
-	for (i = 0; i < 16; i++) {
-		arg_list[i] = StackArgList[i];
-
-		//printf("Arg %d: %p\n", i, arg_list[i]);
-	}
-
-	res = ExecuteNativeFunction_i386(*(DWORD*)(pc + 2), arg_list, 16, &diff);
-
-	printf("DIFF = %x bytes\n", -diff);
-
-	/*if (((PThreadContext)TlsGetValue(dwThreadContextIndex))->dbg_state.print_functions) {
-		printf("	<%s!%s returned %p> (error = %d)\n", *(DWORD*)(pc + 10), *(DWORD*)(pc + 6), res, GetLastError());
-	}*/
-	return res;
-}
-
 int do_int(i386* pCPU, decoded_op* src) {
 	uint32_t vector = read_source(pCPU, src);
 
@@ -1204,8 +1180,8 @@ void decode_operand(decoded_op* pDop, decoded_op* rm, char reg, i386_operand* op
 }
 
 //Mod R/M decoding for 32-bit addressing modes
-uint32_t decode_sib(i386* pCPU, char modrm, decoded_op* op) {
-	char sib = bus_read_8(pCPU->cs.base + pCPU->eip++);
+uint32_t decode_sib(i386* pCPU, unsigned char modrm, decoded_op* op) {
+	unsigned char sib = bus_read_8(pCPU->cs.base + pCPU->eip++);
 	uint32_t offset = 0;
 
 	if (BASE(sib) == 5 && MOD(modrm) == 0) {
@@ -1220,15 +1196,15 @@ uint32_t decode_sib(i386* pCPU, char modrm, decoded_op* op) {
 	}
 
 	if (INDEX(sib) != 4) {
-		offset += pCPU->regs[INDEX(sib)] * (1 << SCALE(sib));
+		offset += pCPU->regs[INDEX(sib)] << SCALE(sib);
 	}
 
 	return offset;
 }
 
-void decode_rm_32(i386* pCPU, decoded_op* op, char modrm) {
-	char mod = MOD(modrm);
-	char rm = RM(modrm);
+void decode_rm_32(i386* pCPU, decoded_op* op, unsigned char modrm) {
+	unsigned char mod = MOD(modrm);
+	unsigned char rm = RM(modrm);
 	uint32_t offset = 0;
 
 	op->sr = 0;
@@ -1277,9 +1253,9 @@ void decode_rm_32(i386* pCPU, decoded_op* op, char modrm) {
 }
 
 //Mod R/M decoding for 16-bit addressing modes
-void decode_rm_16(i386* pCPU, decoded_op* op, char modrm) {
-	char mod = MOD(modrm);
-	char rm = RM(modrm);
+void decode_rm_16(i386* pCPU, decoded_op* op, unsigned char modrm) {
+	unsigned char mod = MOD(modrm);
+	unsigned char rm = RM(modrm);
 	uint16_t offset = 0;
 
 	op->sr = 0;
@@ -1548,6 +1524,9 @@ int i386_step(i386* pCPU) {
 	case LEA:
 		return do_lea(pCPU, &dst, &src1);
 		break;
+	case MOVSX:
+		return do_movsx(pCPU, &dst, &src1);
+	case MOVZX:
 	case MOV:
 		return do_mov(pCPU, &dst, &src1);
 		break;

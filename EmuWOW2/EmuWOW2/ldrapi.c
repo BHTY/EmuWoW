@@ -24,7 +24,7 @@ LPWSTR GetFileNameFromPathW(LPWSTR lpPath) {
 
 VOID UnicodeStringFromWstr(PUCS2_STRING pString, LPWSTR lpString) {
 	USHORT Length = wcslen(lpString) * 2;
-	pString->Buffer = malloc(Length + 2); // HeapAlloc(hHeap, 0, Length + 2);
+	pString->Buffer = malloc(Length + 8); // HeapAlloc(hHeap, 0, Length + 2);
 	wcscpy(pString->Buffer, lpString);
 	pString->Length = Length;
 	pString->MaximumLength = Length;
@@ -41,10 +41,14 @@ VOID LdrAddEntry(PBYTE ImageBase, LPWSTR lpLibFileName) {
 	UnicodeStringFromWstr(&(pDataEntry->FullDllName), lpLibFileName);
 	UnicodeStringFromWstr(&(pDataEntry->BaseDllName), GetFileNameFromPathW(lpLibFileName));
 
+	//printf("%d\n", _heapchk());
+
 	pDataEntry->InMemoryOrderLinks.Flink = &(pLdr->InMemoryOrderModuleList);
 	pDataEntry->InMemoryOrderLinks.Blink = pLdr->InMemoryOrderModuleList.Blink;
 	pLdr->InMemoryOrderModuleList.Blink->Flink = &(pDataEntry->InMemoryOrderLinks);
 	pLdr->InMemoryOrderModuleList.Blink = &(pDataEntry->InMemoryOrderLinks);
+
+	wprintf(L"Loading image %s (%p)\n", GetFileNameFromPathW(lpLibFileName), ImageBase);
 }
 
 VOID LdrWriteRelocs(char* ImageBase, PIMAGE_BASE_RELOCATION base_reloc, DWORD_PTR delta) {
@@ -164,6 +168,8 @@ VOID LdrResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descript
 
 			if (ProcAddr == NULL) {
 				MessageBoxA(NULL, string, "EmuWOW", MB_OK | MB_ICONERROR);
+				/*fprintf(stderr, string);
+				getchar();*/
 				ExitProcess(-1);
 			}
 
@@ -261,6 +267,26 @@ HRESULT LdrMapPE(LPWSTR lpLibFileName, HMODULE* pImageBase) { //check to make su
 	return ERROR_SUCCESS;
 }
 
+void PatchModuleFileName(EmuPEB* peb, PVOID NewDllBase) {
+
+	EmuPEB_LDR_DATA* ldr = peb->Ldr;
+	LIST_ENTRY* rootEntry = &(ldr->InMemoryOrderModuleList);
+	LIST_ENTRY* pEntry;
+
+	for (pEntry = rootEntry->Flink; pEntry != rootEntry; pEntry = pEntry->Flink) {
+		EmuLDR_DATA_TABLE_ENTRY* pDataEntry = (BYTE*)(pEntry)-1 * sizeof(LIST_ENTRY);
+
+		if (pDataEntry->DllBase == GetModuleHandle(NULL)) {
+			printf("Patching %p to %p\n", pDataEntry->DllBase, NewDllBase);
+			pDataEntry->DllBase = NewDllBase;
+		}
+
+	}
+
+	return 0x0;
+
+}
+
 HRESULT LdrLoadPE(LPWSTR lpLibFileName, HMODULE* pImageBase) {
 	PBYTE ImageBase;
 	HRESULT hResult;
@@ -302,7 +328,7 @@ HRESULT LdrLoadPE(LPWSTR lpLibFileName, HMODULE* pImageBase) {
 }
 
 BOOL LdrIsKnownDLL(LPWSTR lpLibFileName) {
-	if (wcsicmp(lpLibFileName, L"KERNEL32.DLL") == 0 || wcsicmp(lpLibFileName, L"NTDLL.DLL") == 0 || wcsicmp(lpLibFileName, L"GDI32.DLL") == 0 || wcsicmp(lpLibFileName, L"USER32.DLL") == 0) {
+	if (wcsicmp(lpLibFileName, L"KERNEL32.DLL") == 0 || wcsicmp(lpLibFileName, L"NTDLL.DLL") == 0 || wcsicmp(lpLibFileName, L"GDI32.DLL") == 0 || wcsicmp(lpLibFileName, L"USER32.DLL") == 0 || wcsicmp(lpLibFileName, L"ADVAPI32.DLL") == 0) {
 		return TRUE;
 	}
 
@@ -361,7 +387,12 @@ HRESULT LdrLoadDLL(LPWSTR lpLibFileName, HMODULE* pImageBase) {
 	PIMAGE_NT_HEADERS nt_hdr;
 
 	if (LdrIsKnownDLL(lpLibFileName)) {
-		return LdrLoadKnownDLL(lpLibFileName, pImageBase);
+		if (LdrGetModuleHandle(lpLibFileName) == NULL) {
+			return LdrLoadKnownDLL(lpLibFileName, pImageBase);
+		}
+
+		*pImageBase = LdrGetModuleHandle(lpLibFileName);
+		return ERROR_SUCCESS;
 	}
 
 	hResult = LdrLoadPE(lpLibFileName, &ImageBase);
@@ -415,6 +446,9 @@ HRESULT LdrLoadEXE(LPWSTR lpLibFileName) { //PatchModuleFileName and command lin
 
 	//Step 4: Create thread context / init TEB
 	EmuCreate(pImageHdr->SizeOfStackReserve, pImageHdr->SizeOfStackCommit);
+
+	PatchModuleFileName(NtCurrentTeb()->ProcessEnvironmentBlock, ImageBase);
+	((PEmuPEB)(NtCurrentTeb()->ProcessEnvironmentBlock))->ImageBaseAddress = ImageBase;
 
 	//Step 5: Resolve imports
 	import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)(ImageBase + data_dir[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);

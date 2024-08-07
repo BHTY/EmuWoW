@@ -94,3 +94,4 @@ extern PEmuPEB pPeb;
 
 VOID InitPEB(PVOID ImageBase, DWORD HeapReserve, DWORD HeapCommit);
 VOID MakeUnicodeString(PUCS2_STRING pString, PWSTR Buffer, USHORT Length, USHORT MaxLength);
+void DisplayLoadedLibs(PEmuPEB_LDR_DATA Ldr);

@@ -149,6 +149,8 @@ static const char* seg_regs[] = { "ES", "CS", "SS", "DS", "FS", "GS" };
 #define ENTER 45
 #define LEAVE 46
 #define CMC 47
+#define MOVSX 48
+#define MOVZX 49
 #define INVALID -1
 
 //Operand Size
@@ -660,22 +662,22 @@ static i386_op ExtendedInstructionTable[256] = { {INVALID},
 	{INVALID},
 	{INVALID},
 	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
+	{ JUMP, JO, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JO rel16
+	{ JUMP, JNO, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JNO rel16
+	{ JUMP, JB, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JB rel16
+	{ JUMP, JAE, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JAE rel16
+	{ JUMP, JE, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JE rel16
+	{ JUMP, JNE, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JNE rel16
+	{ JUMP, JBE, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JBE rel16
+	{ JUMP, JA, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JA rel16
+	{ JUMP, JS, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JS rel16
+	{ JUMP, JNS, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JNS rel16
+	{ JUMP, JP, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JP rel16
+	{ JUMP, JNP, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JNP rel16
+	{ JUMP, JL, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JL rel16
+	{ JUMP, JGE, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JGE rel16
+	{ JUMP, JLE, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JLE rel16
+	{ JUMP, JG, 0, 0, {NONE}, {IP_REL, SZ_1632}, {NONE} }, //JG rel16
 	{INVALID},
 	{INVALID},
 	{INVALID},
@@ -714,17 +716,16 @@ static i386_op ExtendedInstructionTable[256] = { {INVALID},
 	{INVALID},
 	{INVALID},
 	{INVALID},
+	{ MOVZX, 0, USE_MODRM, 0, {REG_MODRM, SZ_1632}, {RM_MODRM, SZ_8}, {NONE} },
+	{ MOVZX, 0, USE_MODRM, 0, {REG_MODRM, SZ_32}, {RM_MODRM, SZ_16}, {NONE} },
 	{INVALID},
 	{INVALID},
 	{INVALID},
 	{INVALID},
 	{INVALID},
 	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
-	{INVALID},
+	{ MOVSX, 0, USE_MODRM, 0, {REG_MODRM, SZ_1632}, {RM_MODRM, SZ_8}, {NONE} },
+	{ MOVSX, 0, USE_MODRM, 0, {REG_MODRM, SZ_32}, {RM_MODRM, SZ_16}, {NONE} },
 	{INVALID},
 	{INVALID},
 	{INVALID},

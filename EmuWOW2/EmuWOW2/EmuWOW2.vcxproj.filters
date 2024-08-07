@@ -36,6 +36,12 @@
     <ClCompile Include="dis386.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mips_dis.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="r4000.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ldrapi.h">
@@ -51,6 +57,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="i386.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="r4000.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mips.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

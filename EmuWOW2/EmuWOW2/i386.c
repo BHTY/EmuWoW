@@ -53,7 +53,7 @@ VOID WriteThunkX86(PBYTE pThunk, DWORD Index, DWORD dwArgs) {
 }
 
 FARPROC MakeThunk386(DWORD Index, DWORD dwArgs) {
-	PBYTE pThunk = malloc(10);
+	PBYTE pThunk = malloc(16);
 	WriteThunkX86(pThunk, Index, dwArgs);
 	return pThunk;
 }

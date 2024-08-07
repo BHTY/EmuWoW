@@ -79,9 +79,17 @@ DWORD_PTR EmuExecute(FARPROC EntryPoint, DWORD dwNumArgs, ...) {
     int i;
     va_start(args, dwNumArgs);
 
+    printf("NATIVE->EMU CALLBACK THUNK: %p(", EntryPoint);
+
     for (i = 0; i < dwNumArgs; i++) {
         dwArgList[i] = va_arg(args, DWORD_PTR);
+
+        printf("%p", dwArgList[i]);
+
+        if (i != dwNumArgs - 1) printf(", ");
     }
+
+    printf(")\n");
 
     return vtable.ExecuteEmulatedProcedure(pContext, EntryPoint, dwArgList, dwNumArgs);
 }
@@ -117,8 +125,9 @@ DWORD_PTR CallSystemService(DWORD dwIndex) {
     WOW_THUNK WowThunk = WowSystemServiceDispatchTable[dwIndex];
     DWORD_PTR Result;
     INT i;
+    DWORD dwArgs = 16; //WowThunk.dwArgs    
 
-    vtable.ExtractParams(pContext, dwArgList, WowThunk.dwArgs);
+    vtable.ExtractParams(pContext, dwArgList, dwArgs);
 
     printf("Calling %s!%s(", WowThunk.ModuleName, WowThunk.ServiceName);
 
@@ -129,7 +138,7 @@ DWORD_PTR CallSystemService(DWORD dwIndex) {
 
     printf(")\n");
 
-    Result = ExecuteNativeFunction(WowThunk.EntryPoint, dwArgList, WowThunk.dwArgs);
+    Result = ExecuteNativeFunction(WowThunk.EntryPoint, dwArgList, dwArgs);
 
     printf("<%s!%s returned %p!>\n", WowThunk.ModuleName, WowThunk.ServiceName, Result);
 

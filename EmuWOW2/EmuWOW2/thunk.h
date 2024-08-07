@@ -18,5 +18,5 @@ FARPROC StubExport(DWORD Index);
 VOID WriteCallbackThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwArgs);
 VOID EmuCreate(DWORD dwStackReserve, DWORD dwStackCommit);
 DWORD_PTR EmuExecute(FARPROC EntryPoint, DWORD dwNumArgs, ...);
-DWORD_PTR CallSysemService(DWORD dwIndex);
+DWORD_PTR CallSystemService(DWORD dwIndex);
 

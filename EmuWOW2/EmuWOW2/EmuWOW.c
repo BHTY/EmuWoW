@@ -9,10 +9,26 @@
 #include "thunk.h"
 #include "i386.h"
 #include "ssdt.h"
+#include "r4000.h"
 
 HANDLE hHeap;
 DWORD dwThreadContextIndex;
-PEmuPEB pPeb;
+PEmuPEB pPeb = NULL;
+
+void DisplayLoadedLibs(PEmuPEB_LDR_DATA Ldr) {
+
+    PLIST_ENTRY rootEntry = &(Ldr->InMemoryOrderModuleList);
+    PLIST_ENTRY pEntry;
+    PBYTE DllBase;
+
+    printf("The loaded libraries were:\n");
+
+    for (pEntry = rootEntry->Flink; pEntry != rootEntry; pEntry = pEntry->Flink) {
+        PEmuLDR_DATA_TABLE_ENTRY pDataEntry = pEntry - 1;
+        DllBase = pDataEntry->DllBase;
+        printf("	%ls: %p (entry point = %p)\n", pDataEntry->BaseDllName.Buffer, DllBase, DllBase + EmuGetNtHeader(DllBase)->OptionalHeader.AddressOfEntryPoint);
+    }
+}
 
 LPWSTR AdjustCommandLine() {
     LPWSTR lpCmdLine = GetCommandLineW();
@@ -41,6 +57,7 @@ VOID InitPEB(PVOID ImageBase, DWORD HeapReserve, DWORD HeapCommit) {
     PEmuPEB_LDR_DATA pLdr = malloc(sizeof(EmuPEB_LDR_DATA)); // HeapAlloc(hHeap, 0, sizeof(EmuPEB_LDR_DATA));
 
     pPeb = malloc(sizeof(PEmuPEB)); //HeapAlloc(hHeap, 0, sizeof(PEmuPEB));
+    memset(pPeb, 0, sizeof(PEmuPEB));
     pPeb->ImageBaseAddress = ImageBase;
     pPeb->ProcessHeap = HeapCreate(0, HeapReserve, HeapCommit);
 
@@ -53,13 +70,16 @@ VOID InitPEB(PVOID ImageBase, DWORD HeapReserve, DWORD HeapCommit) {
     pLdr->InInitializationOrderModuleList.Flink = &(pLdr->InInitializationOrderModuleList);
     pPeb->Ldr = pLdr;
 
+    printf("pLdr = %p\n", pLdr);
+
     //Process Parameters
 }
 
 WNDPROC TestProc;
 
-int main() {
+int wmain(int argc, wchar_t** argv) {
     int i;
+    HRESULT hResult;
 
     dwThreadContextIndex = TlsAlloc();
 
@@ -80,9 +100,11 @@ int main() {
 
     InitSSDT();
 
-    LdrLoadEXE(L"HELLO.EXE");
+    hResult = LdrLoadEXE(argv[1]);
 
     HeapDestroy(hHeap);
+
+    return hResult;
 }
 
 /*

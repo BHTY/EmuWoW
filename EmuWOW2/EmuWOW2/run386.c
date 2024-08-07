@@ -597,6 +597,11 @@ int do_lea(i386* pCPU, decoded_op* dst, decoded_op* src) {
 
 int do_push(i386* pCPU, decoded_op* src) {
 	uint32_t val = read_source(pCPU, src);
+
+	if (src->size == SZ_8) {
+		val = (int32_t)(int8_t)val;
+	}
+
 	i386_push(pCPU, val);
 	return 0;
 }

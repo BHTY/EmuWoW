@@ -7,6 +7,61 @@ FARPROC StubExport(DWORD Index) {
     return vtable.MakeThunk(Index, WowSystemServiceDispatchTable[Index].dwArgs);
 }
 
+VOID WriteThreadEntryThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwStackSize) {
+    if (dwStackSize == 0) {
+        dwStackSize = 0x1000;
+    }
+
+    *pThunk = 0x55; //PUSH EBP
+
+    *(pThunk + 1) = 0x89; //MOV EBP, ...
+    *(pThunk + 2) = 0xE5; //         ESP
+
+    //EmuCreate(dwStackSize, dwStackSize)
+    *(pThunk + 3) = 0x68; //PUSH
+    *(PDWORD)(pThunk + 4) = dwStackSize;
+    
+    *(pThunk + 8) = 0x68; //PUSH
+    *(PDWORD)(pThunk + 9) = dwStackSize;
+
+    *(pThunk + 13) = 0xB8; //MOV EAX, ...
+    *(PDWORD)(pThunk + 14) = EmuCreate;
+
+    *(pThunk + 18) = 0xFF; //CALL ...
+    *(pThunk + 19) = 0xD0; //     EAX
+
+    *(pThunk + 20) = 0x83; //ADD
+    *(pThunk + 21) = 0xC4; //    ESP, 
+    *(pThunk + 22) = 0x08; //         0x08
+
+    //return EmuExecute(EntryPoint, 1, lpParam)
+    *(pThunk + 23) = 0xFF; //PUSH DWORD PTR [
+    *(pThunk + 24) = 0x75; //                EBP
+    *(pThunk + 25) = 0x08; //                    +0x8]
+
+    *(pThunk + 26) = 0x6A; //PUSH ...
+    *(pThunk + 27) = 0x01; //     0x1
+
+    *(pThunk + 28) = 0x68; //PUSH
+    *(PDWORD)(pThunk + 29) = EntryPoint;
+
+    *(pThunk + 33) = 0xB8; //MOV EAX, ...
+    *(PDWORD)(pThunk + 34) = EmuExecute;
+
+    *(pThunk + 38) = 0xFF; //CALL ...
+    *(pThunk + 39) = 0xD0; //     EAX
+
+    *(pThunk + 40) = 0x83; //ADD
+    *(pThunk + 41) = 0xC4; //    ESP, 
+    *(pThunk + 42) = 0x0C; //         0xC
+
+    *(pThunk + 43) = 0x5D; //POP EBP
+
+    *(pThunk + 44) = 0xC2; //RET ...
+    *(PWORD)(pThunk + 45) = 0x04; //0x4
+
+}
+
 VOID WriteCallbackThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwArgs) {
     INT i;
 

@@ -33,6 +33,12 @@ INT_PTR __stdcall Thunk_DialogBoxParamA(HINSTANCE hInst, LPCSTR lpTemplateName, 
 	return DialogBoxParamA(hInst, lpTemplateName, hwndParent, lpfnWndProc, dwInitParam);
 }
 
+HANDLE WINAPI Thunk_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId) {
+	LPTHREAD_START_ROUTINE lpThunk = HeapAlloc(hHeap, 0, 64);
+	WriteThreadEntryThunk(lpThunk, lpStartAddress, dwStackSize);
+	return CreateThread(lpThreadAttributes, dwStackSize, lpThunk, lpParameter, dwCreationFlags, lpThreadId);
+}
+
 WOW_THUNK WowSystemServiceDispatchTable[] = { {0, 0, 0, 0},
 	{"NTDLL.DLL", "wcstoul", 0, 0},
 	{"NTDLL.DLL", "wcstombs", 0, 0},
@@ -2435,7 +2441,7 @@ WOW_THUNK WowSystemServiceDispatchTable[] = { {0, 0, 0, 0},
 	{"KERNEL32.DLL", "CreateSemaphoreA", 0, 4},
 	{"KERNEL32.DLL", "CreateSemaphoreW", 0, 4},
 	{"KERNEL32.DLL", "CreateTapePartition", 0, 4},
-	{"KERNEL32.DLL", "CreateThread", 0, 6},
+	{"KERNEL32.DLL", "CreateThread", Thunk_CreateThread, 6},
 	{"KERNEL32.DLL", "CreateTimerQueue", 0, 0},
 	{"KERNEL32.DLL", "CreateToolhelp32Snapshot", 0, 2},
 	{"KERNEL32.DLL", "CreateVirtualBuffer", 0, 3},

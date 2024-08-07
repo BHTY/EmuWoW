@@ -15,6 +15,7 @@ typedef struct _CPUVTable {
 extern CPUVTable vtable;
 
 FARPROC StubExport(DWORD Index);
+VOID WriteThreadEntryThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwStackSize);
 VOID WriteCallbackThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwArgs);
 VOID EmuCreate(DWORD dwStackReserve, DWORD dwStackCommit);
 DWORD_PTR EmuExecute(FARPROC EntryPoint, DWORD dwNumArgs, ...);

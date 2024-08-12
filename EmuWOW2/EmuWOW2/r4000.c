@@ -644,10 +644,10 @@ FARPROC MakeThunkMIPS(DWORD Index, DWORD dwArgs) {
 }
 
 PThreadContextMIPS InitMIPS(DWORD_PTR sp) {
-	PThreadContextMIPS pContext = malloc(sizeof(PThreadContextMIPS));
+	PThreadContextMIPS pContext = malloc(sizeof(ThreadContextMIPS));
 	MIPS* pCPU = &(pContext->cpu);
 
-	ZeroMemory(pContext, sizeof(PThreadContextMIPS));
+	ZeroMemory(pContext, sizeof(ThreadContextMIPS));
 
 	pCPU->regs[29] = sp - 256;
 

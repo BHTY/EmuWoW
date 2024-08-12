@@ -1,115 +1,24 @@
-﻿  dis386.c
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(16,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(19,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(25,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(28,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(34,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(37,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(48,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(52,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(62,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(47,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(57,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(60,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(97,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(109,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(114,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(86,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(84,8): warning C4101: 'i': unreferenced local variable
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(139,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(147,4): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(155,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(160,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(143,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(183,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(186,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(240,4): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(252,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(257,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(260,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(244,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(247,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(288,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(291,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(298,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(301,5): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(311,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(314,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(317,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(329,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(348,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(416,3): warning C4013: 'fixup_f6' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c(420,3): warning C4013: 'fixup_ff' undefined; assuming extern returning int
-  EmuWOW.c
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\r4000.h(34,1): warning C4005: 'SHIFT': macro redefinition
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.h(145,1): message : see previous definition of 'SHIFT'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\EmuWOW.c(27,34): warning C4133: 'initializing': incompatible types - from 'PLIST_ENTRY' to 'PEmuLDR_DATA_TABLE_ENTRY'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\EmuWOW.c(81,9): warning C4101: 'i': unreferenced local variable
-  i386.c
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(7,13): warning C4047: 'return': 'uint8_t *' differs in levels of indirection from 'uint32_t'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(52,32): warning C4244: '=': conversion from 'DWORD' to 'WORD', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(58,15): warning C4047: 'return': 'FARPROC' differs in levels of indirection from 'PBYTE'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(79,38): warning C4047: '=': 'uint32_t' differs in levels of indirection from 'EmuTEB *'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(102,3): warning C4013: 'printf' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(103,31): warning C4047: 'function': 'unsigned char *' differs in levels of indirection from 'uint32_t'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(103,26): warning C4024: 'dis386': different types for formal and actual parameter 1
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(112,9): warning C4013: 'i386_step' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(95,6): warning C4101: 'res': unreferenced local variable
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(121,3): warning C4013: 'i386_push' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(125,29): warning C4047: '=': 'uint32_t' differs in levels of indirection from 'FARPROC'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(143,16): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(140,9): warning C4047: 'initializing': 'DWORD *' differs in levels of indirection from 'uint32_t'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(148,26): warning C4133: 'initializing': incompatible types - from 'PThreadContextI386 (__cdecl *)(DWORD_PTR)' to 'PThreadContext (__cdecl *)(DWORD_PTR)'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(148,35): warning C4113: 'void (__cdecl *)(PThreadContextI386,DWORD_PTR *,DWORD)' differs in parameter lists from 'void (__cdecl *)(PThreadContext,DWORD_PTR *,DWORD)'
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(148,55): warning C4113: 'DWORD_PTR (__cdecl *)(PThreadContextI386,FARPROC,DWORD_PTR *,DWORD)' differs in parameter lists from 'DWORD_PTR (__cdecl *)(PThreadContext,FARPROC,DWORD_PTR *,DWORD)'
-  run386.c
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(34,3): warning C4013: 'bus_write_32' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(38,3): warning C4013: 'bus_write_16' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(46,9): warning C4013: 'bus_read_32' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(50,9): warning C4013: 'bus_read_16' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(60,2): warning C4013: 'printf' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(179,11): warning C4013: 'bus_read_8' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(223,21): warning C4244: '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(224,15): warning C4244: '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(228,16): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(237,4): warning C4013: 'bus_write_8' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(255,69): warning C4244: '=': conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(260,43): warning C4244: '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(263,26): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(275,38): warning C4244: '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(278,23): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(288,18): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(289,19): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(464,9): warning C4146: unary minus operator applied to unsigned type, result still unsigned
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(503,15): warning C4244: '=': conversion from 'uint64_t' to 'uint8_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(506,15): warning C4244: '=': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(509,16): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(572,17): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(578,16): warning C4244: 'initializing': conversion from 'uint64_t' to 'int16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(599,17): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(615,15): warning C4244: '-=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(610,17): warning C4101: 'i': unreferenced local variable
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(701,17): warning C4244: '=': conversion from 'uint16_t' to 'uint8_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(722,22): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(734,14): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(740,15): warning C4244: '=': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(746,23): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(768,19): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(959,19): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(974,19): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(990,20): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(991,20): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(1000,20): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(1001,20): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(1026,19): warning C4013: 'io_read_32' undefined; assuming extern returning int
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(1025,18): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint16_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(1034,20): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(1350,22): warning C4244: 'initializing': conversion from 'uint64_t' to 'uint32_t', possible loss of data
+﻿  i386.c
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(8,13): warning C4047: 'return': 'uint8_t *' differs in levels of indirection from 'uint32_t'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(53,32): warning C4244: '=': conversion from 'DWORD' to 'WORD', possible loss of data
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(59,15): warning C4047: 'return': 'FARPROC' differs in levels of indirection from 'PBYTE'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(80,38): warning C4047: '=': 'uint32_t' differs in levels of indirection from 'EmuTEB *'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(104,3): warning C4013: 'printf' undefined; assuming extern returning int
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(105,31): warning C4047: 'function': 'unsigned char *' differs in levels of indirection from 'uint32_t'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(105,26): warning C4024: 'dis386': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(115,9): warning C4013: 'i386_step' undefined; assuming extern returning int
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(96,6): warning C4101: 'res': unreferenced local variable
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(126,3): warning C4013: 'i386_push' undefined; assuming extern returning int
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(130,29): warning C4047: '=': 'uint32_t' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(148,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(145,9): warning C4047: 'initializing': 'DWORD *' differs in levels of indirection from 'uint32_t'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(153,26): warning C4133: 'initializing': incompatible types - from 'PThreadContextI386 (__cdecl *)(DWORD_PTR)' to 'PThreadContext (__cdecl *)(DWORD_PTR)'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(153,35): warning C4113: 'void (__cdecl *)(PThreadContextI386,DWORD_PTR *,DWORD)' differs in parameter lists from 'void (__cdecl *)(PThreadContext,DWORD_PTR *,DWORD)'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c(153,55): warning C4113: 'DWORD_PTR (__cdecl *)(PThreadContextI386,FARPROC,DWORD_PTR *,DWORD)' differs in parameter lists from 'DWORD_PTR (__cdecl *)(PThreadContext,FARPROC,DWORD_PTR *,DWORD)'
   Generating code
-  34 of 143 functions (23.8%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    28 functions had inline decision re-evaluated but remain unchanged
 C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(212): warning C4715: 'read_source': not all control paths return a value
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c(1022): warning C4716: 'do_cmpxchg': must return a value
+  41 of 144 functions (28.5%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    28 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   EmuWOW2.vcxproj -> C:\Users\Will\source\repos\EmuWOW2\Release\EmuWOW2.exe

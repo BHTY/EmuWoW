@@ -1,2 +1,10 @@
-C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\EmuWOW2.cpp;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\EmuWOW2.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\dis386.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\dis386.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\EmuWOW.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\EmuWOW.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\heap.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\heap.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\i386.obj
 C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ldrapi.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\ldrapi.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\mips_dis.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\mips_dis.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\r4000.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\r4000.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\run386.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\run386.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\ssdt.obj
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\thunk.c;C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\x64\Debug\thunk.obj

@@ -4,7 +4,10 @@
 CPUVTable vtable;
 
 FARPROC StubExport(DWORD Index) {
-    return vtable.MakeThunk(Index, WowSystemServiceDispatchTable[Index].dwArgs);
+    if (Index != -1) {
+        return vtable.MakeThunk(Index, WowSystemServiceDispatchTable[Index].dwArgs);
+    }
+    return NULL;
 }
 
 VOID WriteThreadEntryThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwStackSize) {
@@ -62,6 +65,8 @@ VOID WriteThreadEntryThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwStackSize) 
 
 }
 
+#ifndef _WIN64
+
 VOID WriteCallbackThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwArgs) {
     INT i;
 
@@ -102,6 +107,18 @@ VOID WriteCallbackThunk(PBYTE pThunk, FARPROC EntryPoint, DWORD dwArgs) {
     *(PWORD)(pThunk + 19) = dwArgs * 4;
 
 }
+
+#else
+
+char x64callbackthunk[] = { 0x4C, 0x89, 0x4C, 0x24, 0x20, 0x4C, 0x89, 0x44, 0x24, 0x18, 0x89, 0x54, 0x24, 0x10, 0x48, 0x89, 0x4C, 0x24, 0x08, 0x48, 0x83, 0xEC, 0x38, 0x48, 0x8B, 0x44, 0x24, 0x58, 0x48, 0x89, 0x44, 0x24, 0x28, 0x48, 0x8B, 0x44, 0x24, 0x50, 0x48, 0x89, 0x44, 0x24, 0x20, 0x44, 0x8B, 0x4C, 0x24, 0x48, 0x4C, 0x8B, 0x44, 0x24, 0x40, 0xBA, 0x04, 0x00, 0x00, 0x00, 0xB9, 0xEF, 0xBE, 0xAD, 0xDE, 0x48, 0xB8, 0xEF, 0xBE, 0xAD, 0xDE, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xD0, 0x48, 0x98, 0x48, 0x83, 0xC4, 0x38, 0xC2, 0x00, 0x00 };
+
+VOID WriteCallbackThunk(PBYTE pThunk, DWORD EntryPoint, DWORD dwArgs) {
+    memcpy(pThunk, x64callbackthunk, sizeof(x64callbackthunk));
+    *(PDWORD)(pThunk + 0x3B) = EntryPoint;
+    *(PULONGLONG)(pThunk + 0x41) = EmuExecute;
+}
+
+#endif
 
 VOID EmuCreate(DWORD dwStackReserve, DWORD dwStackCommit) {
     PThreadContext pContext;
@@ -149,6 +166,16 @@ DWORD_PTR EmuExecute(FARPROC EntryPoint, DWORD dwNumArgs, ...) {
     return vtable.ExecuteEmulatedProcedure(pContext, EntryPoint, dwArgList, dwNumArgs);
 }
 
+#ifdef _WIN64
+
+typedef DWORD_PTR(*__stdcall APIFUNC64)(DWORD_PTR a0, DWORD_PTR a1, DWORD_PTR a2, DWORD_PTR a3, DWORD_PTR a4, DWORD_PTR a5, DWORD_PTR a6, DWORD_PTR a7, DWORD_PTR a8, DWORD_PTR a9, DWORD_PTR a10, DWORD_PTR a11, DWORD_PTR a12, DWORD_PTR a13, DWORD_PTR a14, DWORD_PTR a15);
+
+DWORD_PTR ExecuteNativeFunction(LPVOID pTargetAddress, DWORD_PTR* pParamList, DWORD dwParamCount) {
+    return ((APIFUNC64)(pTargetAddress))(pParamList[0], pParamList[1], pParamList[2], pParamList[3], pParamList[4], pParamList[5], pParamList[6], pParamList[7], pParamList[8], pParamList[9], pParamList[10], pParamList[11], pParamList[12], pParamList[13], pParamList[14], pParamList[15]);
+}
+
+#else
+
 DWORD ExecuteNativeFunction(LPVOID pTargetAddress, DWORD* pParamList, DWORD dwParamCount) {
     DWORD old_esp;
 
@@ -174,6 +201,8 @@ DWORD ExecuteNativeFunction(LPVOID pTargetAddress, DWORD* pParamList, DWORD dwPa
     };
 }
 
+#endif
+
 DWORD_PTR CallSystemService(DWORD dwIndex) {
     PThreadContext pContext = TlsGetValue(dwThreadContextIndex);
     DWORD_PTR dwArgList[16];
@@ -195,7 +224,7 @@ DWORD_PTR CallSystemService(DWORD dwIndex) {
 
     Result = ExecuteNativeFunction(WowThunk.EntryPoint, dwArgList, dwArgs);
 
-    printf("<%s!%s returned %p!>\n", WowThunk.ModuleName, WowThunk.ServiceName, Result);
+    printf("<%s!%s returned %p!> (error code = %d)\n", WowThunk.ModuleName, WowThunk.ServiceName, Result, GetLastError());
 
     return Result;
 }

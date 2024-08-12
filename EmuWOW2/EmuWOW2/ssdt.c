@@ -1,40 +1,123 @@
 #include "SSDT.H"
 #include "thunk.h"
 #include <stdio.h>
+#include "heap.h"
 
-ATOM __stdcall Thunk_RegisterClassA(WNDCLASSA* lpWndClass) {
-	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 64);
-	WriteCallbackThunk(lpfnWndProc, lpWndClass->lpfnWndProc, 4);
+typedef struct tagWNDCLASSA32 {
+	UINT style;
+	DWORD lpfnWndProc;
+	int       cbClsExtra;
+	int       cbWndExtra;
+	DWORD hInstance;
+	DWORD     hIcon;
+	DWORD   hCursor;
+	DWORD    hbrBackground;
+	DWORD    lpszMenuName;
+	DWORD    lpszClassName;
+} WNDCLASSA32;
 
-	lpWndClass->lpfnWndProc = lpfnWndProc;
+typedef struct tagMSG32 {
+	DWORD   hwnd;
+	UINT   message;
+	DWORD wParam;
+	DWORD lParam;
+	DWORD  time;
+	POINT  pt;
+} MSG32, *PMSG32, *LPMSG32;
 
-	return RegisterClassA(lpWndClass);
+void Thunk_ConvertMsg(PMSG32 pMsg32, PMSG pMsg) {
+	pMsg->hwnd = pMsg32->hwnd;
+	pMsg->message = pMsg32->message;
+	pMsg->wParam = pMsg32->wParam;
+	pMsg->lParam = pMsg32->lParam;
+	pMsg->time = pMsg32->time;
+	pMsg->pt = pMsg32->pt;
 }
-ATOM __stdcall Thunk_RegisterClassW(WNDCLASSW* lpWndClass) {
-	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 64);
+
+BOOL __stdcall Thunk_GetMessageA(LPMSG32 lpMsg, HWND  hWnd, UINT  wMsgFilterMin, UINT  wMsgFilterMax) {
+	MSG realMsg;
+	Thunk_ConvertMsg(lpMsg, &realMsg);
+	return GetMessageA(&realMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
+}
+
+BOOL __stdcall Thunk_GetMessageW(LPMSG32 lpMsg, HWND  hWnd, UINT  wMsgFilterMin, UINT  wMsgFilterMax) {
+	MSG realMsg;
+	Thunk_ConvertMsg(lpMsg, &realMsg);
+	return GetMessageW(&realMsg, hWnd, wMsgFilterMin, wMsgFilterMax);
+}
+
+LRESULT __stdcall Thunk_DispatchMessageA(LPMSG32 lpMsg) {
+	MSG realMsg;
+	Thunk_ConvertMsg(lpMsg, &realMsg);
+	return DispatchMessageA(&realMsg);
+}
+
+LRESULT __stdcall Thunk_DispatchMessageW(LPMSG32 lpMsg) {
+	MSG realMsg;
+	Thunk_ConvertMsg(lpMsg, &realMsg);
+	return DispatchMessageW(&realMsg);
+}
+
+BOOL __stdcall Thunk_TranslateMessage(LPMSG32 lpMsg) {
+	MSG realMsg;
+	Thunk_ConvertMsg(lpMsg, &realMsg);
+	return TranslateMessage(&realMsg);
+}
+
+ATOM __stdcall Thunk_RegisterClassA(WNDCLASSA32* lpWndClass) {
+	WNDCLASSA realwndclass;
+	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 128);
 	WriteCallbackThunk(lpfnWndProc, lpWndClass->lpfnWndProc, 4);
 
-	lpWndClass->lpfnWndProc = lpfnWndProc;
+	realwndclass.lpfnWndProc = lpfnWndProc;
+	realwndclass.style = lpWndClass->style;
+	realwndclass.cbClsExtra = lpWndClass->cbClsExtra;
+	realwndclass.cbWndExtra = lpWndClass->cbWndExtra;
+	realwndclass.hInstance = lpWndClass->hInstance;
+	realwndclass.hIcon = lpWndClass->hIcon;
+	realwndclass.hCursor = lpWndClass->hCursor;
+	realwndclass.hbrBackground = lpWndClass->hbrBackground;
+	realwndclass.lpszMenuName = lpWndClass->lpszMenuName;
+	realwndclass.lpszClassName = lpWndClass->lpszClassName;
 
-	return RegisterClassW(lpWndClass);
+	return RegisterClassA(&realwndclass);
+}
+
+ATOM __stdcall Thunk_RegisterClassW(WNDCLASSA32* lpWndClass) {
+	WNDCLASSA realwndclass;
+	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 128);
+	WriteCallbackThunk(lpfnWndProc, lpWndClass->lpfnWndProc, 4);
+
+	realwndclass.lpfnWndProc = lpfnWndProc;
+	realwndclass.style = lpWndClass->style;
+	realwndclass.cbClsExtra = lpWndClass->cbClsExtra;
+	realwndclass.cbWndExtra = lpWndClass->cbWndExtra;
+	realwndclass.hInstance = lpWndClass->hInstance;
+	realwndclass.hIcon = lpWndClass->hIcon;
+	realwndclass.hCursor = lpWndClass->hCursor;
+	realwndclass.hbrBackground = lpWndClass->hbrBackground;
+	realwndclass.lpszMenuName = lpWndClass->lpszMenuName;
+	realwndclass.lpszClassName = lpWndClass->lpszClassName;
+
+	return RegisterClassW(&realwndclass);
 }
 
 INT_PTR __stdcall Thunk_DialogBoxParamW(HINSTANCE hInst, LPCWSTR lpTemplateName, HWND hwndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) {
-	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 64);
+	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 128);
 	WriteCallbackThunk(lpfnWndProc, lpDialogFunc, 4);
 
 	return DialogBoxParamW(hInst, lpTemplateName, hwndParent, lpfnWndProc, dwInitParam);
 }
 
 INT_PTR __stdcall Thunk_DialogBoxParamA(HINSTANCE hInst, LPCSTR lpTemplateName, HWND hwndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam) {
-	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 64);
+	FARPROC lpfnWndProc = HeapAlloc(hHeap, 0, 128);
 	WriteCallbackThunk(lpfnWndProc, lpDialogFunc, 4);
 
 	return DialogBoxParamA(hInst, lpTemplateName, hwndParent, lpfnWndProc, dwInitParam);
 }
 
 HANDLE WINAPI Thunk_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter, DWORD dwCreationFlags, LPDWORD lpThreadId) {
-	LPTHREAD_START_ROUTINE lpThunk = HeapAlloc(hHeap, 0, 64);
+	LPTHREAD_START_ROUTINE lpThunk = HeapAlloc(hHeap, 0, 128);
 	WriteThreadEntryThunk(lpThunk, lpStartAddress, dwStackSize);
 	return CreateThread(lpThreadAttributes, dwStackSize, lpThunk, lpParameter, dwCreationFlags, lpThreadId);
 }

@@ -1,4 +1,5 @@
 #include "i386.h"
+#include "heap.h"
 
 /* Add Stack Backtraces */
 
@@ -53,16 +54,16 @@ VOID WriteThunkX86(PBYTE pThunk, DWORD Index, DWORD dwArgs) {
 }
 
 FARPROC MakeThunk386(DWORD Index, DWORD dwArgs) {
-	PBYTE pThunk = malloc(16);
+	PBYTE pThunk = malloc(64);
 	WriteThunkX86(pThunk, Index, dwArgs);
 	return pThunk;
 }
 
 PThreadContextI386 Init386(DWORD_PTR sp) {
-	PThreadContextI386 pContext = malloc(sizeof(PThreadContextI386));
+	PThreadContextI386 pContext = malloc(sizeof(ThreadContextI386));
 	i386* pCPU = &(pContext->cpu);
 
-	ZeroMemory(pContext, sizeof(PThreadContextI386));
+	ZeroMemory(pContext, sizeof(ThreadContextI386));
 
 	pCPU->sgmt_override = DS;
 	pCPU->running = 1;
@@ -99,8 +100,10 @@ INT I386_step(PThreadContextI386 pContext) {
 		int inst_size;
 		int i;
 
+		
 		printf("%p: ", pCPU->eip);
 		inst_size = dis386(pCPU->eip, pCPU->eip, 1, 1, 0, 0);
+		
 
 		for (i = 0; i < inst_size; i++) {
 			//printf("%02x ", *(BYTE*)(pCPU->eip + i));
@@ -116,6 +119,8 @@ DWORD_PTR i386_ExecuteEmulatedProcedure(PThreadContextI386 pContext, FARPROC dwT
 	i386* pCPU = &(pContext->cpu);
 	DWORD OldEIP = pCPU->eip;
 	int i;
+
+	//dump_386(pCPU);
 
 	for (i = nParams - 1; i >= 0; i--) {
 		i386_push(pCPU, pDwParamList[i]);

@@ -6,8 +6,9 @@
 #include "thunk.h"
 #include "ssdt.h"
 #include <stdio.h>
+#include "heap.h"
 
-IMAGE_NT_HEADERS* EmuGetNtHeader(LPVOID module) {
+IMAGE_NT_HEADERS32* EmuGetNtHeader(LPVOID module) {
 	return (char*)module + ((IMAGE_DOS_HEADER*)module)->e_lfanew;
 }
 
@@ -24,7 +25,7 @@ LPWSTR GetFileNameFromPathW(LPWSTR lpPath) {
 
 VOID UnicodeStringFromWstr(PUCS2_STRING pString, LPWSTR lpString) {
 	USHORT Length = wcslen(lpString) * 2;
-	pString->Buffer = malloc(Length + 8); // HeapAlloc(hHeap, 0, Length + 2);
+	pString->Buffer = WillAlloc((Length + 8)); // HeapAlloc(hHeap, 0, Length + 2);
 	wcscpy(pString->Buffer, lpString);
 	pString->Length = Length;
 	pString->MaximumLength = Length;
@@ -121,7 +122,7 @@ VOID LdrResolveImports(PBYTE ImageBase, PIMAGE_IMPORT_DESCRIPTOR import_descript
 	wchar_t dll_name[80];
 
 	HMODULE lib = NULL;
-	IMAGE_THUNK_DATA* HINT_TABLE = NULL, * IAT_TABLE = NULL;
+	IMAGE_THUNK_DATA32* HINT_TABLE = NULL, * IAT_TABLE = NULL;
 	PIMAGE_IMPORT_BY_NAME by_name = NULL;
 	IMAGE_IMPORT_DESCRIPTOR null_desc;
 	DWORD function_addr = 0;
@@ -242,7 +243,7 @@ HRESULT LdrMapPE(LPWSTR lpLibFileName, HMODULE* pImageBase) { //check to make su
 
 	PBYTE ImageBase;
 	PIMAGE_DOS_HEADER dos_hdr;
-	PIMAGE_NT_HEADERS nt_hdr;
+	PIMAGE_NT_HEADERS32 nt_hdr;
 	PIMAGE_SECTION_HEADER sections;
 	PIMAGE_DATA_DIRECTORY data_dir;
 	
@@ -300,7 +301,7 @@ HRESULT LdrLoadPE(LPWSTR lpLibFileName, HMODULE* pImageBase) {
 	HRESULT hResult;
 
 	PIMAGE_DOS_HEADER dos_hdr;
-	PIMAGE_NT_HEADERS nt_hdr;
+	PIMAGE_NT_HEADERS32 nt_hdr;
 	PIMAGE_SECTION_HEADER sections;
 	PIMAGE_DATA_DIRECTORY data_dir;
 	PIMAGE_IMPORT_DESCRIPTOR import_descriptor;
@@ -344,8 +345,8 @@ BOOL LdrIsKnownDLL(LPWSTR lpLibFileName) {
 }
 
 VOID LdrStubExports(PIMAGE_DOS_HEADER pModule, LPSTR DllName) {
-	PIMAGE_NT_HEADERS nt_headers = (char*)pModule + pModule->e_lfanew;
-	PIMAGE_OPTIONAL_HEADER optional_header = &(nt_headers->OptionalHeader);
+	PIMAGE_NT_HEADERS32 nt_headers = (char*)pModule + pModule->e_lfanew;
+	PIMAGE_OPTIONAL_HEADER32 optional_header = &(nt_headers->OptionalHeader);
 	PIMAGE_DATA_DIRECTORY data_dir = &(optional_header->DataDirectory[0]);
 	PIMAGE_EXPORT_DIRECTORY imageExportDirectory = (char*)pModule + data_dir->VirtualAddress;
 	DWORD* exportAddressTable = (char*)pModule + (DWORD)imageExportDirectory->AddressOfFunctions;
@@ -392,7 +393,7 @@ HRESULT LdrLoadDLL(LPWSTR lpLibFileName, HMODULE* pImageBase) {
 	PBYTE ImageBase;
 	HRESULT hResult;
 	PIMAGE_DOS_HEADER dos_hdr;
-	PIMAGE_NT_HEADERS nt_hdr;
+	PIMAGE_NT_HEADERS32 nt_hdr;
 
 	if (LdrIsKnownDLL(lpLibFileName)) {
 		if (LdrGetModuleHandle(lpLibFileName) == NULL) {
@@ -423,12 +424,12 @@ HRESULT LdrLoadEXE(LPWSTR lpLibFileName) { //PatchModuleFileName and command lin
 	HRESULT hResult;
 
 	PIMAGE_DOS_HEADER dos_hdr;
-	PIMAGE_NT_HEADERS nt_hdr;
+	PIMAGE_NT_HEADERS32 nt_hdr;
 	PIMAGE_SECTION_HEADER sections;
 	PIMAGE_DATA_DIRECTORY data_dir;
 	PIMAGE_IMPORT_DESCRIPTOR import_descriptor;
 	DWORD_PTR delta;
-	PIMAGE_OPTIONAL_HEADER pImageHdr;
+	PIMAGE_OPTIONAL_HEADER32 pImageHdr;
 
 	hResult = LdrMapPE(lpLibFileName, &ImageBase);
 	if (hResult != ERROR_SUCCESS) return hResult;
@@ -486,14 +487,16 @@ HMODULE LdrGetModuleHandle(LPWSTR lpLibFileName) {
 }
 
 FARPROC LdrGetProcAddress(HMODULE module, LPCSTR lpProcName) {
-	IMAGE_NT_HEADERS* nt_headers = (char*)module + ((IMAGE_DOS_HEADER*)(module))->e_lfanew;
-	IMAGE_OPTIONAL_HEADER* optional_header = &(nt_headers->OptionalHeader);
+	IMAGE_NT_HEADERS32* nt_headers = (char*)module + ((IMAGE_DOS_HEADER*)(module))->e_lfanew;
+	IMAGE_OPTIONAL_HEADER32* optional_header = &(nt_headers->OptionalHeader);
 	IMAGE_DATA_DIRECTORY* data_dir = &(optional_header->DataDirectory[0]);
 	IMAGE_EXPORT_DIRECTORY* imageExportDirectory = (char*)module + data_dir->VirtualAddress;
 	DWORD* exportAddressTable = (char*)module + (DWORD)imageExportDirectory->AddressOfFunctions;
 	WORD* nameOrdinalsPointer = (char*)module + (DWORD)imageExportDirectory->AddressOfNameOrdinals;
 	DWORD* exportNamePointerTable = (char*)module + (DWORD)imageExportDirectory->AddressOfNames;
 	int i;
+
+	//if (strcmp(lpProcName, "SelectObject") == 0) DebugBreak();
 
 	if ((DWORD)lpProcName & IMAGE_ORDINAL_FLAG) {
 		lpProcName = (DWORD)(lpProcName) & ~IMAGE_ORDINAL_FLAG;
@@ -508,7 +511,9 @@ FARPROC LdrGetProcAddress(HMODULE module, LPCSTR lpProcName) {
 			return 0xDEADBEEF;
 		}
 
-		if ((DWORD)lpProcName > 0xFFFF && strcmp(lpProcName, procName) == NULL) {
+		//if (strcmp(procName, "SelectObject") == 0) DebugBreak();
+
+		if ((DWORD)lpProcName > 0xFFFF && strcmp(lpProcName, procName) == 0) {
 			/*if (strcmp(lpProcName, "GetVersion") == 0 || strcmp(lpProcName, "GetCommandLineA") == 0) {
 				printf("%s: %p %p\n", lpProcName, exportAddressTable[ordinalIndex], fncAddress);
 			}*/

@@ -10,6 +10,7 @@
 #include "i386.h"
 #include "ssdt.h"
 #include "r4000.h"
+#include "heap.h"
 
 HANDLE hHeap;
 DWORD dwThreadContextIndex;
@@ -56,8 +57,8 @@ VOID MakeUnicodeString(PUCS2_STRING pString, PWSTR Buffer, USHORT Length, USHORT
 VOID InitPEB(PVOID ImageBase, DWORD HeapReserve, DWORD HeapCommit) {
     PEmuPEB_LDR_DATA pLdr = malloc(sizeof(EmuPEB_LDR_DATA)); // HeapAlloc(hHeap, 0, sizeof(EmuPEB_LDR_DATA));
 
-    pPeb = malloc(sizeof(PEmuPEB)); //HeapAlloc(hHeap, 0, sizeof(PEmuPEB));
-    memset(pPeb, 0, sizeof(PEmuPEB));
+    pPeb = malloc((sizeof(EmuPEB))); //HeapAlloc(hHeap, 0, sizeof(PEmuPEB));
+    memset(pPeb, 0, sizeof(EmuPEB));
     pPeb->ImageBaseAddress = ImageBase;
     pPeb->ProcessHeap = HeapCreate(0, HeapReserve, HeapCommit);
 

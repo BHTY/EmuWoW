@@ -16,5 +16,5 @@ HRESULT LdrLoadDLL(LPWSTR lpLibFileName, HMODULE* pImageBase);
 HRESULT LdrLoadEXE(LPWSTR lpLibFileName);
 HMODULE LdrGetModuleHandle(LPWSTR lpLibFileName);
 FARPROC LdrGetProcAddress(HMODULE hModule, LPCSTR lpProcName);
-IMAGE_NT_HEADERS* EmuGetNtHeader(LPVOID module);
+IMAGE_NT_HEADERS32* EmuGetNtHeader(LPVOID module);
 

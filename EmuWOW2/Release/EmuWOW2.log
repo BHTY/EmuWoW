@@ -1,0 +1,11 @@
+﻿  EmuWOW.c
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\r4000.h(34,1): warning C4005: 'SHIFT': macro redefinition
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\i386.h(145,1): message : see previous definition of 'SHIFT'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\EmuWOW.c(28,34): warning C4133: 'initializing': incompatible types - from 'PLIST_ENTRY' to 'PEmuLDR_DATA_TABLE_ENTRY'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\EmuWOW.c(82,9): warning C4101: 'i': unreferenced local variable
+  Generating code
+  0 of 144 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  EmuWOW2.vcxproj -> C:\Users\Will\source\repos\EmuWOW2\Release\EmuWOW2.exe

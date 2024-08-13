@@ -1,0 +1,55 @@
+﻿  ssdt.c
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(29,27): warning C4047: '=': 'HWND' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(70,33): warning C4047: 'function': 'PBYTE' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(70,22): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(70,44): warning C4047: 'function': 'FARPROC' differs in levels of indirection from 'LONG'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(70,35): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 2
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(71,50): warning C4047: 'function': 'LONG' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(71,39): warning C4024: 'SetWindowLongA': different types for formal and actual parameter 3
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(81,33): warning C4047: 'function': 'PBYTE' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(81,22): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(81,44): warning C4047: 'function': 'FARPROC' differs in levels of indirection from 'LONG'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(81,35): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 2
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(82,50): warning C4047: 'function': 'LONG' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(82,39): warning C4024: 'SetWindowLongW': different types for formal and actual parameter 3
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(92,32): warning C4047: 'function': 'PBYTE' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(92,21): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(92,57): warning C4047: 'function': 'FARPROC' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(92,44): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 2
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(94,27): warning C4113: 'FARPROC' differs in parameter lists from 'WNDPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(98,48): warning C4047: '=': 'HINSTANCE' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(99,40): warning C4047: '=': 'HICON' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(100,44): warning C4047: '=': 'HCURSOR' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(101,56): warning C4047: '=': 'HBRUSH' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(102,54): warning C4047: '=': 'LPCSTR' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(103,56): warning C4047: '=': 'LPCSTR' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(111,32): warning C4047: 'function': 'PBYTE' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(111,21): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(111,57): warning C4047: 'function': 'FARPROC' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(111,44): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 2
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(113,27): warning C4113: 'FARPROC' differs in parameter lists from 'WNDPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(117,48): warning C4047: '=': 'HINSTANCE' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(118,40): warning C4047: '=': 'HICON' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(119,44): warning C4047: '=': 'HCURSOR' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(120,56): warning C4047: '=': 'HBRUSH' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(121,54): warning C4047: '=': 'LPCSTR' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(122,56): warning C4047: '=': 'LPCSTR' differs in levels of indirection from 'DWORD'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(124,24): warning C4133: 'function': incompatible types - from 'WNDCLASSA *' to 'const WNDCLASSW *'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(129,32): warning C4047: 'function': 'PBYTE' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(129,21): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(131,60): warning C4113: 'FARPROC' differs in parameter lists from 'DLGPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(136,32): warning C4047: 'function': 'PBYTE' differs in levels of indirection from 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(136,21): warning C4024: 'WriteCallbackThunk': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(138,60): warning C4113: 'FARPROC' differs in parameter lists from 'DLGPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(143,31): warning C4047: 'function': 'PBYTE' differs in levels of indirection from 'LPTHREAD_START_ROUTINE'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(143,24): warning C4024: 'WriteThreadEntryThunk': different types for formal and actual parameter 1
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(143,33): warning C4133: 'function': incompatible types - from 'LPTHREAD_START_ROUTINE' to 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(143,49): warning C4244: 'function': conversion from 'SIZE_T' to 'DWORD', possible loss of data
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(2315,35): warning C4133: 'initializing': incompatible types - from 'ATOM (__cdecl *)(WNDCLASSA32 *)' to 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(2318,35): warning C4133: 'initializing': incompatible types - from 'ATOM (__cdecl *)(WNDCLASSA32 *)' to 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(2403,35): warning C4133: 'initializing': incompatible types - from 'LONG (__cdecl *)(HWND,int,LONG)' to 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(2404,35): warning C4133: 'initializing': incompatible types - from 'LONG (__cdecl *)(HWND,int,LONG)' to 'FARPROC'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(2551,2): warning C4047: 'initializing': 'FARPROC' differs in levels of indirection from 'HANDLE (__cdecl *)(LPSECURITY_ATTRIBUTES,SIZE_T,LPTHREAD_START_ROUTINE,LPVOID,DWORD,LPDWORD)'
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(3738,7): warning C4996: 'stricmp': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _stricmp. See online help for details.
+C:\Users\Will\source\repos\EmuWOW2\EmuWOW2\ssdt.c(3739,8): warning C4996: 'stricmp': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _stricmp. See online help for details.
+  EmuWOW2.vcxproj -> C:\Users\Will\source\repos\EmuWOW2\x64\Debug\EmuWOW2.exe
